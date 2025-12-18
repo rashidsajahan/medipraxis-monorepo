@@ -21,6 +21,20 @@ enum FontStyle {
   Italic = 'italic',
 }
 
+enum Color {
+  DarkGreen = '#01130A',
+  Green = '#90C67C',
+  LightGreen = '#E3F0AF',
+  LightCream = '#FBF6E9',
+  White = '#FFFFFF',
+  Black = '#000000',
+  Grey = '#7D7D7D',
+  LightGrey = '#D3D3D3',
+  Danger = '#FF5757',
+  Success = '#44B619',
+  Warnning = '#FFA500',
+}
+
 
 // Types
 
