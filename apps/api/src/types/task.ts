@@ -14,6 +14,13 @@ export interface Task {
   set_alarm: boolean;
 }
 
+export interface TaskDetails extends Task {
+  task_type_name: string;
+  task_status_name: string;
+  client_first_name: string | null;
+  client_last_name: string | null;
+}
+
 export interface CreateTaskInput {
   task_title: string;
   user_id: string;
