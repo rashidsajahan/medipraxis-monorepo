@@ -32,3 +32,14 @@ export interface CreateTaskInput {
   note?: string;
   set_alarm?: boolean;
 }
+
+export interface UpdateTaskInput {
+  task_title?: string;
+  task_type_id?: string;
+  task_status_id?: string;
+  client_id?: string;
+  start_date?: string;
+  end_date?: string;
+  note?: string;
+  set_alarm?: boolean;
+}

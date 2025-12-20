@@ -1,5 +1,10 @@
 import { TaskRepository } from "../repositories/task.repository";
-import type { CreateTaskInput, Task, TaskDetails } from "../types/task";
+import type {
+    CreateTaskInput,
+    Task,
+    TaskDetails,
+    UpdateTaskInput,
+} from "../types/task";
 import { TaskStatus } from "../types/task-status.enum";
 import { TaskType } from "../types/task-type.enum";
 
@@ -56,5 +61,15 @@ export class TaskService {
     }
 
     return await this.taskRepository.create(input);
+  }
+
+  async updateTask(taskId: string, input: UpdateTaskInput): Promise<Task> {
+    const updatedTask = await this.taskRepository.update(taskId, input);
+
+    if (!updatedTask) {
+      throw new Error("Task not found or could not be updated");
+    }
+
+    return updatedTask;
   }
 }

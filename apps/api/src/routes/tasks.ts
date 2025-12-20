@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { getTaskService } from "../lib/service-factory";
 import type { Env } from "../types/env.type";
-import type { CreateTaskInput } from "../types/task";
+import type { CreateTaskInput, UpdateTaskInput } from "../types/task";
 
 const tasks = new Hono<{ Bindings: Env }>();
 
@@ -49,6 +49,27 @@ tasks.post("/", async (c) => {
     const message =
       error instanceof Error ? error.message : "Failed to create task";
     return c.json({ error: message }, 400);
+  }
+});
+
+tasks.put("/:id", async (c) => {
+  try {
+    const taskService = getTaskService(c);
+    const taskId = c.req.param("id");
+    const body: UpdateTaskInput = await c.req.json();
+
+    const task = await taskService.updateTask(taskId, body);
+
+    return c.json({ success: true, task });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to update task";
+    const status =
+      error instanceof Error &&
+      error.message === "Task not found or could not be updated"
+        ? 404
+        : 400;
+    return c.json({ error: message }, status);
   }
 });
 

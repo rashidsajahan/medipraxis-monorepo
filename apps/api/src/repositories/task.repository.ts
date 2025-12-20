@@ -1,5 +1,10 @@
 import { SupabaseClient } from "@supabase/supabase-js";
-import type { CreateTaskInput, Task, TaskDetails } from "../types/task";
+import type {
+  CreateTaskInput,
+  Task,
+  TaskDetails,
+  UpdateTaskInput,
+} from "../types/task";
 
 export class TaskRepository {
   constructor(private supabase: SupabaseClient) {}
@@ -123,5 +128,44 @@ export class TaskRepository {
     }
 
     return task as Task;
+  }
+
+  async update(
+    taskId: string,
+    taskData: UpdateTaskInput
+  ): Promise<Task | null> {
+    const updateData: any = {
+      modified_date: new Date().toISOString(),
+    };
+
+    if (taskData.task_title !== undefined)
+      updateData.task_title = taskData.task_title;
+    if (taskData.task_type_id !== undefined)
+      updateData.task_type_id = taskData.task_type_id;
+    if (taskData.task_status_id !== undefined)
+      updateData.task_status_id = taskData.task_status_id;
+    if (taskData.client_id !== undefined)
+      updateData.client_id = taskData.client_id;
+    if (taskData.start_date !== undefined)
+      updateData.start_date = taskData.start_date;
+    if (taskData.end_date !== undefined)
+      updateData.end_date = taskData.end_date;
+    if (taskData.note !== undefined) updateData.note = taskData.note;
+    if (taskData.set_alarm !== undefined)
+      updateData.set_alarm = taskData.set_alarm;
+
+    const { data, error } = await this.supabase
+      .from("task")
+      .update(updateData)
+      .eq("task_id", taskId)
+      .is("deleted_date", null)
+      .select()
+      .single();
+
+    if (error || !data) {
+      return null;
+    }
+
+    return data as Task;
   }
 }
