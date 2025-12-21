@@ -7,10 +7,10 @@ import type {
 } from "../types";
 
 export class TaskRepository {
-  constructor(private supabase: SupabaseClient) {}
+  constructor(private db: SupabaseClient) {}
 
   async getTaskStatusByName(statusName: string): Promise<string | null> {
-    const { data, error } = await this.supabase
+    const { data, error } = await this.db
       .from("task_status")
       .select("task_status_id")
       .eq("task_status_name", statusName)
@@ -24,7 +24,7 @@ export class TaskRepository {
   }
 
   async getTaskTypeByName(typeName: string): Promise<string | null> {
-    const { data, error } = await this.supabase
+    const { data, error } = await this.db
       .from("task_type")
       .select("task_type_id")
       .eq("task_type_name", typeName)
@@ -38,7 +38,7 @@ export class TaskRepository {
   }
 
   async findAll(userId?: string): Promise<TaskDetails[]> {
-    let query = this.supabase
+    let query = this.db
       .from("task")
       .select(
         `
@@ -74,7 +74,7 @@ export class TaskRepository {
   }
 
   async findById(taskId: string): Promise<TaskDetails | null> {
-    const { data, error } = await this.supabase
+    const { data, error } = await this.db
       .from("task")
       .select(
         `
@@ -117,7 +117,7 @@ export class TaskRepository {
       modified_date: new Date().toISOString(),
     };
 
-    const { data: task, error } = await this.supabase
+    const { data: task, error } = await this.db
       .from("task")
       .insert(data)
       .select()
@@ -154,7 +154,7 @@ export class TaskRepository {
     if (taskData.set_alarm !== undefined)
       updateData.set_alarm = taskData.set_alarm;
 
-    const { data, error } = await this.supabase
+    const { data, error } = await this.db
       .from("task")
       .update(updateData)
       .eq("task_id", taskId)
