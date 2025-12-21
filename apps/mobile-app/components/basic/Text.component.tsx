@@ -65,7 +65,7 @@ export default function TextComponent<T extends TextVariant = TextVariant>({
     return null;
   }
 
-  // Get text style based on category and size (typed accessor)
+  // Get text style based on category and size
   const getTextStyle = (variant: TextVariant, selectedSize: TextSize): TextStyle | undefined => {
     const mapping = textStyles[variant];
     return mapping ? (mapping as Record<TextSize, TextStyle>)[selectedSize] : undefined;
