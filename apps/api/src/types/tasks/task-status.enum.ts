@@ -1,0 +1,6 @@
+export enum TaskStatus {
+  IN_PROGRESS = "IN_PROGRESS",
+  CANCELLED = "CANCELLED",
+  NOT_STARTED = "NOT_STARTED",
+  COMPLETED = "COMPLETED",
+}
