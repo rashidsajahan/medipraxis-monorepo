@@ -2,7 +2,7 @@
 
 export enum Font {
   Lato = "lato",
-  DMsans = "DMsans",
+  DMsans = "dm_sans",
 }
 
 export enum FontWeight {
@@ -44,7 +44,7 @@ export enum TextSize {
   Small = "small",
   Medium = "medium",
   Large = "large",
-  ExtraLarge = "extraLarge",
+  ExtraLarge = "extra_large",
 }
 
 // Types
