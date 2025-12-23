@@ -52,7 +52,6 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
-    
     <GluestackUIProvider mode="dark">
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
@@ -61,6 +60,5 @@ function RootLayoutNav() {
       </Stack>
     </ThemeProvider>
     </GluestackUIProvider>
-  
   );
 }
