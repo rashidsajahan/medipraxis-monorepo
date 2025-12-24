@@ -10,13 +10,14 @@
 
 ```ts
 <ButtonComponent
-        size={ButtonSize.Small}
-        leftIcon={HeartIcon}
-        rightIcon={StarIcon}
-        buttonColor={Color.Green}
-        textColor={Color.White}
-        iconColor={Color.LightCream}>
-            Favorite
-      </ButtonComponent>
+    size={ButtonSize.Small}
+    leftIcon={HeartIcon}
+    rightIcon={StarIcon}
+    buttonColor={Color.Green}
+    textColor={Color.White}
+    iconColor={Color.LightCream}
+>
+    Favorite
+</ButtonComponent>
 ```
 

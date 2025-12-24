@@ -9,38 +9,45 @@ import { ArrowRightIcon, CheckIcon, HeartIcon, PlusIcon, ShoppingCartIcon, StarI
 export default function TabTwoScreen() {
   return (
     <View style={styles.container}>
-      {/* Sample 1: Small button with both icons - Green theme */}
-      <ButtonComponent
-        size={ButtonSize.Small}
-        leftIcon={HeartIcon}
-        rightIcon={StarIcon}
-        buttonColor={Color.Green}
-        textColor={Color.White}
-        iconColor={Color.LightCream}
-      >
-        Favorite
-      </ButtonComponent>
+      <View style={styles.buttonContainer}>
+        {/* Small button */}
+        <View style={styles.centeredButton}>
+          <ButtonComponent
+            size={ButtonSize.Small}
+            leftIcon={HeartIcon}
+            rightIcon={StarIcon}
+            buttonColor={Color.Green}
+            textColor={Color.White}
+            iconColor={Color.LightCream}
+          >
+            Favorite
+          </ButtonComponent>
+        </View>
 
-      {/* Sample 2: Medium button with both icons - Dark Green theme */}
-      <ButtonComponent
-        size={ButtonSize.Medium}
-        leftIcon={PlusIcon}
-        rightIcon={ArrowRightIcon}
-      >
-        Add Item
-      </ButtonComponent>
+        {/* Medium button */}
+        <View style={styles.centeredButton}>
+          <ButtonComponent
+            size={ButtonSize.Medium}
+            leftIcon={PlusIcon}
+            rightIcon={ArrowRightIcon}
+          >
+            Add Item
+          </ButtonComponent>
+        </View>
 
-      {/* Sample 3: Large button with both icons - Light Green theme */}
-      <ButtonComponent
-        size={ButtonSize.Large}
-        leftIcon={CheckIcon}
-        rightIcon={ShoppingCartIcon}
-        buttonColor={Color.LightGreen}
-        textColor={Color.DarkGreen}
-        iconColor={Color.Green}
-      >
-        Complete Purchase
-      </ButtonComponent>
+        {/* Large button */}
+        <ButtonComponent
+          size={ButtonSize.Large}
+          leftIcon={CheckIcon}
+          rightIcon={ShoppingCartIcon}
+          buttonColor={Color.LightGreen}
+          textColor={Color.DarkGreen}
+          iconColor={Color.Green}
+        >
+          Complete Purchase
+        </ButtonComponent>
+      </View>
+      
       <View
         style={styles.separator}
         lightColor="#eee"
@@ -56,6 +63,14 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+  },
+  buttonContainer: {
+    width: "100%",
+    gap: 16,
+    paddingHorizontal: 16,
+  },
+  centeredButton: {
+    alignItems: "center",
   },
   title: {
     fontSize: 20,
