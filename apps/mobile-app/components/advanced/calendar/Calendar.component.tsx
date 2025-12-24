@@ -1,16 +1,32 @@
-import { DMSans_400Regular, DMSans_500Medium, DMSans_600SemiBold } from '@expo-google-fonts/dm-sans';
-import { Lato_400Regular, Lato_700Bold } from '@expo-google-fonts/lato';
-import { useFonts } from 'expo-font';
-import { CaretLeftIcon, CaretRightIcon } from 'phosphor-react-native';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Calendar, CalendarProvider, WeekCalendar } from 'react-native-calendars';
+import {
+  DMSans_400Regular,
+  DMSans_500Medium,
+  DMSans_600SemiBold,
+} from "@expo-google-fonts/dm-sans";
+import { Lato_400Regular, Lato_700Bold } from "@expo-google-fonts/lato";
+import { useFonts } from "expo-font";
+import { CaretLeftIcon, CaretRightIcon } from "phosphor-react-native";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import {
+  Animated,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import {
+  Calendar,
+  CalendarProvider,
+  WeekCalendar,
+} from "react-native-calendars";
+import { AgendaComponent } from "./Agenda.component";
 
 export function CalendarComponent() {
-  const [selected, setSelected] = useState('');
+  const [selected, setSelected] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
   const [showFullCalendar, setShowFullCalendar] = useState(false);
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toISOString().split("T")[0];
 
   const [fontsLoaded] = useFonts({
     DMSans_400Regular,
@@ -53,8 +69,8 @@ export function CalendarComponent() {
     setIsExpanded(!isExpanded);
   }, [isExpanded]);
 
-  const renderArrow = useCallback((direction: 'left' | 'right') => {
-    return direction === 'left' ? (
+  const renderArrow = useCallback((direction: "left" | "right") => {
+    return direction === "left" ? (
       <CaretLeftIcon size={24} color="#5A6B4D" weight="bold" />
     ) : (
       <CaretRightIcon size={24} color="#5A6B4D" weight="bold" />
@@ -64,9 +80,13 @@ export function CalendarComponent() {
   const renderToggleButton = useCallback(() => {
     return (
       <View style={styles.toggleButtonContainer}>
-        <TouchableOpacity onPress={toggleCalendar} activeOpacity={0.7} style={styles.toggleButton}>
+        <TouchableOpacity
+          onPress={toggleCalendar}
+          activeOpacity={0.7}
+          style={styles.toggleButton}
+        >
           <Text style={styles.toggleButtonText}>
-            {isExpanded ? 'Collapse ▲' : 'Expand ▼'}
+            {isExpanded ? "Collapse ▲" : "Expand ▼"}
           </Text>
         </TouchableOpacity>
       </View>
@@ -78,70 +98,77 @@ export function CalendarComponent() {
   }
 
   const markedDates = {
-    ...(selected && selected !== today ? {
-      [selected]: {
-        selected: true,
-        selectedColor: '#93C48B',
-      }
-    } : {}),
-    ...(selected === today ? {
-      [today]: {
-        selected: true,
-        selectedColor: '#93C48B',
-      }
-    } : {
-      [today]: {
-        customStyles: {
-          container: {
-            borderWidth: 2,
-            borderColor: '#2D5026',
-            borderRadius: 16,
-            width: 40,
-            height: 40,
-            justifyContent: 'center' as const,
-            alignItems: 'center' as const,
+    ...(selected && selected !== today
+      ? {
+          [selected]: {
+            selected: true,
+            selectedColor: "#93C48B",
           },
-          text: {
-            color: '#4F7F48',
-            fontWeight: 'bold' as const,
-          }
         }
-      }
-    })
+      : {}),
+    ...(selected === today
+      ? {
+          [today]: {
+            selected: true,
+            selectedColor: "#93C48B",
+          },
+        }
+      : {
+          [today]: {
+            customStyles: {
+              container: {
+                borderWidth: 2,
+                borderColor: "#2D5026",
+                borderRadius: 16,
+                width: 40,
+                height: 40,
+                justifyContent: "center" as const,
+                alignItems: "center" as const,
+              },
+              text: {
+                color: "#4F7F48",
+                fontWeight: "bold" as const,
+              },
+            },
+          },
+        }),
   };
 
   const calendarTheme = {
-    calendarBackground: '#E8F5B8',
-    textSectionTitleColor: '#5A6B4D',
-    textSectionTitleDisabledColor: '#A8B89D',
-    dayTextColor: '#000000',
-    textDisabledColor: '#A8B89D',
-    monthTextColor: '#000000',
-    selectedDayBackgroundColor: '#93C48B',
-    selectedDayTextColor: '#000000',
-    todayTextColor: '#4F7F48',
-    dotColor: '#4F7F48',
+    calendarBackground: "#E8F5B8",
+    textSectionTitleColor: "#5A6B4D",
+    textSectionTitleDisabledColor: "#A8B89D",
+    dayTextColor: "#000000",
+    textDisabledColor: "#A8B89D",
+    monthTextColor: "#000000",
+    selectedDayBackgroundColor: "#93C48B",
+    selectedDayTextColor: "#000000",
+    todayTextColor: "#4F7F48",
+    dotColor: "#4F7F48",
     textDayFontSize: 20,
     textMonthFontSize: 20,
     textDayHeaderFontSize: 14,
-    textDayFontFamily: 'DMSans_400Regular',
-    textMonthFontFamily: 'DMSans_600SemiBold',
-    textDayHeaderFontFamily: 'DMSans_500Medium',
-    textDayFontWeight: '400' as const,
-    textMonthFontWeight: 'bold' as const,
-    textDayHeaderFontWeight: '400' as const,
-    arrowColor: '#5A6B4D',
+    textDayFontFamily: "DMSans_400Regular",
+    textMonthFontFamily: "DMSans_600SemiBold",
+    textDayHeaderFontFamily: "DMSans_500Medium",
+    textDayFontWeight: "400" as const,
+    textMonthFontWeight: "bold" as const,
+    textDayHeaderFontWeight: "400" as const,
+    arrowColor: "#5A6B4D",
   };
 
   // Interpolate height for smooth animation
   const calendarHeight = animatedHeight.interpolate({
     inputRange: [0, 1],
-    outputRange: [140, 500], // Increased to accommodate months with 6 weeks + toggle button
+    outputRange: [140, 420],
   });
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+      >
         <CalendarProvider date={selected || today}>
           <Animated.View
             style={[
@@ -194,6 +221,7 @@ export function CalendarComponent() {
           </Animated.View>
         </CalendarProvider>
       </ScrollView>
+      <AgendaComponent selectedDate={selected || today} />
     </View>
   );
 }
@@ -203,65 +231,65 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollView: {
-    flex: 1,
+    flexGrow: 0,
   },
   scrollContent: {
-    flexGrow: 1,
+    flexGrow: 0,
   },
   animatedContainer: {
-    overflow: 'hidden',
-    width: '100%',
-    position: 'relative',
+    overflow: "hidden",
+    width: "100%",
+    position: "relative",
   },
   fullCalendarWrapper: {
-    backgroundColor: '#E8F5B8',
+    backgroundColor: "#E8F5B8",
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
-    overflow: 'hidden',
+    overflow: "hidden",
     zIndex: 2,
   },
   weekCalendarContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#E8F5B8',
+    backgroundColor: "#E8F5B8",
     zIndex: 1,
   },
   toggleButtonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
     marginTop: 8,
     marginBottom: 8,
     paddingRight: 16,
   },
   toggleButtonAbsolute: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
     zIndex: 3,
-    backgroundColor: '#E8F5B8',
+    backgroundColor: "#E8F5B8",
   },
   toggleButton: {
-    backgroundColor: '#E8F5B8',
+    backgroundColor: "#E8F5B8",
     borderRadius: 12,
     paddingVertical: 4,
     paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: '#D0E4A3',
+    borderColor: "#D0E4A3",
   },
   toggleButtonText: {
     fontSize: 13,
-    fontFamily: 'DMSans_500Medium',
-    color: '#5A6B4D',
+    fontFamily: "DMSans_500Medium",
+    color: "#5A6B4D",
   },
   calendarWrapper: {
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
-    overflow: 'hidden',
-    width: '100%',
+    overflow: "hidden",
+    width: "100%",
   },
   calendar: {
     borderBottomLeftRadius: 24,
