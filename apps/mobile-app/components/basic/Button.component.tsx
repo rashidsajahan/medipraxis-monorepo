@@ -1,4 +1,5 @@
-import { Color, Icons, TextSize, textStyles, TextVariant } from '@repo/config';
+import { Icons } from '@/config';
+import { Color, TextSize, textStyles, TextVariant } from '@repo/config';
 import type { IconProps } from 'phosphor-react-native';
 import React, { useRef } from 'react';
 import { Animated, TextStyle as RNTextStyle, ViewStyle } from 'react-native';

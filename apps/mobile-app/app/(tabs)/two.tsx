@@ -3,7 +3,8 @@ import { StyleSheet } from "react-native";
 import EditScreenInfo from "@/components/EditScreenInfo";
 import { View } from "@/components/Themed";
 import { ButtonComponent, ButtonSize } from "@/components/basic";
-import { Color, Icons } from '@repo/config';
+import { Icons } from "@/config";
+import { Color } from '@repo/config';
 
 export default function TabTwoScreen() {
   return (
