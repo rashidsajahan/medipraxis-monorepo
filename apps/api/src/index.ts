@@ -19,4 +19,6 @@ app.get("/", (c) => {
 
 app.route("/api", routes);
 
+export type AppType = typeof app;
+
 export default app;
