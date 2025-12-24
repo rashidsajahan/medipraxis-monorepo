@@ -4,8 +4,8 @@ import { StyleSheet } from "react-native";
 import EditScreenInfo from "@/components/EditScreenInfo";
 import { View } from "@/components/Themed";
 import TextComponent, { ButtonComponent, ButtonSize, TextInputComponent } from "@/components/basic";
+import { Icons } from "@/config";
 import { Color, TextSize, TextVariant } from '@repo/config';
-import { ArrowRightIcon, CheckIcon, HeartIcon, PlusIcon, ShoppingCartIcon, StarIcon } from "phosphor-react-native";
 
 export default function TabTwoScreen() {
   const [textInput, setTextInput] = useState("");
@@ -69,8 +69,8 @@ export default function TabTwoScreen() {
         <View style={styles.centeredButton}>
           <ButtonComponent
             size={ButtonSize.Small}
-            leftIcon={HeartIcon}
-            rightIcon={StarIcon}
+            leftIcon={Icons.Heart}
+            rightIcon={Icons.Star}
             buttonColor={Color.Green}
             textColor={Color.White}
             iconColor={Color.LightCream}
@@ -83,8 +83,8 @@ export default function TabTwoScreen() {
         <View style={styles.centeredButton}>
           <ButtonComponent
             size={ButtonSize.Medium}
-            leftIcon={PlusIcon}
-            rightIcon={ArrowRightIcon}
+            leftIcon={Icons.Plus}
+            rightIcon={Icons.ArrowRight}
           >
             Add Item
           </ButtonComponent>
@@ -93,8 +93,8 @@ export default function TabTwoScreen() {
         {/* Large button */}
         <ButtonComponent
           size={ButtonSize.Large}
-          leftIcon={CheckIcon}
-          rightIcon={ShoppingCartIcon}
+          leftIcon={Icons.Check}
+          rightIcon={Icons.ShoppingCart}
           buttonColor={Color.LightGreen}
           textColor={Color.DarkGreen}
           iconColor={Color.Green}
