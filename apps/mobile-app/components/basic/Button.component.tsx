@@ -1,7 +1,7 @@
 import { Color, TextSize, textStyles, TextVariant } from '@repo/config';
 import { IconProps } from 'phosphor-react-native';
 import React, { useRef } from 'react';
-import { Animated, TextStyle as RNTextStyle } from 'react-native';
+import { Animated, TextStyle as RNTextStyle, ViewStyle } from 'react-native';
 import {
   Button as GlueStackButton,
   ButtonText as GlueStackButtonText
@@ -56,7 +56,7 @@ export const ButtonComponent = ({
   // Set icon size based on button size
   const defaultIconSize = size === ButtonSize.Large ? 24 : size === ButtonSize.Medium ? 20 : 16;
   
-  // Set icon coloor or fallback to text color
+  // Set icon color or fallback to text color
   const finalIconColor = iconColor || textColor;
   const iconSettings = { size: defaultIconSize, color: finalIconColor };
 
@@ -73,7 +73,7 @@ export const ButtonComponent = ({
   };
 
   // Animation style for scaling
-  const animatedStyle = {
+  const animatedStyle: Animated.WithAnimatedValue<ViewStyle> = {
     transform: [{ scale: scaleAnim }],
   };
 
@@ -95,10 +95,19 @@ export const ButtonComponent = ({
     }).start();
   };
 
-  // Add margin and padding for large buttons
-  const buttonClassName = size === ButtonSize.Large
-    ? [className ?? '', 'mx-8 px-16 h-12'].filter(Boolean).join(' ')
-    : className;
+  // Button styling based on size
+  let buttonClassName = className ?? '';
+  
+  if (size === ButtonSize.Large) {
+    // Large: Full width with fixed height, centered content
+    buttonClassName = [buttonClassName, 'px-4 h-14 w-full justify-center items-center gap-2'].filter(Boolean).join(' ');
+  } else if (size === ButtonSize.Medium) {
+    // Medium: Hug content with padding and spacing
+    buttonClassName = [buttonClassName, 'px-4 py-2 justify-center items-center gap-2'].filter(Boolean).join(' ');
+  } else {
+    // Small: Hug content with small padding and spacing
+    buttonClassName = [buttonClassName, 'px-3 py-1.5 justify-center items-center gap-1.5'].filter(Boolean).join(' ');
+  }
 
   // Render button content (icons and text)
   const buttonContent = (
@@ -135,5 +144,6 @@ export const ButtonComponent = ({
     </Animated.View>
   );
 };
+
 
 
