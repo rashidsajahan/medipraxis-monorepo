@@ -6,12 +6,23 @@ import { View } from "@/components/Themed";
 import TextComponent, { ButtonComponent, ButtonSize, TextInputComponent } from "@/components/basic";
 import { Icons } from "@/config";
 import { Color, TextSize, TextVariant } from '@repo/config';
+import { z } from "zod";
 
 export default function TabTwoScreen() {
   const [textInput, setTextInput] = useState("");
   const [otp, setOtp] = useState("");
   const [password, setPassword] = useState("");
-
+  const [username, setUsername] = useState("");
+  const passwordSchema = z.string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number");
+  const usernameSchema = z.string()
+    .min(3, "Username must be at least 3 characters")
+    .max(20, "Username must not exceed 20 characters")
+    .regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores");
+  
   return (
       <View style={styles.container}>
         <View>
@@ -29,23 +40,35 @@ export default function TabTwoScreen() {
         <View style={styles.separator} />
         <View>
           <TextInputComponent
-            value={password}
-            onChangeText={setPassword}
-            placeholder="Enter your password"
-            label="Password Input"
-            inputType="password"
-          />
-        </View>
-
-        <View style={styles.separator} />
-        <View>
-          <TextInputComponent
             value={textInput}
             onChangeText={setTextInput}
             placeholder="Enter your name"
             label="Text Input"
           />
         </View>
+        {/* Password Input with Validation */}
+        <TextInputComponent
+          value={password}
+          onChangeText={setPassword}
+          placeholder="Enter secure password"
+          label="Password"
+          inputType="password"
+          validationSchema={passwordSchema}
+          successMessage="Strong password!"
+          helperText="Min 8 chars with uppercase, lowercase & number"
+        />
+        {/* Username with Warning Example */}
+        <TextInputComponent
+          value={username}
+          onChangeText={setUsername}
+          placeholder="johndoe123"
+          label="Username"
+          validationSchema={usernameSchema}
+          showWarning={username === "admin" || username === "test"}
+          warningMessage="This username might be taken"
+          successMessage="Username available!"
+          helperText="3-20 characters, letters, numbers & underscores"
+        />
         <View style={styles.separator} />
         <View>
           <TextInputComponent.OTPField

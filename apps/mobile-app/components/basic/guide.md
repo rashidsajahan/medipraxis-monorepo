@@ -39,11 +39,49 @@
     label="Text Input"
     showPasswordToggle={false}
  />
+```
+
+# TextInput Component - Password
+
+```ts
+import { z } from 'zod';
+
+const [password, setPassword] = useState("");
+const [username, setUsername] = useState("");
+
+const passwordSchema = z.string()
+  .min(8, "Password must be at least 8 characters")
+  .regex(/[A-Z]/, "Must contain uppercase letter")
+  .regex(/[a-z]/, "Must contain lowercase letter")
+  .regex(/[0-9]/, "Must contain number");
+
+const usernameSchema = z.string()
+.min(3, "Username must be at least 3 characters")
+.max(20, "Username must not exceed 20 characters")
+.regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores");
+
+
 <TextInputComponent
-    value={password}
-    onChangeText={setPassword}
-    placeholder="Enter your password"
-    label="Password Input"
-    inputType="password"
+value={password}
+onChangeText={setPassword}
+placeholder="Enter secure password"
+label="Password"
+inputType="password"
+validationSchema={passwordSchema}
+successMessage="Strong password!"
+helperText="Min 8 chars with uppercase, lowercase & number"
 />
+
+<TextInputComponent
+    value={username}
+    onChangeText={setUsername}
+    placeholder="johndoe123"
+    label="Username"
+    validationSchema={usernameSchema}
+    showWarning={username === "admin" || username === "test"}
+    warningMessage="This username might be taken"
+    successMessage="Username available!"
+    helperText="3-20 characters, letters, numbers & underscores"
+/>
+
 ```

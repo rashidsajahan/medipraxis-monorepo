@@ -1,8 +1,9 @@
 import { Input, InputField, InputSlot } from '@/components/ui/input';
 import { Color, Font, TextSize, TextVariant, textStyles } from '@repo/config';
 import { EyeIcon, EyeSlashIcon } from 'phosphor-react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Pressable, TextStyle as RNTextStyle, StyleSheet, Text, View } from 'react-native';
+import { z } from 'zod';
 
 // Props for the TextInput component
 interface TextInputProps {
@@ -18,6 +19,18 @@ interface TextInputProps {
   labelColor?: Color;
   inputType?: 'text' | 'number' | 'decimal' | 'email' | 'phone' | 'password';
   showPasswordToggle?: boolean;
+  validationSchema?: z.ZodString;
+  errorMessage?: string;
+  successMessage?: string;
+  warningMessage?: string;
+  helperText?: string;
+  helperTextColor?: Color;
+  errorTextColor?: Color;
+  successTextColor?: Color;
+  warningTextColor?: Color;
+  showValidation?: boolean;
+  validateOnChange?: boolean;
+  showWarning?: boolean;
 }
 
 // Props for OTP Input Field
@@ -56,6 +69,7 @@ const getKeyboardType = (type: string) => {
 
 // Text styles
 const textLargeStyle = textStyles[TextVariant.Body][TextSize.Large];
+const textSmallStyle = textStyles[TextVariant.Body][TextSize.Small];
 const buttonLargeStyle = textStyles[TextVariant.Button][TextSize.Large];
 
 // Default TextInput component
@@ -72,11 +86,83 @@ const TextInputBase: React.FC<TextInputProps> = ({
   labelColor = Color.Black,
   inputType = 'text',
   showPasswordToggle = false,
+  validationSchema,
+  errorMessage,
+  successMessage,
+  warningMessage,
+  helperText,
+  helperTextColor = Color.Grey,
+  errorTextColor = Color.Danger,
+  successTextColor = Color.Success,
+  warningTextColor = Color.Warnning,
+  showValidation = true,
+  validateOnChange = true,
+  showWarning = false,
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const [isValid, setIsValid] = useState(false);
   
   const shouldShowToggle = showPasswordToggle || inputType === 'password';
   const isSecureEntry = shouldShowToggle && !isPasswordVisible;
+
+  // Validate input
+  useEffect(() => {
+    if (!validationSchema || !showValidation) {
+      setValidationError(null);
+      setIsValid(false);
+      return;
+    }
+
+    if (!validateOnChange && value === '') {
+      setValidationError(null);
+      setIsValid(false);
+      return;
+    }
+
+    const result = validationSchema.safeParse(value);
+    
+    if (result.success) {
+      setValidationError(null);
+      setIsValid(true);
+    } else {
+      setIsValid(false);
+      if (value !== '') {
+        const error = result.error.issues[0]?.message || 'Invalid input';
+        setValidationError(errorMessage || error);
+      } else {
+        setValidationError(null);
+      }
+    }
+  }, [value, validationSchema, showValidation, validateOnChange, errorMessage]);
+
+  // Determine border color based on validation
+  const getBorderColor = () => {
+    if (isInvalid || validationError) return Color.Danger;
+    if (showWarning && warningMessage) return Color.Warnning;
+    if (isValid && value !== '') return Color.Success;
+    return borderColor;
+  };
+
+  // Determine message to display
+  const getMessage = () => {
+    if (validationError) return validationError;
+    if (showWarning && warningMessage) return warningMessage;
+    if (isValid && successMessage) return successMessage;
+    if (helperText && !validationError && !isValid) return helperText;
+    return null;
+  };
+
+  // Determine message color
+  const getMessageColor = () => {
+    if (validationError) return errorTextColor;
+    if (showWarning && warningMessage) return warningTextColor;
+    if (isValid && successMessage) return successTextColor;
+    return helperTextColor;
+  };
+
+  const message = getMessage();
+  const messageColor = getMessageColor();
 
   return (
     <View style={styles.inputWrapper}>
@@ -94,9 +180,10 @@ const TextInputBase: React.FC<TextInputProps> = ({
         variant="outline"
         size="md"
         isDisabled={isDisabled}
-        isInvalid={isInvalid}
+        isInvalid={isInvalid || !!validationError}
         style={{
-          borderColor: borderColor,
+          borderColor: getBorderColor(),
+          borderWidth: 1,
           borderRadius: 8,
           width: '100%',
           height: 50,
@@ -132,6 +219,16 @@ const TextInputBase: React.FC<TextInputProps> = ({
           </InputSlot>
         )}
       </Input>
+      {message && (
+        <Text style={[styles.helperText, {
+          color: messageColor,
+          fontFamily: textSmallStyle.fontFamily === Font.DMsans ? 'DMSans_400Regular' : 'Lato_400Regular',
+          fontSize: textSmallStyle.fontSize,
+          fontWeight: String(textSmallStyle.fontWeight) as RNTextStyle['fontWeight'],
+        }]}>
+          {message}
+        </Text>
+      )}
     </View>
   );
 };
@@ -202,6 +299,10 @@ const styles = StyleSheet.create({
   },
   iconSlot: {
     paddingRight: 16,
+  },
+  helperText: {
+    marginTop: 4,
+    marginLeft: 4,
   },
 });
 
