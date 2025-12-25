@@ -3,9 +3,9 @@ import {
   formatDuration,
   getSlotTimeFromMinutes,
   parseTimeToMinutes,
-  timeToDecimalHour,
 } from "@/utils";
 import { Color, TextSize, TextVariant } from "@repo/config";
+import clsx from "clsx";
 import { Modal, Pressable, ScrollView, View } from "react-native";
 import { AgendaBlockContent } from "./calendar.types";
 
@@ -13,8 +13,8 @@ interface AgendaBlockModalProps {
   visible: boolean;
   onClose: () => void;
   groupId: string;
-  startHour: string;
-  endHour: string;
+  startTime: string;
+  endTime: string;
   slots: number;
   contents: (AgendaBlockContent | null)[];
   onAppointmentPress?: (
@@ -28,18 +28,20 @@ export function AgendaBlockModal({
   visible,
   onClose,
   groupId,
-  startHour,
-  endHour,
+  startTime,
+  endTime,
   slots,
   contents,
   onAppointmentPress,
   onEmptySlotPress,
 }: AgendaBlockModalProps): React.JSX.Element {
-  const startHourDecimal = timeToDecimalHour(startHour);
-  const endHourDecimal = timeToDecimalHour(endHour);
-  const startTimeMinutes = parseTimeToMinutes(startHour);
-  const totalDurationMinutes = (endHourDecimal - startHourDecimal) * 60;
+  // Start and end times of full window in minutes
+  const startTimeMinutes = parseTimeToMinutes(startTime);
+  const endTimeMinutes = parseTimeToMinutes(endTime);
+  // Total duration of the full window and per slot
+  const totalDurationMinutes = endTimeMinutes - startTimeMinutes;
   const slotDurationMinutes = totalDurationMinutes / slots;
+  // Count of reserved slots
   const reservedSlots = contents.filter((content) => content !== null).length;
 
   return (
@@ -49,24 +51,9 @@ export function AgendaBlockModal({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <View
-          style={{
-            backgroundColor: "white",
-            borderRadius: 16,
-            padding: 20,
-            width: "85%",
-            height: "70%",
-          }}
-        >
-          <View style={{ marginBottom: 16 }}>
+      <View className="flex-1 bg-black/50 justify-center items-center">
+        <View className="bg-white rounded-2xl p-5 w-[85%] h-[70%]">
+          <View className="mb-4">
             <TextComponent size={TextSize.Medium} variant={TextVariant.Title}>
               Appointments
             </TextComponent>
@@ -80,8 +67,8 @@ export function AgendaBlockModal({
           </View>
 
           <ScrollView
-            style={{ flex: 1 }}
-            contentContainerStyle={{ paddingBottom: 8 }}
+            className="flex-1"
+            contentContainerClassName="pb-4"
             showsVerticalScrollIndicator={true}
           >
             {contents.map((content, index) => {
@@ -106,32 +93,21 @@ export function AgendaBlockModal({
                       onEmptySlotPress?.(groupId, index);
                     }
                   }}
-                  style={{
-                    paddingVertical: 12,
-                    paddingHorizontal: 16,
-                    marginBottom: 8,
-                    backgroundColor: content ? "#F8F9FA" : "#FFFFFF",
-                    borderRadius: 8,
-                    borderLeftWidth: content ? 4 : 1,
-                    borderWidth: content ? 0 : 1,
-                    borderStyle: content ? "solid" : "dashed",
-                    borderColor: content ? Color.Green : Color.LightGrey,
-                  }}
+                  className={clsx("py-3 px-4 mb-2 rounded-lg", {
+                    "bg-[#F8F9FA] border-l-4 border-mp-green": content,
+                    "bg-white border border-dashed border-mp-light-grey":
+                      !content,
+                  })}
                 >
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <View style={{ flex: 1 }}>
+                  <View className="flex-row justify-between items-center">
+                    <View className="flex-1">
                       <TextComponent
                         size={TextSize.Small}
                         variant={TextVariant.Body}
                         color={Color.Grey}
                       >
-                        {slotTime} - {endSlotTime} ({formatDuration(slotDurationMinutes)})
+                        {slotTime} - {endSlotTime} (
+                        {formatDuration(slotDurationMinutes)})
                       </TextComponent>
                       {content ? (
                         <>
@@ -168,13 +144,7 @@ export function AgendaBlockModal({
 
           <Pressable
             onPress={onClose}
-            style={{
-              marginTop: 16,
-              backgroundColor: Color.Green,
-              padding: 12,
-              borderRadius: 8,
-              alignItems: "center",
-            }}
+            className="mt-4 bg-mp-green p-3 rounded-lg items-center"
           >
             <TextComponent
               size={TextSize.Small}

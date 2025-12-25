@@ -1,40 +1,4 @@
 /**
- * Calculates the time for a specific slot based on slot index and configuration
- * @param slotIndex - The index of the slot (0-based)
- * @param startHour - The starting hour of the time block
- * @param slotDurationMinutes - Duration of each slot in minutes
- * @returns Formatted time string (e.g., "8:30 am")
- */
-export function getSlotTime(
-  slotIndex: number,
-  startHour: number,
-  slotDurationMinutes: number
-): string {
-  const totalMinutesFromStart = slotIndex * slotDurationMinutes;
-  const hours = startHour + Math.floor(totalMinutesFromStart / 60);
-  const minutes = Math.floor(totalMinutesFromStart % 60);
-  const period = hours >= 12 ? "pm" : "am";
-  const displayHours = hours > 12 ? hours - 12 : hours === 0 ? 12 : hours;
-  return `${displayHours}:${minutes.toString().padStart(2, "0")} ${period}`;
-}
-
-/**
- * Calculates slot duration in minutes based on time block configuration
- * @param startHour - The starting hour of the time block
- * @param endHour - The ending hour of the time block
- * @param slots - Total number of slots in the time block
- * @returns Duration of each slot in minutes
- */
-export function calculateSlotDuration(
-  startHour: number,
-  endHour: number,
-  slots: number
-): number {
-  const totalDurationMinutes = (endHour - startHour) * 60;
-  return totalDurationMinutes / slots;
-}
-
-/**
  * Converts hours and minutes to total minutes from midnight
  * @param hours - Hour value (0-23)
  * @param minutes - Minute value (0-59)
@@ -69,19 +33,6 @@ export function formatTimeFromMinutes(totalMinutes: number): string {
   const period = hours >= 12 ? "pm" : "am";
   const displayHours = hours > 12 ? hours - 12 : hours === 0 ? 12 : hours;
   return `${displayHours}:${minutes.toString().padStart(2, "0")} ${period}`;
-}
-
-/**
- * Calculates the duration between two times in minutes
- * @param startTimeMinutes - Start time in minutes from midnight
- * @param endTimeMinutes - End time in minutes from midnight
- * @returns Duration in minutes
- */
-export function calculateDuration(
-  startTimeMinutes: number,
-  endTimeMinutes: number
-): number {
-  return endTimeMinutes - startTimeMinutes;
 }
 
 /**
@@ -193,7 +144,9 @@ export function formatDuration(durationMinutes: number): string {
  * @param defaultDurationMinutes - Default duration when no endTime (default: 30)
  * @returns Array of grouped reminders
  */
-export function groupReminders<T extends { startTime: string; endTime?: string }>(
+export function groupReminders<
+  T extends { startTime: string; endTime?: string },
+>(
   reminders: T[],
   proximityMinutes: number = 15,
   defaultDurationMinutes: number = 30
@@ -237,7 +190,8 @@ export function groupReminders<T extends { startTime: string; endTime?: string }
     // Check if this reminder should be grouped with current group
     // Group if: overlapping OR within proximity threshold
     const isOverlapping = reminderStartMinutes < groupEndMinutes;
-    const isCloseProximity = reminderStartMinutes - groupEndMinutes <= proximityMinutes;
+    const isCloseProximity =
+      reminderStartMinutes - groupEndMinutes <= proximityMinutes;
 
     if (isOverlapping || isCloseProximity) {
       // Add to current group and extend end time if needed

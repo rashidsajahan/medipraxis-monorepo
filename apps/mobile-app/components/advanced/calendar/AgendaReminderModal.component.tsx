@@ -17,29 +17,10 @@ export function AgendaReminderModal({
   onReminderPress,
 }: AgendaReminderModalProps): React.JSX.Element {
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-    >
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <View
-          style={{
-            backgroundColor: "white",
-            borderRadius: 16,
-            padding: 20,
-            width: "85%",
-            height: "70%",
-          }}
-        >
-          <View style={{ marginBottom: 16 }}>
+    <Modal visible={visible} transparent animationType="fade">
+      <View className="flex-1 bg-black/50 justify-center items-center">
+        <View className="bg-white rounded-2xl p-5 w-[85%] h-[70%]">
+          <View className="mb-4">
             <TextComponent size={TextSize.Medium} variant={TextVariant.Title}>
               Tasks
             </TextComponent>
@@ -53,8 +34,8 @@ export function AgendaReminderModal({
           </View>
 
           <ScrollView
-            style={{ flex: 1 }}
-            contentContainerStyle={{ paddingBottom: 8 }}
+            className="flex-1"
+            contentContainerClassName="pb-2"
             showsVerticalScrollIndicator={true}
           >
             {reminders.map((reminder, index) => (
@@ -64,15 +45,7 @@ export function AgendaReminderModal({
                   onReminderPress?.(reminder.content);
                   onClose();
                 }}
-                style={{
-                  paddingVertical: 12,
-                  paddingHorizontal: 16,
-                  marginBottom: 8,
-                  backgroundColor: Color.LightGreen,
-                  borderRadius: 8,
-                  borderLeftWidth: 4,
-                  borderColor: Color.Green,
-                }}
+                className="py-3 px-4 mb-2 bg-mp-light-green rounded-lg border-l-4 border-mp-green"
               >
                 <TextComponent
                   size={TextSize.Small}
@@ -86,13 +59,7 @@ export function AgendaReminderModal({
 
           <Pressable
             onPress={onClose}
-            style={{
-              marginTop: 16,
-              backgroundColor: Color.Green,
-              padding: 12,
-              borderRadius: 8,
-              alignItems: "center",
-            }}
+            className="mt-4 bg-mp-green p-3 rounded-lg items-center"
           >
             <TextComponent
               size={TextSize.Small}

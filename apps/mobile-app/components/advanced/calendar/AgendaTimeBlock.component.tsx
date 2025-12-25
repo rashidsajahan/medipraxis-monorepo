@@ -7,8 +7,8 @@ import { AgendaBlockContent } from "./calendar.types";
 
 interface AgendaTimeBlockProps {
   content: AgendaBlockContent;
-  startHour: string;
-  endHour: string;
+  startTime: string;
+  endTime: string;
   bgColor?: string;
   borderColor?: string;
   onPress?: (appointment: AgendaBlockContent, groupId: string | null) => void;
@@ -16,15 +16,15 @@ interface AgendaTimeBlockProps {
 
 export function AgendaTimeBlock({
   content,
-  startHour,
-  endHour,
+  startTime,
+  endTime,
   bgColor = "#E3F2FD",
   borderColor = "#2196F3",
   onPress,
 }: AgendaTimeBlockProps): React.JSX.Element {
   const { width: screenWidth } = useWindowDimensions();
-  const startHourDecimal = timeToDecimalHour(startHour);
-  const endHourDecimal = timeToDecimalHour(endHour);
+  const startHourDecimal = timeToDecimalHour(startTime);
+  const endHourDecimal = timeToDecimalHour(endTime);
   const height = (endHourDecimal - startHourDecimal) * HOUR_HEIGHT;
   const topPosition = startHourDecimal * HOUR_HEIGHT;
 
@@ -37,19 +37,15 @@ export function AgendaTimeBlock({
   return (
     <Pressable
       onPress={() => onPress?.(content, null)}
+      className="absolute flex flex-row items-center gap-2 border border-l-4 pl-4"
       style={{
-        position: "absolute",
         height,
         top: topPosition,
         left: LEFT_MARGIN,
         width: columnWidth,
         backgroundColor: bgColor,
         borderColor: borderColor,
-        borderWidth: 1,
-        borderLeftWidth: 4,
-        paddingLeft: 16,
       }}
-      className="flex flex-row items-center gap-2"
     >
       <TextComponent
         size={TextSize.Small}

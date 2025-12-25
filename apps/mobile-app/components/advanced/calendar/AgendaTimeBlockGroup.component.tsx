@@ -1,6 +1,7 @@
 import TextComponent from "@/components/basic";
 import { timeToDecimalHour } from "@/utils";
 import { Color, TextSize, TextVariant } from "@repo/config";
+import clsx from "clsx";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
 import { Pressable, View, useWindowDimensions } from "react-native";
@@ -14,8 +15,8 @@ import { AgendaBlockContent } from "./calendar.types";
 
 interface AgendaTimeBlockGroupProps {
   groupId: string;
-  startHour: string;
-  endHour: string;
+  startTime: string;
+  endTime: string;
   slots: number;
   contents: (AgendaBlockContent | null)[];
   onAppointmentPress?: (
@@ -27,8 +28,8 @@ interface AgendaTimeBlockGroupProps {
 
 export function AgendaTimeBlockGroup({
   groupId,
-  startHour,
-  endHour,
+  startTime: startHour,
+  endTime: endHour,
   slots,
   contents,
   onAppointmentPress,
@@ -61,8 +62,8 @@ export function AgendaTimeBlockGroup({
 
   return (
     <View
+      className="absolute"
       style={{
-        position: "absolute",
         height: totalHeight,
         top: topPosition,
         left: LEFT_MARGIN,
@@ -77,16 +78,15 @@ export function AgendaTimeBlockGroup({
           <Pressable
             key={index}
             onPress={() => setModalVisible(true)}
+            className={clsx("flex flex-row items-center gap-2 border border-l-4 pl-4", {
+              "opacity-100": content,
+              "opacity-50": !content,
+            })}
             style={{
               height: slotHeight,
               backgroundColor: content ? color.bg : "#F3F4F6",
               borderColor: content ? color.border : Color.LightGrey,
-              borderWidth: 1,
-              borderLeftWidth: 4,
-              paddingLeft: 16,
-              opacity: content ? 1 : 0.5,
             }}
-            className="flex flex-row items-center gap-2"
           >
             {content && !showSummaryOverlay && (
               <>
@@ -114,13 +114,7 @@ export function AgendaTimeBlockGroup({
       {showSummaryOverlay && (
         <Pressable
           onPress={() => setModalVisible(true)}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-          }}
+          className="absolute top-0 left-0 right-0 bottom-0"
         >
           <LinearGradient
             colors={[
@@ -130,11 +124,7 @@ export function AgendaTimeBlockGroup({
             ]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              paddingLeft: 16,
-            }}
+            className="flex-1 justify-center pl-4"
           >
             <TextComponent size={TextSize.Medium} variant={TextVariant.Body}>
               {reservedSlots}/{slots} slots reserved
@@ -149,8 +139,8 @@ export function AgendaTimeBlockGroup({
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         groupId={groupId}
-        startHour={startHour}
-        endHour={endHour}
+        startTime={startHour}
+        endTime={endHour}
         slots={slots}
         contents={contents}
         onAppointmentPress={onAppointmentPress}

@@ -1,6 +1,7 @@
 import TextComponent from "@/components/basic";
 import { groupReminders } from "@/utils";
 import { Color, TextSize, TextVariant } from "@repo/config";
+import clsx from "clsx";
 import React, { useMemo, useState } from "react";
 import {
   NativeScrollEvent,
@@ -13,7 +14,7 @@ import { AgendaReminderModal } from "./AgendaReminderModal.component";
 import { AgendaTimeBlock } from "./AgendaTimeBlock.component";
 import { AgendaTimeBlockGroup } from "./AgendaTimeBlockGroup.component";
 import { AGENDA_COLORS, HOUR_HEIGHT } from "./calendar.constants";
-import {
+import type {
   AgendaBlockContent,
   AgendaData,
   AgendaReminderContent,
@@ -67,8 +68,8 @@ export function AgendaComponent({
     return date.toLocaleDateString("en-US", options);
   };
 
-  const getColorByHour = (startHour: number) => {
-    return AGENDA_COLORS[startHour % AGENDA_COLORS.length];
+  const getColorByIndex = (index: number) => {
+    return AGENDA_COLORS[index % AGENDA_COLORS.length];
   };
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -79,14 +80,13 @@ export function AgendaComponent({
   return (
     <>
       <View
-        className="px-4 py-4 bg-white"
+        className={clsx("px-4 py-4 bg-white z-10")}
         style={{
           shadowColor: "#0000007b",
           shadowOffset: { width: 0, height: 8 },
           shadowOpacity: isScrolled ? 0.05 : 0,
           shadowRadius: 4,
           elevation: isScrolled ? 2 : 0,
-          zIndex: 10,
         }}
       >
         <TextComponent size={TextSize.Small} variant={TextVariant.Title}>
@@ -95,21 +95,18 @@ export function AgendaComponent({
       </View>
       <ScrollView
         className="flex-1 bg-white"
-        contentContainerStyle={{ paddingTop: 16, paddingBottom: 16 }}
+        contentContainerClassName="pt-4 pb-4"
         onScroll={handleScroll}
         scrollEventThrottle={16}
       >
-        <View style={{ position: "relative", minHeight: 25 * 60 }}>
+        <View className="relative" style={{ minHeight: 25 * 60 }}>
           {hours.map((hour, index) => (
             <View
               key={index}
-              className="flex-row"
-              style={{ position: "relative", height: HOUR_HEIGHT }}
+              className="flex-row relative"
+              style={{ height: HOUR_HEIGHT }}
             >
-              <View
-                className="w-[70px] pr-5"
-                style={{ position: "absolute", top: -8, left: 0 }}
-              >
+              <View className="w-[70px] pr-5 absolute -top-2 left-0">
                 <TextComponent
                   size={TextSize.Small}
                   variant={TextVariant.Body}
@@ -119,20 +116,17 @@ export function AgendaComponent({
                   {hour}
                 </TextComponent>
               </View>
-              <View
-                className="flex-1 h-[1px] bg-gray-200"
-                style={{ marginLeft: 60 }}
-              />
+              <View className="flex-1 h-[1px] bg-gray-200 ml-[60px]" />
             </View>
           ))}
           {agendaData?.timeBlocks?.map((block, index) => (
             <AgendaTimeBlock
               key={`timeblock-${index}`}
               content={block.content}
-              startHour={block.startTime}
-              endHour={block.endTime}
-              bgColor={getColorByHour(index).bg}
-              borderColor={getColorByHour(index).border}
+              startTime={block.startTime}
+              endTime={block.endTime}
+              bgColor={getColorByIndex(index).bg}
+              borderColor={getColorByIndex(index).border}
               onPress={(appointment) => onAppointmentPress?.(appointment, null)}
             />
           ))}
@@ -140,8 +134,8 @@ export function AgendaComponent({
             <AgendaTimeBlockGroup
               key={`timeblockgroup-${index}`}
               groupId={group.id}
-              startHour={group.startTime}
-              endHour={group.endTime}
+              startTime={group.startTime}
+              endTime={group.endTime}
               slots={group.slots}
               contents={group.contents}
               onAppointmentPress={onAppointmentPress}

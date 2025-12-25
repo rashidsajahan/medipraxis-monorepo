@@ -50,17 +50,12 @@ export function AgendaReminderBlock({
   return (
     <Pressable
       onPress={() => onPress?.(content)}
-      className="px-1"
+      className="px-1 absolute bg-mp-light-green border border-mp-green justify-center"
       style={{
-        position: "absolute",
         height,
         top: topPosition,
         left: leftPosition,
         width: columnWidth,
-        backgroundColor: Color.LightGreen,
-        borderColor: Color.Green,
-        borderWidth: 1,
-        justifyContent: "center",
       }}
     >
       <TextComponent
