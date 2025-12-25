@@ -21,19 +21,19 @@ export default function ScheduleScreen() {
         Alert.alert(
           "Appointment Selected",
           `Appointment ID: ${selectedAppointment.appointmentId}\nGroup ID: ${selectedAppointment.groupId || "null"}`,
-          [{ text: "OK" }]
+          [{ text: "OK", onPress: () => setSelectedAppointment(null) }]
         );
       } else if (selectedAppointment.type === AgendaSelectionType.EmptySlot) {
         Alert.alert(
           "Empty Slot Selected",
           `Group ID: ${selectedAppointment.groupId}\nSlot Number: ${selectedAppointment.slotNumber}`,
-          [{ text: "OK" }]
+          [{ text: "OK", onPress: () => setSelectedAppointment(null) }]
         );
       } else if (selectedAppointment.type === AgendaSelectionType.Reminder) {
         Alert.alert(
           "Reminder Selected",
           `Reminder ID: ${selectedAppointment.reminderId}`,
-          [{ text: "OK" }]
+          [{ text: "OK", onPress: () => setSelectedAppointment(null) }]
         );
       }
     }
@@ -88,7 +88,7 @@ export default function ScheduleScreen() {
     ],
     reminders: [
       {
-        content: { id: "rem-001", title: "Take medication" },
+        content: { id: "rem-001", title: "Check records" },
         startTime: "2:30 am",
       },
       {
@@ -104,9 +104,25 @@ export default function ScheduleScreen() {
         startTime: "9:45 am",
       },
       {
-        content: { id: "rem-005", title: "Lunch break" },
+        content: { id: "rem-005", title: "Check inventory" },
+        startTime: "9:50 am", // Close to rem-004, will be grouped
+      },
+      {
+        content: { id: "rem-006", title: "Lunch break" },
         startTime: "12:00 pm",
         endTime: "12:30 pm",
+      },
+      {
+        content: { id: "rem-007", title: "Team meeting prep" },
+        startTime: "2:00 pm",
+      },
+      {
+        content: { id: "rem-008", title: "Review notes" },
+        startTime: "2:10 pm", // Close to rem-007, will be grouped
+      },
+      {
+        content: { id: "rem-009", title: "Call supplier" },
+        startTime: "2:15 pm", // Also close, will be grouped with rem-007 and rem-008
       },
     ],
   };
