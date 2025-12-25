@@ -1,3 +1,4 @@
+import ButtonComponent, { ButtonSize } from "@/components/basic/Button.component";
 import TextComponent from "@/components/basic";
 import { Color, TextSize, TextVariant } from "@repo/config";
 import { Modal, Pressable, ScrollView, View } from "react-native";
@@ -65,18 +66,15 @@ export function AgendaReminderModal({
             ))}
           </ScrollView>
 
-          <Pressable
+          <ButtonComponent
             onPress={onClose}
-            className="mt-4 bg-mp-green p-3 rounded-lg items-center"
+            size={ButtonSize.Medium}
+            buttonColor={Color.Green}
+            textColor={Color.White}
+            className="mt-4 rounded-lg"
           >
-            <TextComponent
-              size={TextSize.Small}
-              variant={TextVariant.Title}
-              color={Color.White}
-            >
-              Close
-            </TextComponent>
-          </Pressable>
+            Close
+          </ButtonComponent>
         </View>
       </View>
     </Modal>
