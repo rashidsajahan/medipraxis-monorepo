@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 
 import EditScreenInfo from "@/components/EditScreenInfo";
 import { View } from "@/components/Themed";
-import TextComponent, { ButtonComponent, ButtonSize, DropdownComponent, TextInputComponent } from "@/components/basic";
+import TextComponent, { ButtonComponent, ButtonSize, DropdownComponent, TextInputComponent, ToggleButton } from "@/components/basic";
 import { Icons } from "@/config";
 import { Color, TextSize, TextVariant } from '@repo/config';
 import { z } from "zod";
@@ -14,6 +14,8 @@ export default function TabTwoScreen() {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [country, setCountry] = useState('');
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [darkModeEnabled, setDarkModeEnabled] = useState(true);
 
     // Country options
   const countryOptions = [
@@ -99,6 +101,17 @@ export default function TabTwoScreen() {
             helperText="Please select your country"
             showValidation={true}
           />
+        <ToggleButton 
+          size="sm" 
+          label="Enable toggle"
+          isActive={notificationsEnabled}
+          onToggle={setNotificationsEnabled}
+        />
+        <ToggleButton 
+          size="sm"
+          isActive={darkModeEnabled}
+          onToggle={setDarkModeEnabled}
+        />
         </View>
 
       <View style={styles.buttonContainer}>

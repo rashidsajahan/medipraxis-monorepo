@@ -98,4 +98,20 @@ validationSchema={otpSchema}
 />
 ```
 
+# Toggle Component
 
+```ts
+const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+const [darkModeEnabled, setDarkModeEnabled] = useState(true);
+<ToggleButton 
+    size="sm" 
+    label="Enable toggle"
+    isActive={notificationsEnabled}
+    onToggle={setNotificationsEnabled}
+/>
+<ToggleButton 
+    size="sm"
+    isActive={darkModeEnabled}
+    onToggle={setDarkModeEnabled}
+/>
+```
