@@ -7,7 +7,8 @@ import {
 } from "@/utils";
 import { Color, TextSize, TextVariant } from "@repo/config";
 import clsx from "clsx";
-import { Modal, Pressable, ScrollView, View } from "react-native";
+import { useRef } from "react";
+import { Animated, Modal, Pressable, ScrollView, View } from "react-native";
 import { AgendaBlockContent } from "./calendar.types";
 
 interface AgendaBlockModalProps {
@@ -23,6 +24,86 @@ interface AgendaBlockModalProps {
     groupId: string | null
   ) => void;
   onEmptySlotPress?: (groupId: string, slotNumber: number) => void;
+}
+
+interface SlotItemProps {
+  content: AgendaBlockContent | null;
+  slotTime: string;
+  endSlotTime: string;
+  slotDurationMinutes: number;
+  onPress: () => void;
+}
+
+function SlotItem({
+  content,
+  slotTime,
+  endSlotTime,
+  slotDurationMinutes,
+  onPress,
+}: SlotItemProps) {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.95,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 10,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 10,
+    }).start();
+  };
+
+  return (
+    <Pressable onPress={onPress} onPressIn={handlePressIn} onPressOut={handlePressOut}>
+      <Animated.View
+        className={clsx("py-3 px-4 mb-2 rounded-lg", {
+          "bg-[#F8F9FA] border-l-4 border-mp-green": content,
+          "bg-white border border-dashed border-mp-light-grey": !content,
+        })}
+        style={{ transform: [{ scale: scaleAnim }] }}
+      >
+        <View className="flex-row justify-between items-center">
+          <View className="flex-1">
+            <TextComponent
+              size={TextSize.Small}
+              variant={TextVariant.Body}
+              color={Color.Grey}
+            >
+              {slotTime} - {endSlotTime} ({formatDuration(slotDurationMinutes)})
+            </TextComponent>
+            {content ? (
+              <>
+                <TextComponent size={TextSize.Small} variant={TextVariant.Title}>
+                  {content.title}
+                </TextComponent>
+                {content.client && (
+                  <TextComponent size={TextSize.Small} variant={TextVariant.Body}>
+                    Client: {content.client}
+                  </TextComponent>
+                )}
+              </>
+            ) : (
+              <TextComponent
+                size={TextSize.Small}
+                variant={TextVariant.Body}
+                color={Color.Grey}
+              >
+                Available
+              </TextComponent>
+            )}
+          </View>
+        </View>
+      </Animated.View>
+    </Pressable>
+  );
 }
 
 export function AgendaBlockModal({
@@ -85,8 +166,12 @@ export function AgendaBlockModal({
               );
 
               return (
-                <Pressable
+                <SlotItem
                   key={index}
+                  content={content}
+                  slotTime={slotTime}
+                  endSlotTime={endSlotTime}
+                  slotDurationMinutes={slotDurationMinutes}
                   onPress={() => {
                     if (content) {
                       onAppointmentPress?.(content, groupId);
@@ -94,51 +179,7 @@ export function AgendaBlockModal({
                       onEmptySlotPress?.(groupId, index);
                     }
                   }}
-                  className={clsx("py-3 px-4 mb-2 rounded-lg", {
-                    "bg-[#F8F9FA] border-l-4 border-mp-green": content,
-                    "bg-white border border-dashed border-mp-light-grey":
-                      !content,
-                  })}
-                >
-                  <View className="flex-row justify-between items-center">
-                    <View className="flex-1">
-                      <TextComponent
-                        size={TextSize.Small}
-                        variant={TextVariant.Body}
-                        color={Color.Grey}
-                      >
-                        {slotTime} - {endSlotTime} (
-                        {formatDuration(slotDurationMinutes)})
-                      </TextComponent>
-                      {content ? (
-                        <>
-                          <TextComponent
-                            size={TextSize.Small}
-                            variant={TextVariant.Title}
-                          >
-                            {content.title}
-                          </TextComponent>
-                          {content.client && (
-                            <TextComponent
-                              size={TextSize.Small}
-                              variant={TextVariant.Body}
-                            >
-                              Client: {content.client}
-                            </TextComponent>
-                          )}
-                        </>
-                      ) : (
-                        <TextComponent
-                          size={TextSize.Small}
-                          variant={TextVariant.Body}
-                          color={Color.Grey}
-                        >
-                          Available
-                        </TextComponent>
-                      )}
-                    </View>
-                  </View>
-                </Pressable>
+                />
               );
             })}
           </ScrollView>

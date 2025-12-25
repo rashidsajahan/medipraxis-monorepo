@@ -1,7 +1,8 @@
 import ButtonComponent, { ButtonSize } from "@/components/basic/Button.component";
 import TextComponent from "@/components/basic";
 import { Color, TextSize, TextVariant } from "@repo/config";
-import { Modal, Pressable, ScrollView, View } from "react-native";
+import { useRef } from "react";
+import { Animated, Modal, Pressable, ScrollView, View } from "react-native";
 import { AgendaReminderContent, AgendaReminderData } from "./calendar.types";
 
 interface AgendaReminderModalProps {
@@ -9,6 +10,57 @@ interface AgendaReminderModalProps {
   onClose: () => void;
   reminders: AgendaReminderData[];
   onReminderPress?: (reminder: AgendaReminderContent) => void;
+}
+
+interface ReminderItemProps {
+  reminder: AgendaReminderData;
+  onPress: () => void;
+}
+
+function ReminderItem({ reminder, onPress }: ReminderItemProps) {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.95,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 10,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 10,
+    }).start();
+  };
+
+  return (
+    <Pressable onPress={onPress} onPressIn={handlePressIn} onPressOut={handlePressOut}>
+      <Animated.View
+        className="py-3 px-4 mb-2 bg-[#F8F9FA] rounded-lg border-l-4 border-mp-green"
+        style={{ transform: [{ scale: scaleAnim }] }}
+      >
+        <TextComponent
+          size={TextSize.Small}
+          variant={TextVariant.Body}
+          color={Color.Grey}
+        >
+          {reminder.startTime}
+          {reminder.endTime && ` - ${reminder.endTime}`}
+        </TextComponent>
+        <TextComponent
+          size={TextSize.Small}
+          variant={TextVariant.Title}
+        >
+          {reminder.content.title}
+        </TextComponent>
+      </Animated.View>
+    </Pressable>
+  );
 }
 
 export function AgendaReminderModal({
@@ -40,29 +92,14 @@ export function AgendaReminderModal({
             showsVerticalScrollIndicator={true}
           >
             {reminders.map((reminder, index) => (
-              <Pressable
+              <ReminderItem
                 key={index}
+                reminder={reminder}
                 onPress={() => {
                   onReminderPress?.(reminder.content);
                   onClose();
                 }}
-                className="py-3 px-4 mb-2 bg-[#F8F9FA] rounded-lg border-l-4 border-mp-green"
-              >
-                <TextComponent
-                  size={TextSize.Small}
-                  variant={TextVariant.Body}
-                  color={Color.Grey}
-                >
-                  {reminder.startTime}
-                  {reminder.endTime && ` - ${reminder.endTime}`}
-                </TextComponent>
-                <TextComponent
-                  size={TextSize.Small}
-                  variant={TextVariant.Title}
-                >
-                  {reminder.content.title}
-                </TextComponent>
-              </Pressable>
+              />
             ))}
           </ScrollView>
 
