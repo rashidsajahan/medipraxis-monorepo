@@ -67,9 +67,8 @@ export type TextMapping = {
   >;
 };
 
-// Text Styles
-
-export const textStyles: TextMapping = {
+// Orginal Text Styles (Initial figma hifi design)
+const originalTextStyles: TextMapping = {
   [TextVariant.Title]: {
     // Title – Small
     [TextSize.Small]: {
@@ -156,3 +155,22 @@ export const textStyles: TextMapping = {
     },
   },
 };
+
+// Updated Text Styles with fontSize increased by 20%
+
+export const textStyles = Object.entries(originalTextStyles).reduce(
+  (acc, [variant, sizes]) => {
+    acc[variant as TextVariant] = Object.entries(sizes).reduce(
+      (sizeAcc, [size, style]) => {
+        sizeAcc[size as TextSize] = {
+          ...style,
+          fontSize: Math.round(style.fontSize * 1.2),
+        };
+        return sizeAcc;
+      },
+      {} as Record<TextSize, TextStyle>
+    );
+    return acc;
+  },
+  {} as TextMapping
+);
