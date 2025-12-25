@@ -1,4 +1,4 @@
-import { createApiClient } from "../../../packages/api-client/src";
+import { createApiClient } from "@repo/api-client";
 
 const RPCTest = () => {
   // Initialize the API client - Sample code
