@@ -28,3 +28,22 @@
 <ButtonComponent.BackButton size={ButtonSize.Small}>Home</ButtonComponent.BackButton>
 <ButtonComponent.BackButton>Go To Home Page</ButtonComponent.BackButton>
 ```
+
+# TextInput Component
+
+```ts
+<TextInputComponent
+    value={textInput}
+    onChangeText={setTextInput}
+    placeholder="Enter your name"
+    label="Text Input"
+    showPasswordToggle={false}
+ />
+<TextInputComponent
+    value={password}
+    onChangeText={setPassword}
+    placeholder="Enter your password"
+    label="Password Input"
+    inputType="password"
+/>
+```

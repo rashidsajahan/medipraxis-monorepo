@@ -10,40 +10,31 @@ import { Color, TextSize, TextVariant } from '@repo/config';
 export default function TabTwoScreen() {
   const [textInput, setTextInput] = useState("");
   const [otp, setOtp] = useState("");
+  const [password, setPassword] = useState("");
 
   return (
       <View style={styles.container}>
         <View>
-          <TextComponent variant={TextVariant.Title} size={TextSize.ExtraLarge}>
-            Title-extralarge
-          </TextComponent>
           <TextComponent variant={TextVariant.Title} size={TextSize.Large}>
-            Title-large
+            Welcome to Tab Two!
           </TextComponent>
-          <TextComponent variant={TextVariant.Title} size={TextSize.Medium}>
-            Title-medium
-          </TextComponent>
-          <TextComponent variant={TextVariant.Title} size={TextSize.Small}>
-            Title-small
-          </TextComponent>
-          <TextComponent variant={TextVariant.Button} size={TextSize.Large}>
-            Button-large
-          </TextComponent>
-          <TextComponent variant={TextVariant.Button} size={TextSize.Medium}>
-            Button-medium
-          </TextComponent>
-          <TextComponent variant={TextVariant.Button} size={TextSize.Small}>
-            Button-small
-          </TextComponent>
-          <TextComponent variant={TextVariant.Body} size={TextSize.Large}>
-            Body-large
-          </TextComponent>
-          <TextComponent variant={TextVariant.Body} size={TextSize.Medium}>
-            Body-medium
-          </TextComponent>
-          <TextComponent variant={TextVariant.Body} size={TextSize.Small}>
-            Body-small
-          </TextComponent>
+          <TextInputComponent
+            value={textInput}
+            onChangeText={setTextInput}
+            placeholder="Enter your name"
+            label="Text Input"
+            showPasswordToggle={false}
+          />
+        </View>
+        <View style={styles.separator} />
+        <View>
+          <TextInputComponent
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Enter your password"
+            label="Password Input"
+            inputType="password"
+          />
         </View>
 
         <View style={styles.separator} />

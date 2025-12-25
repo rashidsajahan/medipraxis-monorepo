@@ -1,7 +1,8 @@
-import { Input, InputField } from '@/components/ui/input';
+import { Input, InputField, InputSlot } from '@/components/ui/input';
 import { Color, Font, TextSize, TextVariant, textStyles } from '@repo/config';
-import React from 'react';
-import { TextStyle as RNTextStyle, StyleSheet, Text, View } from 'react-native';
+import { EyeIcon, EyeSlashIcon } from 'phosphor-react-native';
+import React, { useState } from 'react';
+import { Pressable, TextStyle as RNTextStyle, StyleSheet, Text, View } from 'react-native';
 
 // Props for the TextInput component
 interface TextInputProps {
@@ -15,7 +16,8 @@ interface TextInputProps {
   textColor?: Color;
   placeholderColor?: Color;
   labelColor?: Color;
-  inputType?: 'text' | 'number' | 'decimal' | 'email' | 'phone';
+  inputType?: 'text' | 'number' | 'decimal' | 'email' | 'phone' | 'password';
+  showPasswordToggle?: boolean;
 }
 
 // Props for OTP Input Field
@@ -69,7 +71,13 @@ const TextInputBase: React.FC<TextInputProps> = ({
   placeholderColor = Color.Grey,
   labelColor = Color.Black,
   inputType = 'text',
+  showPasswordToggle = false,
 }) => {
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  
+  const shouldShowToggle = showPasswordToggle || inputType === 'password';
+  const isSecureEntry = shouldShowToggle && !isPasswordVisible;
+
   return (
     <View style={styles.inputWrapper}>
       {label && (
@@ -89,9 +97,9 @@ const TextInputBase: React.FC<TextInputProps> = ({
         isInvalid={isInvalid}
         style={{
           borderColor: borderColor,
-          borderRadius: 8, // Border radius
-          width: '100%', // Full width
-          height: 50, // Fixed height for Input Box
+          borderRadius: 8,
+          width: '100%',
+          height: 50,
         }}
       >
         <InputField
@@ -99,10 +107,12 @@ const TextInputBase: React.FC<TextInputProps> = ({
           onChangeText={onChangeText}
           placeholder={placeholder}
           placeholderTextColor={placeholderColor}
+          secureTextEntry={isSecureEntry}
           style={{
             color: textColor,
-            paddingHorizontal: 16, // Padding
-            paddingVertical: 8, // Padding
+            paddingHorizontal: 16,
+            paddingVertical: 8,
+            paddingRight: shouldShowToggle ? 48 : 16,
             fontFamily: textLargeStyle.fontFamily === Font.DMsans ? 'DMSans_400Regular' : 'Lato_400Regular',
             fontSize: textLargeStyle.fontSize,
             fontWeight: String(textLargeStyle.fontWeight) as RNTextStyle['fontWeight'],
@@ -110,6 +120,17 @@ const TextInputBase: React.FC<TextInputProps> = ({
           }}
           keyboardType={getKeyboardType(inputType)}
         />
+        {shouldShowToggle && (
+          <InputSlot style={styles.iconSlot}>
+            <Pressable onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
+              {isPasswordVisible ? (
+                <EyeIcon size={20} color={Color.Grey} weight="regular" />
+              ) : (
+                <EyeSlashIcon size={20} color={Color.Grey} weight="regular" />
+              )}
+            </Pressable>
+          </InputSlot>
+        )}
       </Input>
     </View>
   );
@@ -146,7 +167,7 @@ const OTPField: React.FC<OTPInputFieldProps> = ({
         isInvalid={isInvalid}
         style={{
           borderColor: borderColor,
-          borderRadius: 8, // Border radius for OTP input
+          borderRadius: 8,
           width: size,
           height: size,
         }}
@@ -177,7 +198,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   label: {
-    marginBottom: 8, // Margin between label and input
+    marginBottom: 8,
+  },
+  iconSlot: {
+    paddingRight: 16,
   },
 });
 
