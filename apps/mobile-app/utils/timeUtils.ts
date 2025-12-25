@@ -185,3 +185,86 @@ export function formatDuration(durationMinutes: number): string {
     return `${hours} hr${hours !== 1 ? "s" : ""} ${minutes} min${minutes !== 1 ? "s" : ""}`;
   }
 }
+
+/**
+ * Groups reminders that are in close proximity or have overlapping times
+ * @param reminders - Array of reminder data with startTime and optional endTime
+ * @param proximityMinutes - Minutes threshold for grouping (default: 15)
+ * @param defaultDurationMinutes - Default duration when no endTime (default: 30)
+ * @returns Array of grouped reminders
+ */
+export function groupReminders<T extends { startTime: string; endTime?: string }>(
+  reminders: T[],
+  proximityMinutes: number = 15,
+  defaultDurationMinutes: number = 30
+): Array<{
+  startTime: string;
+  endTime: string;
+  reminders: T[];
+  count: number;
+}> {
+  if (!reminders || reminders.length === 0) {
+    return [];
+  }
+
+  // Sort reminders by start time
+  const sorted = [...reminders].sort((a, b) => {
+    const aMinutes = parseTimeToMinutes(a.startTime);
+    const bMinutes = parseTimeToMinutes(b.startTime);
+    return aMinutes - bMinutes;
+  });
+
+  const groups: Array<{
+    startTime: string;
+    endTime: string;
+    reminders: T[];
+    count: number;
+  }> = [];
+
+  let currentGroup: T[] = [sorted[0]];
+  let groupStartMinutes = parseTimeToMinutes(sorted[0].startTime);
+  let groupEndMinutes = sorted[0].endTime
+    ? parseTimeToMinutes(sorted[0].endTime)
+    : groupStartMinutes + defaultDurationMinutes;
+
+  for (let i = 1; i < sorted.length; i++) {
+    const reminder = sorted[i];
+    const reminderStartMinutes = parseTimeToMinutes(reminder.startTime);
+    const reminderEndMinutes = reminder.endTime
+      ? parseTimeToMinutes(reminder.endTime)
+      : reminderStartMinutes + defaultDurationMinutes;
+
+    // Check if this reminder should be grouped with current group
+    // Group if: overlapping OR within proximity threshold
+    const isOverlapping = reminderStartMinutes < groupEndMinutes;
+    const isCloseProximity = reminderStartMinutes - groupEndMinutes <= proximityMinutes;
+
+    if (isOverlapping || isCloseProximity) {
+      // Add to current group and extend end time if needed
+      currentGroup.push(reminder);
+      groupEndMinutes = Math.max(groupEndMinutes, reminderEndMinutes);
+    } else {
+      // Save current group and start new one
+      groups.push({
+        startTime: formatTimeFromMinutes(groupStartMinutes),
+        endTime: formatTimeFromMinutes(groupEndMinutes),
+        reminders: currentGroup,
+        count: currentGroup.length,
+      });
+
+      currentGroup = [reminder];
+      groupStartMinutes = reminderStartMinutes;
+      groupEndMinutes = reminderEndMinutes;
+    }
+  }
+
+  // Add the last group
+  groups.push({
+    startTime: formatTimeFromMinutes(groupStartMinutes),
+    endTime: formatTimeFromMinutes(groupEndMinutes),
+    reminders: currentGroup,
+    count: currentGroup.length,
+  });
+
+  return groups;
+}

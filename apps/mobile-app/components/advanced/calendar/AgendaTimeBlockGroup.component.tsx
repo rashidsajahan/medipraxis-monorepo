@@ -47,7 +47,7 @@ export function AgendaTimeBlockGroup({
 
   // Calculate width for left column (appointments) - 75% of available space
   const availableWidth = screenWidth - LEFT_MARGIN - RIGHT_MARGIN;
-  const columnWidth = availableWidth * 0.75;
+  const columnWidth = availableWidth * 0.7;
 
   // Calculate slot duration in minutes
   const totalDurationMinutes = (endHourDecimal - startHourDecimal) * 60;

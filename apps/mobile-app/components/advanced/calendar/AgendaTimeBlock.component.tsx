@@ -32,7 +32,7 @@ export function AgendaTimeBlock({
   const LEFT_MARGIN = 60;
   const RIGHT_MARGIN = 16;
   const availableWidth = screenWidth - LEFT_MARGIN - RIGHT_MARGIN;
-  const columnWidth = availableWidth * 0.75;
+  const columnWidth = availableWidth * 0.7;
 
   return (
     <Pressable

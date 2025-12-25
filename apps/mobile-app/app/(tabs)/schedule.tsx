@@ -14,7 +14,7 @@ export default function ScheduleScreen() {
   const [selectedAppointment, setSelectedAppointment] =
     useState<AgendaSelection | null>(null);
 
-  // Debug toast when appointment is selected
+  // Debug toast when appointment/reminder is selected
   useEffect(() => {
     if (selectedAppointment) {
       if (selectedAppointment.type === AgendaSelectionType.Appointment) {
@@ -27,6 +27,12 @@ export default function ScheduleScreen() {
         Alert.alert(
           "Empty Slot Selected",
           `Group ID: ${selectedAppointment.groupId}\nSlot Number: ${selectedAppointment.slotNumber}`,
+          [{ text: "OK" }]
+        );
+      } else if (selectedAppointment.type === AgendaSelectionType.Reminder) {
+        Alert.alert(
+          "Reminder Selected",
+          `Reminder ID: ${selectedAppointment.reminderId}`,
           [{ text: "OK" }]
         );
       }
@@ -80,6 +86,29 @@ export default function ScheduleScreen() {
         ],
       },
     ],
+    reminders: [
+      {
+        content: { id: "rem-001", title: "Take medication" },
+        startTime: "2:30 am",
+      },
+      {
+        content: { id: "rem-002", title: "Call pharmacy" },
+        startTime: "6:00 am",
+      },
+      {
+        content: { id: "rem-003", title: "Review lab results" },
+        startTime: "7:30 am",
+      },
+      {
+        content: { id: "rem-004", title: "Follow up with patient" },
+        startTime: "9:45 am",
+      },
+      {
+        content: { id: "rem-005", title: "Lunch break" },
+        startTime: "12:00 pm",
+        endTime: "12:30 pm",
+      },
+    ],
   };
 
   return (
@@ -100,6 +129,12 @@ export default function ScheduleScreen() {
             type: AgendaSelectionType.EmptySlot,
             groupId,
             slotNumber,
+          })
+        }
+        onReminderPress={(reminder) =>
+          setSelectedAppointment({
+            type: AgendaSelectionType.Reminder,
+            reminderId: reminder.id,
           })
         }
       />

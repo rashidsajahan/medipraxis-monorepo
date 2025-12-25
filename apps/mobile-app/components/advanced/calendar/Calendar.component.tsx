@@ -21,7 +21,7 @@ import {
   WeekCalendar,
 } from "react-native-calendars";
 import { AgendaComponent } from "./Agenda.component";
-import { AgendaBlockContent, AgendaData } from "./calendar.types";
+import { AgendaBlockContent, AgendaData, AgendaReminderContent } from "./calendar.types";
 
 interface CalendarComponentProps {
   agendaData?: AgendaData;
@@ -29,9 +29,10 @@ interface CalendarComponentProps {
   onDateChange?: (date: string) => void;
   onAppointmentPress?: (appointment: AgendaBlockContent, groupId: string | null) => void;
   onEmptySlotPress?: (groupId: string, slotNumber: number) => void;
+  onReminderPress?: (reminder: AgendaReminderContent) => void;
 }
 
-export function CalendarComponent({ agendaData, selectedDate, onDateChange, onAppointmentPress, onEmptySlotPress }: CalendarComponentProps = {}) {
+export function CalendarComponent({ agendaData, selectedDate, onDateChange, onAppointmentPress, onEmptySlotPress, onReminderPress }: CalendarComponentProps = {}) {
   const [selected, setSelected] = useState(selectedDate || "");
   const [isExpanded, setIsExpanded] = useState(false);
   const [showFullCalendar, setShowFullCalendar] = useState(false);
@@ -249,6 +250,7 @@ export function CalendarComponent({ agendaData, selectedDate, onDateChange, onAp
         agendaData={agendaData}
         onAppointmentPress={onAppointmentPress}
         onEmptySlotPress={onEmptySlotPress}
+        onReminderPress={onReminderPress}
       />
     </View>
   );

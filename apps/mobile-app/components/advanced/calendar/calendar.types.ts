@@ -18,14 +18,27 @@ export interface AgendaTimeBlockGroupData {
   contents: (AgendaBlockContent | null)[];
 }
 
+export interface AgendaReminderContent {
+  id: string;
+  title: string;
+}
+
+export interface AgendaReminderData {
+  content: AgendaReminderContent;
+  startTime: string;
+  endTime?: string;
+}
+
 export interface AgendaData {
   timeBlocks?: AgendaTimeBlockData[];
   timeBlockGroups?: AgendaTimeBlockGroupData[];
+  reminders?: AgendaReminderData[];
 }
 
 export enum AgendaSelectionType {
   Appointment = "appointment",
   EmptySlot = "empty_slot",
+  Reminder = "reminder",
 }
 
 export type AgendaSelection =
@@ -38,4 +51,8 @@ export type AgendaSelection =
       type: AgendaSelectionType.EmptySlot;
       groupId: string;
       slotNumber: number;
+    }
+  | {
+      type: AgendaSelectionType.Reminder;
+      reminderId: string;
     };

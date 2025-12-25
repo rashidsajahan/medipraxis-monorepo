@@ -1,16 +1,24 @@
 import TextComponent from "@/components/basic";
+import { groupReminders } from "@/utils";
 import { Color, TextSize, TextVariant } from "@repo/config";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   NativeScrollEvent,
   NativeSyntheticEvent,
   ScrollView,
   View,
 } from "react-native";
+import { AgendaReminderBlock } from "./AgendaReminderBlock.component";
+import { AgendaReminderModal } from "./AgendaReminderModal.component";
 import { AgendaTimeBlock } from "./AgendaTimeBlock.component";
 import { AgendaTimeBlockGroup } from "./AgendaTimeBlockGroup.component";
 import { AGENDA_COLORS, HOUR_HEIGHT } from "./calendar.constants";
-import { AgendaBlockContent, AgendaData } from "./calendar.types";
+import {
+  AgendaBlockContent,
+  AgendaData,
+  AgendaReminderContent,
+  AgendaReminderData,
+} from "./calendar.types";
 
 interface AgendaComponentProps {
   selectedDate: string;
@@ -20,6 +28,7 @@ interface AgendaComponentProps {
     groupId: string | null
   ) => void;
   onEmptySlotPress?: (groupId: string, slotNumber: number) => void;
+  onReminderPress?: (reminder: AgendaReminderContent) => void;
 }
 
 export function AgendaComponent({
@@ -27,13 +36,25 @@ export function AgendaComponent({
   agendaData,
   onAppointmentPress,
   onEmptySlotPress,
+  onReminderPress,
 }: AgendaComponentProps): React.JSX.Element {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [reminderModalVisible, setReminderModalVisible] = useState(false);
+  const [selectedReminderGroup, setSelectedReminderGroup] = useState<
+    AgendaReminderData[]
+  >([]);
+
   const hours = Array.from({ length: 25 }, (_, i) => {
     const hour = i % 12 || 12;
     const period = i < 12 ? "am" : "pm";
     return `${hour} ${period}`;
   });
+
+  // Group reminders that are close together or overlapping
+  const groupedReminders = useMemo(() => {
+    if (!agendaData?.reminders) return [];
+    return groupReminders(agendaData.reminders, 15, 30);
+  }, [agendaData?.reminders]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -127,8 +148,34 @@ export function AgendaComponent({
               onEmptySlotPress={onEmptySlotPress}
             />
           ))}
+          {groupedReminders.map((group, index) => (
+            <AgendaReminderBlock
+              key={`reminder-group-${index}`}
+              content={
+                group.count > 1
+                  ? { id: `group-${index}`, title: `${group.count} Tasks` }
+                  : group.reminders[0].content
+              }
+              startTime={group.startTime}
+              endTime={group.endTime}
+              onPress={
+                group.count > 1
+                  ? () => {
+                      setSelectedReminderGroup(group.reminders);
+                      setReminderModalVisible(true);
+                    }
+                  : () => onReminderPress?.(group.reminders[0].content)
+              }
+            />
+          ))}
         </View>
       </ScrollView>
+      <AgendaReminderModal
+        visible={reminderModalVisible}
+        onClose={() => setReminderModalVisible(false)}
+        reminders={selectedReminderGroup}
+        onReminderPress={onReminderPress}
+      />
     </>
   );
 }
