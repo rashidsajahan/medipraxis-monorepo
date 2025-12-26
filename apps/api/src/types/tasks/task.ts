@@ -14,7 +14,7 @@ export interface Task {
   set_alarm: boolean;  
 
   // appointment 
-  appointment_number: string;
+  appointment_number: number;
 }
 
 export interface TaskDetails extends Task {
@@ -36,7 +36,7 @@ export interface CreateTaskInput {
   set_alarm?: boolean;
     
   // appointment
-  appointment_number: string;
+  appointment_number: number;
 }
 
 export interface UpdateTaskInput {
@@ -50,6 +50,6 @@ export interface UpdateTaskInput {
   set_alarm?: boolean;
     
   // appointment 
-  appointment_number: string;
+  appointment_number: number;
   user_id: string
 }

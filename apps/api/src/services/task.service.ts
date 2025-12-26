@@ -61,7 +61,7 @@ export class TaskService {
 				appointmentDate
 			);
 
-			const appointmentNumber = String(count + 1).padStart(3, "0");
+			const appointmentNumber = count + 1;
 			
 			return this.taskRepository.create({
 				...input,
