@@ -63,11 +63,11 @@ export class TaskService {
 
 			const appointmentNumber = count + 1;
 			
-			return this.taskRepository.create({
+			input = {
 				...input,
 				appointment_number: appointmentNumber,
 				task_type_id: appointmentTypeId,
-			});
+			};
 		}
 
     if (!input.task_status_id) {
