@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 
 import EditScreenInfo from "@/components/EditScreenInfo";
 import { View } from "@/components/Themed";
-import TextComponent, { ButtonComponent, ButtonSize, DropdownComponent, TextInputComponent, ToggleButton } from "@/components/basic";
+import TextComponent, { ButtonComponent, ButtonSize, ChipComponent, DropdownComponent, IconSize, TextInputComponent, ToggleButton } from "@/components/basic";
 import { Icons } from "@/config";
 import { Color, TextSize, TextVariant } from '@repo/config';
 import { z } from "zod";
@@ -85,22 +85,22 @@ export default function TabTwoScreen() {
           showWarning={username === "admin" || username === "test"}
           helperText="3-20 characters, letters, numbers & underscores"
         />
-                <View>
-          <TextInputComponent.OTPField
-            value={otp1}
-            onChangeText={setOtp1}
-            validationSchema={otpSchema}
-          />
-          <DropdownComponent
-            value={country}
-            onValueChange={setCountry}
-            options={countryOptions}
-            label="Country"
-            placeholder="Select a country"
-            validationSchema={requiredSchema}
-            helperText="Please select your country"
-            showValidation={true}
-          />
+      <View>
+        <TextInputComponent.OTPField
+          value={otp1}
+          onChangeText={setOtp1}
+          validationSchema={otpSchema}
+        />
+        <DropdownComponent
+          value={country}
+          onValueChange={setCountry}
+          options={countryOptions}
+          label="Country"
+          placeholder="Select a country"
+          validationSchema={requiredSchema}
+          helperText="Please select your country"
+          showValidation={true}
+        />
         <ToggleButton 
           size="sm" 
           label="Enable toggle"
@@ -112,8 +112,28 @@ export default function TabTwoScreen() {
           isActive={darkModeEnabled}
           onToggle={setDarkModeEnabled}
         />
-        </View>
+        <ChipComponent 
+          text="Penicillin allergy" 
+          backgroundColor={Color.Danger} 
+          textColor={Color.White}
+          textSize={TextSize.Small}
+          iconName={Icons.Heart}
+          iconSize={IconSize.Small}
+          iconColor={Color.LightCream}
+          iconPosition="left"
+        />
 
+        <ChipComponent 
+          text="Warning" 
+          backgroundColor={Color.Warnning} 
+          textColor={Color.White}
+          textSize={TextSize.Medium}
+          iconName={Icons.Check}
+          iconSize={IconSize.Medium}
+          iconColor={Color.LightCream}
+          iconPosition="right"
+        />
+        </View>
       <View style={styles.buttonContainer}>
         {/* Small button */}
         <View style={styles.centeredButton}>
