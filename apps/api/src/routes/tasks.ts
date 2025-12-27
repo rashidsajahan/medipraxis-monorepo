@@ -8,9 +8,8 @@ import {
 } from "@repo/models";
 import { Hono } from "hono";
 import { TaskController } from "../controllers";
-import { Env } from "../types";
 
-const tasks = new Hono<{ Bindings: Env }>()
+const tasks = new Hono()
   .post("/", zValidator("json", createTaskSchema), TaskController.createTask)
   .get(
     "/",
