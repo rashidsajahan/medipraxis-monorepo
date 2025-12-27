@@ -1,11 +1,9 @@
 import { CreateTaskInput, UpdateTaskInput } from "@repo/models";
-import type { Context } from "hono";
 import { getTaskService } from "../lib";
-import type { Env } from "../types";
-import { APICreateRequestContext, APIUpdateRequestContext } from "../types/api-request-context";
+import { APIContext } from "../types/api-context";
 
 export class TaskController {
-  static async getAllTasks(c: Context<{ Bindings: Env }>) {
+  static async getAllTasks(c: APIContext<null>) {
     try {
       const taskService = getTaskService(c);
       const userId = c.req.query("user_id");
@@ -20,7 +18,7 @@ export class TaskController {
     }
   }
 
-  static async getTaskById(c: Context<{ Bindings: Env }>) {
+  static async getTaskById(c: APIContext<null, "/:id">) {
     try {
       const taskService = getTaskService(c);
       const taskId = c.req.param("id");
@@ -39,7 +37,7 @@ export class TaskController {
     }
   }
 
-  static async createTask(c: APICreateRequestContext<CreateTaskInput>) {
+  static async createTask(c: APIContext<CreateTaskInput>) {
     try {
       const taskService = getTaskService(c);
       const body: CreateTaskInput = c.req.valid("json");
@@ -54,7 +52,7 @@ export class TaskController {
     }
   }
 
-  static async updateTask(c: APIUpdateRequestContext<UpdateTaskInput>) {
+  static async updateTask(c: APIContext<UpdateTaskInput, "/:id">) {
     try {
       const taskService = getTaskService(c);
       const taskId = c.req.param("id");
