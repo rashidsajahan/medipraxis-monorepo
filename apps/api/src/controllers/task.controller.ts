@@ -5,7 +5,7 @@ import {
   UpdateTaskInput,
 } from "@repo/models";
 import { getTaskService } from "../lib";
-import { APIContext } from "../types/api-context";
+import type { APIContext } from "../types/api-context";
 
 export class TaskController {
   static async getAllTasks(c: APIContext<{ query: GetAllTaskQuery }>) {
