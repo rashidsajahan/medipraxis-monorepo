@@ -36,12 +36,42 @@ const RPCTest = () => {
     }
   };
 
+  const testUpdateTaskApiCall = async () => {
+  try {
+    const taskId = "24f21ec7-bf59-4c35-9c54-36cb24afafbe"; // Replace with actual task ID
+    
+    const res = await api.tasks[":id"].$put({
+      param: {
+        id: taskId,
+      },
+      json: {
+        task_title: "Updated: Daily Blood Sugar Monitoring",
+        task_type_id: "24f21ec7-bf59-4c35-9c54-36cb24afafbe",
+        client_id: "24f21ec7-bf59-4c35-9c54-36cb24afafb3",
+        start_date: "2025-12-20T06:46:42.023",
+        end_date: "2025-12-26T05:32:21.756", // Updated end date
+        note: "Updated: Patient needs to monitor blood sugar levels twice daily.",
+        set_alarm: true, // Changed to true
+        task_status_id: "24f21ec7-bf59-4c35-9c54-36cb24afafbb", // Updated status
+      },
+    });
+    
+    const data = await res.json();
+    console.log("Update Task API Response:", data);
+  } catch (error) {
+    console.error("Update Task API Call Error:", error);
+  }
+};
+
   return (
     <>
       <div style={{ display: "flex", gap: "10px" }}>
         <button onClick={testApiCall}>Get Tasks API Call Test</button>
         <button onClick={testCreateTaskApiCall}>
           Create Task API Call Test
+        </button>
+        <button onClick={testUpdateTaskApiCall}>
+          Update Task API Call Test
         </button>
       </div>
     </>

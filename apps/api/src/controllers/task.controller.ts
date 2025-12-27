@@ -1,8 +1,8 @@
-import { CreateTaskInput } from "@repo/models";
+import { CreateTaskInput, UpdateTaskInput } from "@repo/models";
 import type { Context } from "hono";
 import { getTaskService } from "../lib";
-import type { Env, UpdateTaskInput } from "../types";
-import { APIRequestContext } from "../types/api-request-context";
+import type { Env } from "../types";
+import { APICreateRequestContext, APIUpdateRequestContext } from "../types/api-request-context";
 
 export class TaskController {
   static async getAllTasks(c: Context<{ Bindings: Env }>) {
@@ -54,7 +54,7 @@ export class TaskController {
     }
   }
 
-  static async updateTask(c: Context<{ Bindings: Env }>) {
+  static async updateTask(c: APIUpdateRequestContext<UpdateTaskInput>) {
     try {
       const taskService = getTaskService(c);
       const taskId = c.req.param("id");

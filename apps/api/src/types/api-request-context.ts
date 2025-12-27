@@ -11,3 +11,14 @@ export type APICreateRequestContext<T, P extends string = "/"> = Context<
     out: { json: any };
   }
 >;
+
+export type APIUpdateRequestContext<T, P extends string = "/:id"> = Context<
+  {
+    Bindings: Env;
+  },
+  P,
+  {
+    in: { json: T; param: { id: string } };
+    out: { json: any };
+  }
+>;
