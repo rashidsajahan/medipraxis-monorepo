@@ -2,11 +2,11 @@ import { createApiClient } from "@repo/api-client";
 
 const RPCTest = () => {
   // Initialize the API client - Sample code
-  const api = createApiClient(import.meta.env.VITE_API_URL);
+  const api = createApiClient(import.meta.env.VITE_API_URL).api;
 
   const testApiCall = async () => {
     try {
-      const res = await (api as any).api.tasks.$get();
+      const res = await api.tasks.$get();
       const data = await res.json();
       console.log("API Response:", data);
     } catch (error) {
@@ -16,9 +16,9 @@ const RPCTest = () => {
 
   const testCreateTaskApiCall = async () => {
     try {
-      const res = await (api as any).api.tasks.$post({
+      const res = await api.tasks.$post({
         json: {
-          task_title: "Make the log notes on the diabetic patient",
+          task_title: "Daily Blood Sugar Monitoring",
           task_type_id: "24f21ec7-bf59-4c35-9c54-36cb24afafbe",
           client_id: "24f21ec7-bf59-4c35-9c54-36cb24afafb3",
           user_id: "2a3c19b8-d352-4b30-a2ac-1cdf993d3102",
