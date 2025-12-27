@@ -1571,11 +1571,6 @@
     find-yarn-workspace-root "^2.0.0"
     fs-extra "^11.1.0"
 
-"@hono/client@^0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@hono/client/-/client-0.0.3.tgz#d1e724a4b34301655bd91dbfdc3d7280915c905b"
-  integrity sha512-1TrYdppLelv39uCqevePjKUeyf4AoKYWQ+/qfNtRzY8OPBur78XA1Gtv3Pi08uXT6GOuQN5fi3IFUwMsxnEhcQ==
-
 "@hono/zod-validator@^0.7.6":
   version "0.7.6"
   resolved "https://registry.yarnpkg.com/@hono/zod-validator/-/zod-validator-0.7.6.tgz#e51261e50138512f8b09996345c16b66d510355d"

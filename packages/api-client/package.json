@@ -7,7 +7,5 @@
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*"
   },
-  "dependencies": {
-    "@hono/client": "^0.0.3"
-  }
+  "dependencies": {}
 }
