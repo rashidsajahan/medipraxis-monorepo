@@ -2,17 +2,7 @@ import { CreateTaskInput } from "@repo/models";
 import type { Context } from "hono";
 import { getTaskService } from "../lib";
 import type { Env, UpdateTaskInput } from "../types";
-
-type CreateTaskContext<T, P extends string = "/"> = Context<
-  {
-    Bindings: Env;
-  },
-  P,
-  {
-    in: { json: T };
-    out: { json: any };
-  }
->;
+import { APIRequestContext } from "../types/api-request-context";
 
 export class TaskController {
   static async getAllTasks(c: Context<{ Bindings: Env }>) {
@@ -49,7 +39,7 @@ export class TaskController {
     }
   }
 
-  static async createTask(c: CreateTaskContext<CreateTaskInput>) {
+  static async createTask(c: APIRequestContext<CreateTaskInput>) {
     try {
       const taskService = getTaskService(c);
       const body: CreateTaskInput = c.req.valid("json");
