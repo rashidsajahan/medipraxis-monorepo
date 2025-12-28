@@ -67,8 +67,6 @@ export const FormDemo: React.FC = () => {
   };
 
   return (
-    <div style={{ maxWidth: "800px", margin: "0 auto", padding: "20px" }}>
-      <DynamicForm formData={mockFormData} onSubmit={handleSubmit} />
-    </div>
+    <DynamicForm formData={mockFormData} onSubmit={handleSubmit} />
   );
 };
