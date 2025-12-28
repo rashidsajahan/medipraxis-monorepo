@@ -1,5 +1,5 @@
 import { generateText } from "ai";
-import { models } from "./models";
+import { createModels, type ModelsMapping } from "./models";
 
 export type TaskType =
   | "greeting"
@@ -13,7 +13,7 @@ export interface RouterResponse {
   response?: string;
   isValid: boolean;
   guardRailViolation?: string;
-  workflowCalled?: boolean;
+  shouldCallWorkflow?: boolean;
 }
 
 const GUARD_RAIL_INSTRUCTIONS = [
@@ -41,7 +41,10 @@ Based on the medical practitioner's message, identify which task category it bel
 Respond with ONLY the task category name.
 `;
 
-async function checkGuardRails(userPrompt: string): Promise<{
+async function checkGuardRails(
+  userPrompt: string,
+  models: ModelsMapping
+): Promise<{
   isValid: boolean;
   violation?: string;
 }> {
@@ -70,7 +73,10 @@ Practitioner message: "${userPrompt}"
   return { isValid: true };
 }
 
-async function identifyTask(userPrompt: string): Promise<TaskType> {
+async function identifyTask(
+  userPrompt: string,
+  models: ModelsMapping
+): Promise<TaskType> {
   const { text } = await generateText({
     model: models.gemini.fast,
     prompt: `${TASK_IDENTIFICATION_PROMPT}\n\nPractitioner message: "${userPrompt}"`,
@@ -92,7 +98,8 @@ async function identifyTask(userPrompt: string): Promise<TaskType> {
 
 async function generateResponse(
   userPrompt: string,
-  task: TaskType
+  task: TaskType,
+  models: ModelsMapping
 ): Promise<string> {
   const contextPrompts: Record<TaskType, string> = {
     greeting: `${GUARD_RAIL_INSTRUCTIONS.join("\n")}\n\nRespond professionally and warmly to this medical practitioner's greeting. Keep it brief and respectful.\n\nPractitioner: ${userPrompt}`,
@@ -110,18 +117,14 @@ async function generateResponse(
   return text;
 }
 
-async function callWorkflow(task: TaskType, userPrompt: string): Promise<void> {
-  // TODO: Implement workflow execution
-  console.log(`[WORKFLOW] Calling workflow for task: ${task}`);
-  console.log(`[WORKFLOW] User prompt: ${userPrompt}`);
-  console.log(`[WORKFLOW] Workflow execution not yet implemented`);
-}
-
-export async function routeAIRequest(
-  userPrompt: string
+export async function processAIQuery(
+  userPrompt: string,
+  apiKey: string
 ): Promise<RouterResponse> {
+  const models = createModels(apiKey);
+
   // Step 1: Check guard rails
-  const guardRailCheck = await checkGuardRails(userPrompt);
+  const guardRailCheck = await checkGuardRails(userPrompt, models);
   if (!guardRailCheck.isValid) {
     console.log(`[GUARD RAIL VIOLATION] ${guardRailCheck.violation}`, {
       userPrompt,
@@ -133,30 +136,30 @@ export async function routeAIRequest(
       isValid: false,
       guardRailViolation: guardRailCheck.violation,
     };
+  } else {
+    console.log(`[GUARD RAIL CHECK] Passed`, { userPrompt });
   }
 
   // Step 2: Identify the task
-  const task = await identifyTask(userPrompt);
+  const task = await identifyTask(userPrompt, models);
 
   // Step 3: Handle based on task type
   const workflowTasks: TaskType[] = ["appointment", "client_management"];
 
   if (workflowTasks.includes(task)) {
-    // Call workflow for these tasks
-    await callWorkflow(task, userPrompt);
     return {
       task,
       isValid: true,
-      workflowCalled: true,
+      shouldCallWorkflow: true,
     };
   } else {
     // Generate response for greeting, general, unknown
-    const response = await generateResponse(userPrompt, task);
+    const response = await generateResponse(userPrompt, task, models);
     return {
       task,
       response,
       isValid: true,
-      workflowCalled: false,
+      shouldCallWorkflow: false,
     };
   }
 }
