@@ -8,12 +8,12 @@
   font-size: 2rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  color: #1a1a1a;
+  color: #181718;
 }
 
 .form-description {
   font-size: 1rem;
-  color: #666;
+  color: #7d7d7d;
   margin-bottom: 2rem;
 }
 
@@ -36,52 +36,53 @@
 .file-upload-label {
   font-size: 1rem;
   font-weight: 500;
-  color: #333;
+  color: #181718;
 }
 
 .required {
-  color: #ef4444;
+  color: #ff5757;
   margin-left: 0.25rem;
 }
 
 .help-text {
   font-size: 0.875rem;
-  color: #666;
+  color: #7d7d7d;
   margin: 0;
 }
 
 .notes {
   font-size: 0.875rem;
-  color: #888;
+  color: #7d7d7d;
   font-style: italic;
   margin: 0;
 }
 
 .file-upload-area {
-  border: 2px dashed #d1d5db;
+  border: 2px dashed #d3d3d3;
   border-radius: 8px;
   padding: 1.5rem;
-  background-color: #f9fafb;
+  background-color: #fbfbfb;
   transition: border-color 0.2s;
 }
 
 .file-upload-area:hover {
-  border-color: #9ca3af;
+  border-color: #90c67c;
 }
 
 .upload-button {
-  background-color: #3b82f6;
-  color: white;
+  background-color: #90c67c;
+  color: #01130a;
   padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 6px;
   font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s;
 }
 
 .upload-button:hover {
-  background-color: #2563eb;
+  background-color: #44b619;
 }
 
 .file-preview {
@@ -95,7 +96,7 @@
   max-height: 200px;
   border-radius: 8px;
   object-fit: cover;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #d3d3d3;
 }
 
 .file-info {
@@ -106,17 +107,17 @@
 
 .file-name {
   font-weight: 500;
-  color: #1a1a1a;
+  color: #181718;
 }
 
 .file-size {
   font-size: 0.875rem;
-  color: #666;
+  color: #7d7d7d;
 }
 
 .remove-button {
-  background-color: #ef4444;
-  color: white;
+  background-color: #ff5757;
+  color: #ffffff;
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 6px;
@@ -127,18 +128,18 @@
 }
 
 .remove-button:hover {
-  background-color: #dc2626;
+  background-color: #e03e3e;
 }
 
 .error-text {
-  color: #ef4444;
+  color: #ff5757;
   font-size: 0.875rem;
   margin: 0;
 }
 
 .file-requirements {
   font-size: 0.75rem;
-  color: #888;
+  color: #7d7d7d;
   margin: 0;
 }
 
@@ -148,12 +149,12 @@
   justify-content: flex-end;
   gap: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid #d3d3d3;
 }
 
 .submit-button {
-  background-color: #10b981;
-  color: white;
+  background-color: #44b619;
+  color: #ffffff;
   padding: 0.75rem 2rem;
   border: none;
   border-radius: 6px;
@@ -164,15 +165,15 @@
 }
 
 .submit-button:hover {
-  background-color: #059669;
+  background-color: #3a9d15;
 }
 
 /* Not Implemented Field */
 .field-not-implemented {
   padding: 1rem;
-  background-color: #fef3c7;
-  border: 1px solid #fbbf24;
+  background-color: #fbf6e9;
+  border: 1px solid #ffa500;
   border-radius: 6px;
-  color: #92400e;
+  color: #01130a;
   font-size: 0.875rem;
 }
