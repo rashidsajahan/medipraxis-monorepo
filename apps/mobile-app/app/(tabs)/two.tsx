@@ -3,92 +3,83 @@ import { StyleSheet } from "react-native";
 
 import EditScreenInfo from "@/components/EditScreenInfo";
 import { View } from "@/components/Themed";
-import TextComponent, { ButtonComponent, ButtonSize, DropdownComponent, TextInputComponent } from "@/components/basic";
+import {
+  ButtonComponent,
+  ButtonSize,
+  DropdownComponent,
+  TextComponent,
+  TextInputComponent,
+} from "@/components/basic";
 import { Icons } from "@/config";
-import { Color, TextSize, TextVariant } from '@repo/config';
+import { Color, KeyboardInputType, TextSize, TextVariant } from "@repo/config";
 import { z } from "zod";
 
 export default function TabTwoScreen() {
-  const [textInput, setTextInput] = useState("");
-  const [otp1, setOtp1] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
-  const [country, setCountry] = useState('');
+  const [country, setCountry] = useState("");
 
-    // Country options
+  // Country options
   const countryOptions = [
-    { label: 'United States', value: 'us' },
-    { label: 'United Kingdom', value: 'uk' },
-    { label: 'Canada', value: 'ca' },
-    { label: 'Australia', value: 'au' },
-    { label: 'Germany', value: 'de' },
-    { label: 'France', value: 'fr' },
-    { label: 'Japan', value: 'jp' },
-    { label: 'India', value: 'in' },
+    { label: "United States", value: "us" },
+    { label: "United Kingdom", value: "uk" },
+    { label: "Canada", value: "ca" },
+    { label: "Australia", value: "au" },
+    { label: "Germany", value: "de" },
+    { label: "France", value: "fr" },
+    { label: "Japan", value: "jp" },
+    { label: "India", value: "in" },
   ];
-  
+
   // Validation Schemas
-  const passwordSchema = z.string()
+  const [otp, setOtp] = useState("");
+
+  const passwordSchema = z
+    .string()
     .min(8, "Password must be at least 8 characters")
     .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
     .regex(/[a-z]/, "Password must contain at least one lowercase letter")
     .regex(/[0-9]/, "Password must contain at least one number");
-  const usernameSchema = z.string()
+  const usernameSchema = z
+    .string()
     .min(3, "Username must be at least 3 characters")
     .max(20, "Username must not exceed 20 characters")
-    .regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores");
-  const otpSchema = z.string().regex(/^[0-9]$/, "Must be a number");
-  const requiredSchema = z.string().min(1, 'This field is required');
+    .regex(
+      /^[a-zA-Z0-9_]+$/,
+      "Username can only contain letters, numbers, and underscores"
+    );
+  const requiredSchema = z.string().min(1, "This field is required");
+  const otpSchema = z
+    .string()
+    .length(1, "Must be a single digit")
+    .regex(/^[0-9]$/, "Must be a number");
 
   return (
-      <View style={styles.container}>
-        <View>
-          <TextComponent variant={TextVariant.Title} size={TextSize.Large}>
-            Welcome to Tab Two!
-          </TextComponent>
-          <TextInputComponent
-            value={textInput}
-            onChangeText={setTextInput}
-            placeholder="Enter your name"
-            label="Text Input"
-            showPasswordToggle={false}
-          />
-        </View>
-        <View style={styles.separator} />
-        <View>
-          <TextInputComponent
-            value={textInput}
-            onChangeText={setTextInput}
-            placeholder="Enter your name"
-            label="Text Input"
-          />
-        </View>
-        {/* Password Input with Validation */}
+    <View style={styles.container}>
+      <View>
+        <TextComponent variant={TextVariant.Title} size={TextSize.Large}>
+          Welcome to Tab Two!
+        </TextComponent>
+      </View>
+      <View style={styles.separator} />
+      <View>
         <TextInputComponent
-          value={password}
-          onChangeText={setPassword}
-          placeholder="Enter secure password"
-          label="Password"
-          inputType="password"
-          validationSchema={passwordSchema}
-          helperText="Min 8 chars with uppercase, lowercase & number"
-        />
-        {/* Username with Warning Example */}
-        <TextInputComponent
-          value={username}
-          onChangeText={setUsername}
-          placeholder="johndoe123"
+          inputWrapper={{
+            accessibilityHint: "Enter your username",
+          }}
+          inputField={{
+            value: username,
+            onChangeText: setUsername,
+            placeholder: "Enter username",
+            placeholderTextColor: Color.Grey,
+          }}
           label="Username"
+          inputType={KeyboardInputType.Text}
           validationSchema={usernameSchema}
-          showWarning={username === "admin" || username === "test"}
-          helperText="3-20 characters, letters, numbers & underscores"
+          helperText="Username must be 3-20 characters"
+          validateOnChange={true}
         />
-                <View>
-          <TextInputComponent.OTPField
-            value={otp1}
-            onChangeText={setOtp1}
-            validationSchema={otpSchema}
-          />
+        <View>
           <DropdownComponent
             value={country}
             onValueChange={setCountry}
@@ -100,6 +91,35 @@ export default function TabTwoScreen() {
             showValidation={true}
           />
         </View>
+        <TextInputComponent
+          inputWrapper={{
+            accessibilityHint: "Enter your password",
+          }}
+          inputField={{
+            value: password,
+            onChangeText: setPassword,
+            placeholder: "Enter password",
+            placeholderTextColor: Color.Grey,
+          }}
+          label="Password"
+          inputType={KeyboardInputType.Password}
+          validationSchema={passwordSchema}
+          helperText="Password must be at least 8 characters with uppercase, lowercase, and number"
+          validateOnChange={true}
+        />
+        <TextInputComponent.OTPField
+          inputWrapper={{
+            accessibilityHint: "Enter OTP digit",
+          }}
+          inputField={{
+            value: otp,
+            onChangeText: setOtp,
+          }}
+          label="Enter OTP"
+          size={60}
+          validationSchema={otpSchema}
+        />
+      </View>
 
       <View style={styles.buttonContainer}>
         {/* Small button */}
@@ -138,13 +158,15 @@ export default function TabTwoScreen() {
         >
           Complete Purchase
         </ButtonComponent>
-        
+
         {/* Back button */}
         <View style={styles.centeredButton}>
-          <ButtonComponent.BackButton size={ButtonSize.Medium}>Back</ButtonComponent.BackButton>
+          <ButtonComponent.BackButton size={ButtonSize.Medium}>
+            Back
+          </ButtonComponent.BackButton>
         </View>
       </View>
-      
+
       <View
         style={styles.separator}
         lightColor="#eee"
@@ -177,5 +199,5 @@ const styles = StyleSheet.create({
     marginVertical: 30,
     height: 1,
     width: "80%",
-  }
+  },
 });
