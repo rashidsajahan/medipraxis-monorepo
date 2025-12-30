@@ -1,16 +1,19 @@
-import { Input, InputField, InputSlot } from '@/components/ui/input';
-import { Icons } from '@/config';
-import { Color, Font, TextSize, TextVariant, textStyles } from '@repo/config';
-import React, { useEffect, useState } from 'react';
-import { Pressable, TextStyle as RNTextStyle, StyleSheet, Text, View } from 'react-native';
-import { z } from 'zod';
+import { Input, InputField, InputSlot } from "@/components/ui/input";
+import { Icons } from "@/config";
+import { Color, Font, TextSize, TextVariant, textStyles } from "@repo/config";
+import React, { useEffect, useState } from "react";
+import { Pressable, TextStyle as RNTextStyle, Text, View } from "react-native";
+import { z } from "zod";
 
 // Props for the TextInput component
 interface TextInputProps {
-  inputWrapper?: Omit<React.ComponentPropsWithoutRef<typeof Input>, 'size' | 'variant' | 'style'>;
-  inputField?: Omit<React.ComponentPropsWithoutRef<typeof InputField>, 'style'>;
+  inputWrapper?: Omit<
+    React.ComponentPropsWithoutRef<typeof Input>,
+    "size" | "variant" | "style"
+  >;
+  inputField?: Omit<React.ComponentPropsWithoutRef<typeof InputField>, "style">;
   label?: string;
-  inputType?: 'text' | 'number' | 'decimal' | 'email' | 'phone' | 'password';
+  inputType?: "text" | "number" | "decimal" | "email" | "phone" | "password";
   validationSchema?: z.ZodString;
   helperText?: string;
   hideHelperText?: boolean;
@@ -19,8 +22,11 @@ interface TextInputProps {
 
 // Props for OTP Input Field
 interface OTPInputFieldProps {
-  inputWrapper?: Omit<React.ComponentPropsWithoutRef<typeof Input>, 'size' | 'variant' | 'style'>;
-  inputField?: Omit<React.ComponentPropsWithoutRef<typeof InputField>, 'style'>;
+  inputWrapper?: Omit<
+    React.ComponentPropsWithoutRef<typeof Input>,
+    "size" | "variant" | "style"
+  >;
+  inputField?: Omit<React.ComponentPropsWithoutRef<typeof InputField>, "style">;
   label?: string;
   size?: number;
   validationSchema?: z.ZodString;
@@ -35,16 +41,16 @@ interface TextInputComponentType extends React.FC<TextInputProps> {
 // Map inputType to React Native keyboardType
 const getKeyboardType = (type?: string) => {
   switch (type) {
-    case 'number':
-      return 'number-pad';
-    case 'decimal':
-      return 'decimal-pad';
-    case 'email':
-      return 'email-address';
-    case 'phone':
-      return 'phone-pad';
+    case "number":
+      return "number-pad";
+    case "decimal":
+      return "decimal-pad";
+    case "email":
+      return "email-address";
+    case "phone":
+      return "phone-pad";
     default:
-      return 'default';
+      return "default";
   }
 };
 
@@ -58,7 +64,7 @@ const TextInputBase: React.FC<TextInputProps> = ({
   inputWrapper = {},
   inputField = {},
   label,
-  inputType = 'text',
+  inputType = "text",
   validationSchema,
   helperText,
   hideHelperText = false,
@@ -68,10 +74,19 @@ const TextInputBase: React.FC<TextInputProps> = ({
   const [validationError, setValidationError] = useState<string | null>(null);
   const [isValid, setIsValid] = useState(false);
 
-  const { isDisabled = false, isInvalid = false, ...restInputWrapper } = inputWrapper;
-  const { value = '', onChangeText, placeholder, ...restInputField } = inputField;
+  const {
+    isDisabled = false,
+    isInvalid = false,
+    ...restInputWrapper
+  } = inputWrapper;
+  const {
+    value = "",
+    onChangeText,
+    placeholder,
+    ...restInputField
+  } = inputField;
 
-  const shouldShowToggle = inputType === 'password';
+  const shouldShowToggle = inputType === "password";
   const isSecureEntry = shouldShowToggle && !isPasswordVisible;
 
   // Validate input - automatically gets error message from Zod schema
@@ -82,7 +97,7 @@ const TextInputBase: React.FC<TextInputProps> = ({
       return;
     }
 
-    if (!validateOnChange && value === '') {
+    if (!validateOnChange && value === "") {
       setValidationError(null);
       setIsValid(false);
       return;
@@ -95,9 +110,9 @@ const TextInputBase: React.FC<TextInputProps> = ({
       setIsValid(true);
     } else {
       setIsValid(false);
-      if (value !== '') {
+      if (value !== "") {
         // Automatically get the error message from Zod schema
-        const zodError = result.error.issues[0]?.message || 'Invalid input';
+        const zodError = result.error.issues[0]?.message || "Invalid input";
         setValidationError(zodError);
       } else {
         setValidationError(null);
@@ -108,7 +123,7 @@ const TextInputBase: React.FC<TextInputProps> = ({
   // Determine border color based on validation
   const getBorderColor = () => {
     if (isInvalid || validationError) return Color.Danger;
-    if (isValid && value !== '') return Color.Success;
+    if (isValid && value !== "") return Color.Success;
     return Color.LightGrey;
   };
 
@@ -132,18 +147,21 @@ const TextInputBase: React.FC<TextInputProps> = ({
   const messageColor = getMessageColor();
 
   return (
-    <View style={styles.inputWrapper}>
+    <View className="w-full">
       {label && (
         <Text
-          style={[
-            styles.label,
-            {
-              color: Color.Black,
-              fontFamily: textLargeStyle.fontFamily === Font.DMsans ? 'DMSans_400Regular' : 'Lato_400Regular',
-              fontSize: textLargeStyle.fontSize,
-              fontWeight: String(textLargeStyle.fontWeight) as RNTextStyle['fontWeight'],
-            },
-          ]}
+          className="mb-2"
+          style={{
+            color: Color.Black,
+            fontFamily:
+              textLargeStyle.fontFamily === Font.DMsans
+                ? "DMSans_400Regular"
+                : "Lato_400Regular",
+            fontSize: textLargeStyle.fontSize,
+            fontWeight: String(
+              textLargeStyle.fontWeight
+            ) as RNTextStyle["fontWeight"],
+          }}
         >
           {label}
         </Text>
@@ -158,7 +176,7 @@ const TextInputBase: React.FC<TextInputProps> = ({
           borderColor: getBorderColor(),
           borderWidth: 1,
           borderRadius: 8,
-          width: '100%',
+          width: "100%",
           height: 50,
         }}
       >
@@ -173,14 +191,19 @@ const TextInputBase: React.FC<TextInputProps> = ({
             paddingHorizontal: 16,
             paddingVertical: 8,
             paddingRight: shouldShowToggle ? 48 : 16,
-            fontFamily: textLargeStyle.fontFamily === Font.DMsans ? 'DMSans_400Regular' : 'Lato_400Regular',
+            fontFamily:
+              textLargeStyle.fontFamily === Font.DMsans
+                ? "DMSans_400Regular"
+                : "Lato_400Regular",
             fontSize: textLargeStyle.fontSize,
-            fontWeight: String(textLargeStyle.fontWeight) as RNTextStyle['fontWeight'],
-            textAlign: 'left',
+            fontWeight: String(
+              textLargeStyle.fontWeight
+            ) as RNTextStyle["fontWeight"],
+            textAlign: "left",
           }}
         />
         {shouldShowToggle && (
-          <InputSlot style={styles.iconSlot}>
+          <InputSlot className="pr-4">
             <Pressable onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
               {isPasswordVisible ? (
                 <Icons.Eye size={20} color={Color.Grey} weight="regular" />
@@ -193,15 +216,18 @@ const TextInputBase: React.FC<TextInputProps> = ({
       </Input>
       {message && (
         <Text
-          style={[
-            styles.helperText,
-            {
-              color: messageColor,
-              fontFamily: textSmallStyle.fontFamily === Font.DMsans ? 'DMSans_400Regular' : 'Lato_400Regular',
-              fontSize: textSmallStyle.fontSize,
-              fontWeight: String(textSmallStyle.fontWeight) as RNTextStyle['fontWeight'],
-            },
-          ]}
+          className="mt-1 ml-1"
+          style={{
+            color: messageColor,
+            fontFamily:
+              textSmallStyle.fontFamily === Font.DMsans
+                ? "DMSans_400Regular"
+                : "Lato_400Regular",
+            fontSize: textSmallStyle.fontSize,
+            fontWeight: String(
+              textSmallStyle.fontWeight
+            ) as RNTextStyle["fontWeight"],
+          }}
         >
           {message}
         </Text>
@@ -222,8 +248,12 @@ const OTPField: React.FC<OTPInputFieldProps> = ({
   const [validationError, setValidationError] = useState<string | null>(null);
   const [isValid, setIsValid] = useState(false);
 
-  const { isDisabled = false, isInvalid = false, ...restInputWrapper } = inputWrapper;
-  const { value = '', onChangeText, ...restInputField } = inputField;
+  const {
+    isDisabled = false,
+    isInvalid = false,
+    ...restInputWrapper
+  } = inputWrapper;
+  const { value = "", onChangeText, ...restInputField } = inputField;
 
   // Validate input - automatically gets error message from Zod schema
   useEffect(() => {
@@ -240,8 +270,8 @@ const OTPField: React.FC<OTPInputFieldProps> = ({
       setIsValid(true);
     } else {
       setIsValid(false);
-      if (value !== '') {
-        setValidationError('Invalid');
+      if (value !== "") {
+        setValidationError("Invalid");
       } else {
         setValidationError(null);
       }
@@ -251,23 +281,26 @@ const OTPField: React.FC<OTPInputFieldProps> = ({
   // Determine border color based on validation
   const getBorderColor = () => {
     if (isInvalid || validationError) return Color.Danger;
-    if (isValid && value !== '') return Color.Success;
+    if (isValid && value !== "") return Color.Success;
     return Color.LightGrey;
   };
 
   return (
-    <View style={styles.otpWrapper}>
+    <View className="items-center">
       {label && (
         <Text
-          style={[
-            styles.label,
-            {
-              color: Color.Black,
-              fontFamily: textLargeStyle.fontFamily === Font.DMsans ? 'DMSans_400Regular' : 'Lato_400Regular',
-              fontSize: textLargeStyle.fontSize,
-              fontWeight: String(textLargeStyle.fontWeight) as RNTextStyle['fontWeight'],
-            },
-          ]}
+          className="mb-2"
+          style={{
+            color: Color.Black,
+            fontFamily:
+              textLargeStyle.fontFamily === Font.DMsans
+                ? "DMSans_400Regular"
+                : "Lato_400Regular",
+            fontSize: textLargeStyle.fontSize,
+            fontWeight: String(
+              textLargeStyle.fontWeight
+            ) as RNTextStyle["fontWeight"],
+          }}
         >
           {label}
         </Text>
@@ -290,17 +323,22 @@ const OTPField: React.FC<OTPInputFieldProps> = ({
           value={value}
           onChangeText={(text) => {
             // Only allow numbers
-            const numericText = text.replace(/[^0-9]/g, '');
+            const numericText = text.replace(/[^0-9]/g, "");
             onChangeText?.(numericText);
           }}
           maxLength={1}
           keyboardType="number-pad"
           {...restInputField}
           style={{
-            fontFamily: buttonLargeStyle.fontFamily === Font.DMsans ? 'DMSans_500Regular' : 'Lato_500Regular',
+            fontFamily:
+              buttonLargeStyle.fontFamily === Font.DMsans
+                ? "DMSans_500Regular"
+                : "Lato_500Regular",
             fontSize: buttonLargeStyle.fontSize,
-            fontWeight: String(buttonLargeStyle.fontWeight) as RNTextStyle['fontWeight'],
-            textAlign: 'center',
+            fontWeight: String(
+              buttonLargeStyle.fontWeight
+            ) as RNTextStyle["fontWeight"],
+            textAlign: "center",
           }}
         />
       </Input>
@@ -308,27 +346,7 @@ const OTPField: React.FC<OTPInputFieldProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  inputWrapper: {
-    width: '100%',
-  },
-  otpWrapper: {
-    alignItems: 'center',
-  },
-  label: {
-    marginBottom: 8,
-  },
-  iconSlot: {
-    paddingRight: 16,
-  },
-  helperText: {
-    marginTop: 4,
-    marginLeft: 4,
-  },
-});
-
 // Combine the components
 export const TextInputComponent = Object.assign(TextInputBase, {
   OTPField: OTPField,
 }) as TextInputComponentType;
-
