@@ -96,7 +96,7 @@ const DropdownPortal: React.FC<DropdownPortalProps> = ({
 
     if (openUpwards) {
       return {
-        bottom: screenHeight - (triggerLayout.y - 10),
+        bottom: screenHeight - triggerLayout.y - 40,
         left: triggerLayout.x,
         width: triggerLayout.width,
       };
