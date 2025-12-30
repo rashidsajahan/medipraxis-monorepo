@@ -67,7 +67,7 @@ const getFontFamily = (
 };
 
 // Main TextComponent
-export default function TextComponent<T extends TextVariant = TextVariant>({
+export function TextComponent<T extends TextVariant = TextVariant>({
   variant: category,
   size,
   children,
@@ -130,3 +130,5 @@ export default function TextComponent<T extends TextVariant = TextVariant>({
     </RNText>
   );
 }
+
+TextComponent.displayName = "TextComponent";
