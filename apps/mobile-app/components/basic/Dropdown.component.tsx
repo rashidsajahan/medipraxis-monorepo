@@ -169,7 +169,7 @@ const DropdownComponent: React.FC<DropdownProps> = ({
   helperTextColor = Color.Grey,
   errorTextColor = Color.Danger,
   successTextColor = Color.Success,
-  warningTextColor = Color.Warnning,
+  warningTextColor = Color.Warning,
   showValidation = true,
   validateOnChange = true,
   showWarning = false,
@@ -212,7 +212,7 @@ const DropdownComponent: React.FC<DropdownProps> = ({
   // Determine border color based on validation
   const getBorderColor = () => {
     if (isInvalid || validationError) return Color.Danger;
-    if (showWarning) return Color.Warnning;
+    if (showWarning) return Color.Warning;
     if (isValid && value !== "") return Color.Success;
     return borderColor;
   };
