@@ -3,9 +3,10 @@ import { StyleSheet } from "react-native";
 
 import EditScreenInfo from "@/components/EditScreenInfo";
 import { View } from "@/components/Themed";
-import TextComponent, {
+import {
   ButtonComponent,
   ButtonSize,
+  TextComponent,
   TextInputComponent,
 } from "@/components/basic";
 import { Icons } from "@/config";
