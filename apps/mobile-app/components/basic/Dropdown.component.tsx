@@ -304,6 +304,27 @@ const DropdownComponent: React.FC<DropdownProps> = ({
       >
         <DropdownContent>
           <View className="bg-white">
+            {/* Default unselect option */}
+            <Pressable
+              onPress={() => handleSelect("")}
+              className={`py-3 px-4 border-b border-gray-100 ${
+                value === "" ? "bg-gray-100" : ""
+              }`}
+            >
+              <Text
+                className="text-gray-400"
+                style={{
+                  fontFamily:
+                    textBodyLargeStyle.fontFamily === Font.DMsans
+                      ? "DMSans_400Regular"
+                      : "Lato_400Regular",
+                  fontSize: textBodyLargeStyle.fontSize,
+                }}
+              >
+                {placeholder}
+              </Text>
+            </Pressable>
+
             {options.map((option) => (
               <Pressable
                 key={option.value}
