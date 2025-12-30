@@ -13,10 +13,10 @@ import { Color, TextSize, TextVariant } from "@repo/config";
 import { z } from "zod";
 
 export default function TabTwoScreen() {
-  const [textInput, setTextInput] = useState("");
-  const [otp1, setOtp1] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
+  const [otp, setOtp] = useState("");
+
   const passwordSchema = z
     .string()
     .min(8, "Password must be at least 8 characters")
@@ -31,7 +31,10 @@ export default function TabTwoScreen() {
       /^[a-zA-Z0-9_]+$/,
       "Username can only contain letters, numbers, and underscores"
     );
-  const otpSchema = z.string().regex(/^[0-9]$/, "Must be a number");
+  const otpSchema = z
+    .string()
+    .length(1, "Must be a single digit")
+    .regex(/^[0-9]$/, "Must be a number");
 
   return (
     <View style={styles.container}>
@@ -39,48 +42,51 @@ export default function TabTwoScreen() {
         <TextComponent variant={TextVariant.Title} size={TextSize.Large}>
           Welcome to Tab Two!
         </TextComponent>
-        <TextInputComponent
-          value={textInput}
-          onChangeText={setTextInput}
-          placeholder="Enter your name"
-          label="Text Input"
-          showPasswordToggle={false}
-        />
       </View>
       <View style={styles.separator} />
       <View>
         <TextInputComponent
-          value={textInput}
-          onChangeText={setTextInput}
-          placeholder="Enter your name"
-          label="Text Input"
+          inputWrapper={{
+            accessibilityHint: "Enter your username",
+          }}
+          inputField={{
+            value: username,
+            onChangeText: setUsername,
+            placeholder: "Enter username",
+            placeholderTextColor: Color.Grey,
+          }}
+          label="Username"
+          inputType="text"
+          validationSchema={usernameSchema}
+          helperText="Username must be 3-20 characters"
+          validateOnChange={true}
         />
-      </View>
-      {/* Password Input with Validation */}
-      <TextInputComponent
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Enter secure password"
-        label="Password"
-        inputType="password"
-        validationSchema={passwordSchema}
-        helperText="Min 8 chars with uppercase, lowercase & number"
-      />
-      {/* Username with Warning Example */}
-      <TextInputComponent
-        value={username}
-        onChangeText={setUsername}
-        placeholder="johndoe123"
-        label="Username"
-        validationSchema={usernameSchema}
-        showWarning={username === "admin" || username === "test"}
-        helperText="3-20 characters, letters, numbers & underscores"
-      />
-      <View style={styles.separator} />
-      <View>
+        <TextInputComponent
+          inputWrapper={{
+            accessibilityHint: "Enter your password",
+          }}
+          inputField={{
+            value: password,
+            onChangeText: setPassword,
+            placeholder: "Enter password",
+            placeholderTextColor: Color.Grey,
+          }}
+          label="Password"
+          inputType="password"
+          validationSchema={passwordSchema}
+          helperText="Password must be at least 8 characters with uppercase, lowercase, and number"
+          validateOnChange={true}
+        />
         <TextInputComponent.OTPField
-          value={otp1}
-          onChangeText={setOtp1}
+          inputWrapper={{
+            accessibilityHint: "Enter OTP digit",
+          }}
+          inputField={{
+            value: otp,
+            onChangeText: setOtp,
+          }}
+          label="Enter OTP"
+          size={60}
           validationSchema={otpSchema}
         />
       </View>
