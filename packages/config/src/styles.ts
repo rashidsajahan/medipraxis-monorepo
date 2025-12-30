@@ -33,6 +33,15 @@ export enum Color {
   Warnning = "#FFA500",
 }
 
+export enum KeyboardInputType {
+  Text = "text",
+  Number = "number",
+  Decimal = "decimal",
+  Email = "email",
+  Phone = "phone",
+  Password = "password",
+}
+
 // Variant and Size enums
 
 export enum TextVariant {

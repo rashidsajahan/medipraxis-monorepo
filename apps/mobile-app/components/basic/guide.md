@@ -75,7 +75,7 @@ const usernameSchema = z
     placeholderTextColor: Color.Grey,
     }}
     label="Username"
-    inputType="text"
+    inputType={KeyboardInputType.Text}
     validationSchema={usernameSchema}
     helperText="Username must be 3-20 characters"
     validateOnChange={true}
@@ -92,7 +92,7 @@ const usernameSchema = z
     placeholderTextColor: Color.Grey,
     }}
     label="Password"
-    inputType="password"
+    inputType={KeyboardInputType.Password}
     validationSchema={passwordSchema}
     helperText="Password must be at least 8 characters with uppercase, lowercase, and number"
     validateOnChange={true}

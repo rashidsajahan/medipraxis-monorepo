@@ -1,6 +1,13 @@
 import { Input, InputField, InputSlot } from "@/components/ui/input";
 import { Icons } from "@/config";
-import { Color, Font, TextSize, TextVariant, textStyles } from "@repo/config";
+import {
+  Color,
+  Font,
+  KeyboardInputType,
+  TextSize,
+  TextVariant,
+  textStyles,
+} from "@repo/config";
 import React, { useEffect, useState } from "react";
 import { Pressable, TextStyle as RNTextStyle, Text, View } from "react-native";
 import { z } from "zod";
@@ -13,7 +20,7 @@ interface TextInputProps {
   >;
   inputField?: Omit<React.ComponentPropsWithoutRef<typeof InputField>, "style">;
   label?: string;
-  inputType?: "text" | "number" | "decimal" | "email" | "phone" | "password";
+  inputType?: KeyboardInputType;
   validationSchema?: z.ZodString;
   helperText?: string;
   hideHelperText?: boolean;
