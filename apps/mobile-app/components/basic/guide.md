@@ -187,16 +187,16 @@ const countryOptions = [
 # Chip Component
 
 ```ts
-<ChipComponent 
-    text="Penicillin allergy" 
-    backgroundColor={Color.Danger} 
+<ChipComponent
+    text="Penicillin allergy"
+    backgroundColor={Color.Danger}
     textColor={Color.White}
     textSize={TextSize.Small}
 />
 
-<ChipComponent 
-    text="Warning" 
-    backgroundColor={Color.Warnning} 
+<ChipComponent
+    text="Warning"
+    backgroundColor={Color.Warnning}
     textColor={Color.White}
     textSize={TextSize.Medium}
     iconName={Icons.Check}

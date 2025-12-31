@@ -3,7 +3,7 @@ import { Color, TextSize, TextVariant, textStyles } from "@repo/config";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-export type IconComponent = typeof Icons[keyof typeof Icons];
+export type IconComponent = (typeof Icons)[keyof typeof Icons];
 
 export enum IconSize {
   Small = 12,
@@ -33,16 +33,16 @@ export const ChipComponent: React.FC<ChipComponentProps> = ({
 }) => {
   // Get text style from the design system
   const textStyle = textStyles[TextVariant.Body][textSize];
-  
+
   // Use textColor as default iconColor if not specified
   const finalIconColor = iconColor || textColor;
-  
+
   // Icon component is now directly passed
   const IconComponent = iconName;
 
   //Add bold weight for medium size icon
-  const finalIconWeight = (iconSize === IconSize.Medium ? "bold" : "regular");
-  
+  const finalIconWeight = iconSize === IconSize.Medium ? "bold" : "regular";
+
   return (
     <View
       style={[
@@ -62,7 +62,7 @@ export const ChipComponent: React.FC<ChipComponentProps> = ({
           />
         </View>
       )}
-      
+
       <Text
         style={{
           color: textColor,
@@ -74,7 +74,7 @@ export const ChipComponent: React.FC<ChipComponentProps> = ({
       >
         {text}
       </Text>
-      
+
       {/* Render icon on the right if specified */}
       {IconComponent && iconPosition === "right" && (
         <View style={styles.iconContainer}>
