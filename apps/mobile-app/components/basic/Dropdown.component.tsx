@@ -25,6 +25,8 @@ interface DropdownProps {
   options: DropdownOption[];
   placeholder?: string;
   label?: string;
+  helperText?: string;
+  showHelperText?: boolean;
   isInvalid?: boolean;
   validationSchema?: z.ZodString;
   validateOnChange?: boolean;
@@ -146,6 +148,8 @@ const DropdownComponent = ({
   options,
   placeholder = "Select an option",
   label,
+  helperText,
+  showHelperText = true,
   isInvalid = false,
   validationSchema,
   validateOnChange = true,
@@ -192,9 +196,19 @@ const DropdownComponent = ({
     return Color.LightGrey;
   };
 
-  // Determine message to display and color
-  const message = validationError;
-  const messageColor = Color.Danger;
+  // Get helper text to display
+  const getHelperText = (): string | null => {
+    if (!showHelperText) return null;
+    if (validationError) return validationError;
+    return helperText || null;
+  };
+
+  // Determine helper text color
+  const getHelperTextColor = () => {
+    if (validationError) return Color.Danger;
+    if (isValid) return Color.Success;
+    return Color.Grey;
+  };
 
   // Get selected option label
   const selectedOption = options.find((opt) => opt.value === value);
@@ -205,6 +219,8 @@ const DropdownComponent = ({
     onValueChange(optionValue);
     setIsOpen(false);
   };
+
+  const displayedHelperText = getHelperText();
 
   return (
     <View className="w-full">
@@ -313,11 +329,11 @@ const DropdownComponent = ({
         </DropdownContent>
       </DropdownPortal>
 
-      {message && (
+      {displayedHelperText && (
         <Text
           className="mt-1 ml-1"
           style={{
-            color: messageColor,
+            color: getHelperTextColor(),
             fontFamily:
               textBodySmallStyle.fontFamily === Font.DMsans
                 ? "DMSans_400Regular"
@@ -328,7 +344,7 @@ const DropdownComponent = ({
             ) as RNTextStyle["fontWeight"],
           }}
         >
-          {message}
+          {displayedHelperText}
         </Text>
       )}
     </View>
