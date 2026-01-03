@@ -53,7 +53,7 @@ export default function TabTwoScreen() {
       /^[a-zA-Z0-9_]+$/,
       "Username can only contain letters, numbers, and underscores"
     );
-  const requiredSchema = z.string().min(1, "This field is required");
+  const countrySchema = z.string().min(1, "Please select a country");
   const otpSchema = z
     .string()
     .length(1, "Must be a single digit")
@@ -115,8 +115,10 @@ export default function TabTwoScreen() {
             options={countryOptions}
             label="Country"
             placeholder="Select a country"
-            validationSchema={requiredSchema}
+            helperText="Choose your country of residence"
+            validationSchema={countrySchema}
             validateOnChange={true}
+            showHelperText={true}
           />
           <ToggleButton
             size={ToggleSize.Medium}
