@@ -6,9 +6,8 @@ import type {
   SlotWindowTemplate,
   UpdateSlotWindowTemplateInput,
 } from "@repo/models";
-import type { SlotWindowRepository } from "../repositories/slot_window.repository";
-import type { TaskRepository } from "../repositories/task.repository";
-import { TaskStatus } from "../types";
+import { TaskStatus } from "@repo/models";
+import type { SlotWindowRepository, TaskRepository } from "../repositories";
 
 export class SlotWindowService {
   private slotWindowRepository: SlotWindowRepository;

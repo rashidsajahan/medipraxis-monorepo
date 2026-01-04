@@ -4,7 +4,7 @@ import type {
   TaskDetails,
   UpdateTaskInput,
 } from "@repo/models";
-import { TaskType } from "@repo/models";
+import { TaskType, type TaskStatus } from "@repo/models";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 export const TASK_QUERIES = {
@@ -31,7 +31,7 @@ export class TaskRepository {
     this.db = db;
   }
 
-  async getTaskStatusByName(statusName: string): Promise<string | null> {
+  async getTaskStatusByName(statusName: TaskStatus): Promise<string | null> {
     const { data, error } = await this.db
       .from("task_status")
       .select(TASK_QUERIES.TASK_STATUS_ID)
@@ -45,7 +45,7 @@ export class TaskRepository {
     return data.task_status_id;
   }
 
-  async getTaskTypeByName(typeName: string): Promise<string | null> {
+  async getTaskTypeByName(typeName: TaskType): Promise<string | null> {
     const { data, error } = await this.db
       .from("task_type")
       .select(TASK_QUERIES.TASK_TYPE_ID)
