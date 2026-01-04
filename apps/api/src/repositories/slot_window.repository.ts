@@ -57,10 +57,14 @@ export const SLOT_WINDOW_QUERIES = {
   `,
 
   // Slot window queries
-  SLOT_WINDOW_BASE: "*",
+  SLOT_WINDOW_BASE: `
+    *,
+    task_status:task_status_id (task_status_name)
+  `,
   SLOT_WINDOW_FOR_CLIENT: `
     slot_window_id, template_id, user_id, start_date, end_date,
-    total_slots, slots_filled, task_status_id, note, location
+    total_slots, slots_filled, task_status_id, note, location,
+    task_status:task_status_id (task_status_name)
   `,
 } as const;
 
