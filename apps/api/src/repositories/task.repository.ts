@@ -191,4 +191,47 @@ export class TaskRepository {
 
     return count ?? 0;
   }
+
+  async findBySlotWindowId(slotWindowId: string): Promise<Task[]> {
+    const { data, error } = await this.db
+      .from("task")
+      .select("*")
+      .eq("slot_window_id", slotWindowId)
+      .is("deleted_date", null);
+
+    if (error) {
+      console.error("Error fetching tasks by slot window ID:", error);
+      throw new Error("Failed to fetch tasks for the given slot window ID");
+    }
+
+    if (!data) {
+      throw new Error("No tasks found for the given slot window ID");
+    }
+
+    return data as Task[];
+  }
+
+  async softDelete(taskId: string): Promise<Task | null> {
+    const { data, error } = await this.db
+      .from("task")
+      .update({
+        deleted_date: new Date().toISOString(),
+        modified_date: new Date().toISOString(),
+      })
+      .eq("task_id", taskId)
+      .is("deleted_date", null)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Error deleting task:", error);
+      throw new Error("Failed to delete the task");
+    }
+
+    if (!data) {
+      return null;
+    }
+
+    return data as Task;
+  }
 }

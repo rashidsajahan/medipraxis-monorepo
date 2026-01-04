@@ -36,8 +36,11 @@ function convertDaysToNumbers(days: DayOfWeek[]): number[] {
   return days.map((day) => DAY_OF_WEEK_MAP[day]);
 }
 
-function convertNumbersToDays(numbers: number[]): DayOfWeek[] {
-  return numbers.map((num) => NUMBER_TO_DAY_MAP[num] as DayOfWeek);
+function convertNumbersToDays(numbers: (number | string)[]): DayOfWeek[] {
+  return numbers.map((num) => {
+    const numericValue = typeof num === "string" ? parseInt(num, 10) : num;
+    return NUMBER_TO_DAY_MAP[numericValue] as DayOfWeek;
+  });
 }
 
 export const SLOT_WINDOW_QUERIES = {
@@ -53,7 +56,7 @@ export const SLOT_WINDOW_QUERIES = {
   TEMPLATE_BASE: "*",
   TEMPLATE_WITH_USER: `
     *,
-    user:user_id (user_id, first_name, last_name, email)
+    user:user_id (user_id, first_name, last_name)
   `,
 
   // Slot window queries
@@ -85,7 +88,9 @@ export class SlotWindowRepository {
   // ===== SLOT WINDOW TEMPLATE METHODS =====
 
   async createSlotWindowTemplate(
-    slotWindowTemplateData: CreateSlotWindowTemplateInput
+    slotWindowTemplateData: CreateSlotWindowTemplateInput & {
+      slot_duration: number;
+    }
   ): Promise<SlotWindowTemplate> {
     const data = {
       user_id: slotWindowTemplateData.user_id,
@@ -211,7 +216,12 @@ export class SlotWindowRepository {
       .eq("is_deleted", false)
       .order("user_id", { ascending: true });
 
-    if (error || !data) {
+    if (error) {
+      console.error("Error fetching templates for generation:", error);
+      return [];
+    }
+
+    if (!data) {
       return [];
     }
 
@@ -284,7 +294,7 @@ export class SlotWindowRepository {
   // ===== SLOT WINDOW METHODS =====
 
   async createSlotWindow(
-    windowData: CreateSlotWindowInput
+    windowData: CreateSlotWindowInput & { task_status_id: string }
   ): Promise<SlotWindow> {
     const data = {
       template_id: windowData.template_id || null, // slot windows that are non-recurring won't have a template_id

@@ -53,10 +53,9 @@ export const createSlotWindowTemplateSchema = z
   .object({
     user_id: z.string(),
     day_of_week: z.array(DayOfWeekEnum),
-    start_time: z.string(),
-    end_time: z.string(),
+    start_time: z.string(), // HH:MM:SS format
+    end_time: z.string(), // HH:MM:SS format
     total_slots: z.number().int().positive(),
-    slot_duration: z.number().int().positive(),
     end_date: z.string().optional(),
     note: z.string().optional(),
     location: z.string().optional(),
@@ -69,7 +68,6 @@ export const updateSlotWindowTemplateSchema = z
     start_time: z.string().optional(),
     end_time: z.string().optional(),
     total_slots: z.number().int().positive().optional(),
-    slot_duration: z.number().int().positive().optional(),
     end_date: z.string().optional(),
     note: z.string().optional(),
     location: z.string().optional(),
@@ -83,7 +81,6 @@ export const createSlotWindowSchema = z
     start_date: z.string(),
     end_date: z.string(),
     total_slots: z.number().int().positive(),
-    task_status_id: z.string(),
     slots_filled: z.number().int().min(0).optional(),
     is_override: z.boolean().optional(),
     note: z.string().optional(),
