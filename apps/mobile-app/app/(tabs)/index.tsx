@@ -2,7 +2,7 @@ import { View } from "@/components/Themed";
 import { useState } from "react";
 import { Button, StyleSheet } from "react-native";
 
-import TaskForm from "@/components/advance/taskPanel/TaskForm";
+import TaskForm from "@/components/advanced/taskPanel/TaskForm";
 
 export default function TabOneScreen() {
   const [showForm, setShowForm] = useState(false);
