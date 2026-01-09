@@ -5,7 +5,7 @@ import type {
   UpdateClientInput,
   UpdateClientParam,
 } from "@repo/models";
-import { APIContext } from "../types";
+import type { APIContext } from "../types";
 import { getClientService } from "../lib";
 
 export class ClientController {
