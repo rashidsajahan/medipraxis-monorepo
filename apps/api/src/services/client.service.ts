@@ -105,12 +105,12 @@ export class ClientService {
   }
 
   async deleteClient(clientId: string): Promise<boolean> {
-    const success = await this.clientRepository.delete(clientId);
+    const deleted = await this.clientRepository.delete(clientId);
 
-    if (!success) {
+    if (!deleted) {
       throw new Error("Client not found or could not be deleted");
     }
 
-    return success;
+    return deleted;
   }
 }
