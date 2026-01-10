@@ -134,7 +134,11 @@ export const updateClientSchema = z
     date_of_birth: z.string().optional(),
     emergency_contact_name: z.string().nullable().optional(),
     emergency_contact_country_code: z.string().nullable().optional(),
-    emergency_contact_number: z.string().regex(PHONE_REGEX, "Invalid emergency contact phone number format").nullable().optional(),
+    emergency_contact_number: z
+      .string()
+      .regex(PHONE_REGEX, "Invalid emergency contact phone number format")
+      .nullable()
+      .optional(),
     emergency_contact_relationship: z.string().nullable().optional(),
     known_conditions: z.array(z.string()).nullable().optional(),
     note: z.string().nullable().optional(),
@@ -153,4 +157,6 @@ export type CreateClientInput = z.infer<typeof createClientSchema>;
 export type UpdateClientInput = z.infer<typeof updateClientSchema>;
 export type ContactInfo = z.infer<typeof contactInfoSchema>;
 export type CreateContactInfoInput = z.infer<typeof createContactInfoSchema>;
-export type CreateClientWithContactInput = z.infer<typeof createClientWithContactSchema>;
+export type CreateClientWithContactInput = z.infer<
+  typeof createClientWithContactSchema
+>;
