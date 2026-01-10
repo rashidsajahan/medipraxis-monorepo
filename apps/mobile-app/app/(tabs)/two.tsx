@@ -10,6 +10,8 @@ import {
   TextComponent,
   TextInputComponent,
   TextInputType,
+  ToggleButton,
+  ToggleSize,
 } from "@/components/basic";
 import { Icons } from "@/config";
 import { Color, TextSize, TextVariant } from "@repo/config";
@@ -19,6 +21,8 @@ export default function TabTwoScreen() {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [country, setCountry] = useState("");
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [darkModeEnabled, setDarkModeEnabled] = useState(true);
 
   // Country options
   const countryOptions = [
@@ -115,6 +119,17 @@ export default function TabTwoScreen() {
             validationSchema={countrySchema}
             validateOnChange={true}
             showHelperText={true}
+          />
+          <ToggleButton
+            size={ToggleSize.Medium}
+            label="Enable toggle"
+            isActive={notificationsEnabled}
+            onToggle={setNotificationsEnabled}
+          />
+          <ToggleButton
+            size={ToggleSize.Large}
+            isActive={darkModeEnabled}
+            onToggle={setDarkModeEnabled}
           />
         </View>
         <TextInputComponent

@@ -137,6 +137,26 @@ const otpSchema = z
 />
 ```
 
+# Toggle Component
+
+```ts
+const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+const [darkModeEnabled, setDarkModeEnabled] = useState(true);
+
+<ToggleButton
+    size={ToggleSize.Medium}
+    label="Enable toggle"
+    isActive={notificationsEnabled}
+    onToggle={setNotificationsEnabled}
+/>
+
+<ToggleButton
+    size={ToggleSize.Large}
+    isActive={darkModeEnabled}
+    onToggle={setDarkModeEnabled}
+/>
+```
+
 # Dropdown Component
 
 ```ts
