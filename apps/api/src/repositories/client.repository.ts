@@ -60,9 +60,10 @@ export class ClientRepository {
       full_name: `${clientData.first_name} ${clientData.last_name}`,
       gender: clientData.gender,
       date_of_birth: clientData.date_of_birth,
-      phone: clientData.phone,
       emergency_contact_name: clientData.emergency_contact_name || null,
-      emergency_contact_phone: clientData.emergency_contact_phone || null,
+      emergency_contact_country_code:
+        clientData.emergency_contact_country_code || null,
+      emergency_contact_number: clientData.emergency_contact_number || null,
       emergency_contact_relationship:
         clientData.emergency_contact_relationship || null,
       known_conditions: clientData.known_conditions || null,
