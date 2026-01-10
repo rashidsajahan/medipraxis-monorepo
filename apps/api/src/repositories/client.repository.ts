@@ -6,12 +6,8 @@ import type {
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 export const CLIENT_QUERIES = {
-  FIND_ALL: `
-    *
-  `,
-  FIND_BY_ID: `
-    *
-  `,
+  FIND_ALL: "*",
+  FIND_BY_ID: "*",
 } as const;
 
 export class ClientRepository {
