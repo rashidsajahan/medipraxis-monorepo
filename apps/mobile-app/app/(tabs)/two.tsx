@@ -6,6 +6,8 @@ import { View } from "@/components/Themed";
 import {
   ButtonComponent,
   ButtonSize,
+  ChipComponent,
+  ChipVariant,
   DropdownComponent,
   TextComponent,
   TextInputComponent,
@@ -107,7 +109,27 @@ export default function TabTwoScreen() {
           helperText="Username must be 3-20 characters"
           validateOnChange={true}
         />
-
+        <View>
+          <ChipComponent
+            text="Penicillin allergy"
+            variant={ChipVariant.Danger}
+            iconName="Heart"
+            iconPosition="left"
+          />
+          <ChipComponent
+            text="Warning"
+            variant={ChipVariant.Warning}
+            iconName="Check"
+            iconPosition="right"
+          />
+          <ChipComponent
+            text="Success"
+            variant={ChipVariant.Success}
+            iconName="Star"
+            iconPosition="left"
+          />
+          <ChipComponent text="Light Theme" variant={ChipVariant.LightGreen} />
+        </View>
         <View>
           <DropdownComponent
             value={country}
@@ -160,7 +182,6 @@ export default function TabTwoScreen() {
           validationSchema={otpSchema}
         />
       </View>
-
       <View style={styles.buttonContainer}>
         {/* Small button */}
         <View style={styles.centeredButton}>

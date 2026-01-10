@@ -183,3 +183,27 @@ const countryOptions = [
     validateOnChange={true}
 />
 ```
+
+# Chip Component
+
+```ts
+<ChipComponent
+    text="Penicillin allergy"
+    variant={ChipVariant.Danger}
+    iconName="Heart"
+    iconPosition="left"
+/>
+<ChipComponent
+    text="Warning"
+    variant={ChipVariant.Warning}
+    iconName="Check"
+    iconPosition="right"
+/>
+<ChipComponent
+    text="Success"
+    variant={ChipVariant.Success}
+    iconName="Star"
+    iconPosition="left"
+/>
+<ChipComponent text="Light Theme" variant={ChipVariant.LightGreen} />
+```
