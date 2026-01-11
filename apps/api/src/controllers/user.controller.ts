@@ -23,4 +23,27 @@ export class UserController {
       return c.json({ error: message }, status);
     }
   }
+
+  // Update user by ID
+  static async updateUser(
+    c: APIContext<{ json: any; param: UserParam }, "/:id">
+  ) {
+    try {
+      const userService = getUserService(c);
+      const userId = c.req.param("id");
+      const body = c.req.valid("json");
+
+      const user = await userService.updateUser(userId, body);
+
+      return c.json({ success: true, user });
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to update user";
+      const status =
+        error instanceof Error && error.message.includes("not found")
+          ? 404
+          : 400;
+      return c.json({ error: message }, status);
+    }
+  }
 }
