@@ -2,6 +2,7 @@ import type {
   CancelAppointmentByClientInput,
   CreateTaskInput,
   GetAllTaskQuery,
+  GetAppointmentsByClientQuery,
   GetTaskParam,
   ReserveAppointmentByClientInput,
   UpdateTaskInput,
@@ -22,6 +23,50 @@ export class TaskController {
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Failed to get tasks";
+      return c.json({ error: message }, 500);
+    }
+  }
+
+  static async getAllAppointments(c: APIContext<{ query: GetAllTaskQuery }>) {
+    try {
+      const taskService = getTaskService(c);
+      const userId = c.req.query("user_id");
+
+      if (!userId) {
+        return c.json({ error: "user_id is required" }, 400);
+      }
+
+      const appointments = await taskService.getAppointmentsByUserId(userId);
+
+      return c.json({ appointments, count: appointments.length });
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to get appointments";
+      return c.json({ error: message }, 500);
+    }
+  }
+
+  static async getAppointmentsByClient(
+    c: APIContext<{ query: GetAppointmentsByClientQuery }>
+  ) {
+    try {
+      const taskService = getTaskService(c);
+      const clientId = c.req.query("client_id");
+
+      if (!clientId) {
+        return c.json({ error: "client_id is required" }, 400);
+      }
+
+      const appointments = await taskService.getAppointmentsByClientId(clientId);
+
+      return c.json({ appointments, count: appointments.length });
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to get client appointments";
       return c.json({ error: message }, 500);
     }
   }

@@ -218,10 +218,10 @@ export class TaskRepository {
       taskStatusId?: string;
       slotWindowId?: string;
     }
-  ): Promise<Task[]> {
+  ): Promise<TaskDetails[]> {
     let query = this.db
       .from("task")
-      .select("*")
+      .select(TASK_QUERIES.FIND_ALL)
       .eq("client_id", clientId)
       .is("deleted_date", null);
 
@@ -237,13 +237,95 @@ export class TaskRepository {
       query = query.eq("slot_window_id", options.slotWindowId);
     }
 
-    const { data, error } = await query;
+    const { data, error } = await query.order("start_date", { ascending: true });
 
-    if (error) {
-      console.error("Error fetching tasks by client ID:", error);
-      throw new Error("Failed to fetch tasks for the given client ID");
+    if (error || !data) {
+      return [];
     }
 
-    return (data as Task[]) || [];
+    return data.map((item) => {
+      const { task_type, task_status, client, ...taskData } = item;
+      return {
+        ...taskData,
+        task_type_name: task_type?.task_type_name || "",
+        task_status_name: task_status?.task_status_name || "",
+        client_first_name: client?.first_name || null,
+        client_last_name: client?.last_name || null,
+      } as TaskDetails;
+    });
+  }
+
+  async findByUserId(
+    userId: string,
+    options?: {
+      taskTypeId?: string;
+      taskStatusId?: string;
+      slotWindowId?: string;
+    }
+  ): Promise<TaskDetails[]> {
+    let query = this.db
+      .from("task")
+      .select(TASK_QUERIES.FIND_ALL)
+      .eq("user_id", userId)
+      .is("deleted_date", null);
+
+    if (options?.taskTypeId) {
+      query = query.eq("task_type_id", options.taskTypeId);
+    }
+
+    if (options?.taskStatusId) {
+      query = query.eq("task_status_id", options.taskStatusId);
+    }
+
+    if (options?.slotWindowId) {
+      query = query.eq("slot_window_id", options.slotWindowId);
+    }
+
+    const { data, error } = await query.order("start_date", { ascending: true });
+
+    if (error || !data) {
+      return [];
+    }
+
+    return data.map((item) => {
+      const { task_type, task_status, client, ...taskData } = item;
+      return {
+        ...taskData,
+        task_type_name: task_type?.task_type_name || "",
+        task_status_name: task_status?.task_status_name || "",
+        client_first_name: client?.first_name || null,
+        client_last_name: client?.last_name || null,
+      } as TaskDetails;
+    });
+  }
+
+  async findAppointmentsByUserId(userId: string): Promise<TaskDetails[]> {
+    // Get appointment type ID
+    const appointmentTypeId = await this.getTaskTypeByName(
+      TaskType.APPOINTMENT
+    );
+
+    if (!appointmentTypeId) {
+      throw new Error('Task type "APPOINTMENT" not found in database');
+    }
+
+    return await this.findByUserId(userId, {
+      taskTypeId: appointmentTypeId,
+    });
+  }
+
+  async findAppointmentsByClientId(clientId: string): Promise<TaskDetails[]> {
+    // Get appointment type ID
+    const appointmentTypeId = await this.getTaskTypeByName(
+      TaskType.APPOINTMENT
+    );
+
+    if (!appointmentTypeId) {
+      throw new Error('Task type "APPOINTMENT" not found in database');
+    }
+
+    return await this.findByClientId(clientId, {
+      taskTypeId: appointmentTypeId,
+    });
   }
 }

@@ -206,6 +206,26 @@ export class SlotWindowRepository {
     })) as SlotWindowTemplate[];
   }
 
+  async findSlotWindowTemplatesByUserId(
+    userId: string
+  ): Promise<SlotWindowTemplate[]> {
+    const { data, error } = await this.db
+      .from(SLOT_WINDOW_QUERIES.SLOT_WINDOW_TEMPLATE_TABLE)
+      .select(SLOT_WINDOW_QUERIES.TEMPLATE_BASE)
+      .eq("user_id", userId)
+      .eq("is_deleted", false)
+      .order("created_date", { ascending: false });
+
+    if (error || !data) {
+      return [];
+    }
+
+    return data.map((slotWindowTemplate: any) => ({
+      ...slotWindowTemplate,
+      day_of_week: convertNumbersToDays(slotWindowTemplate.day_of_week),
+    })) as SlotWindowTemplate[];
+  }
+
   async findSlotWindowTemplatesForGeneration(): Promise<SlotWindowTemplate[]> {
     const { data, error } = await this.db
       .from(SLOT_WINDOW_QUERIES.SLOT_WINDOW_TEMPLATE_TABLE)
@@ -416,6 +436,20 @@ export class SlotWindowRepository {
       .eq("user_id", userId)
       .gte("start_date", startDate)
       .lte("end_date", endDate)
+      .order("start_date", { ascending: true });
+
+    if (error || !data) {
+      return [];
+    }
+
+    return data as SlotWindow[];
+  }
+
+  async findAllSlotWindowsByUserId(userId: string): Promise<SlotWindow[]> {
+    const { data, error } = await this.db
+      .from(SLOT_WINDOW_QUERIES.SLOT_WINDOW_TABLE)
+      .select(SLOT_WINDOW_QUERIES.SLOT_WINDOW_BASE)
+      .eq("user_id", userId)
       .order("start_date", { ascending: true });
 
     if (error || !data) {

@@ -3,6 +3,7 @@ import {
   cancelAppointmentByClientSchema,
   createTaskSchema,
   getAllTasksQuerySchema,
+  getAppointmentsByClientQuerySchema,
   getTaskParamSchema,
   reserveAppointmentByClientSchema,
   updateTaskParamSchema,
@@ -17,6 +18,16 @@ const tasks = new Hono()
     "/",
     zValidator("query", getAllTasksQuerySchema),
     TaskController.getAllTasks
+  )
+  .get(
+    "/appointments",
+    zValidator("query", getAllTasksQuerySchema),
+    TaskController.getAllAppointments
+  )
+  .get(
+    "/appointments/client",
+    zValidator("query", getAppointmentsByClientQuerySchema),
+    TaskController.getAppointmentsByClient
   )
   .get(
     "/:id",

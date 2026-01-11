@@ -18,6 +18,14 @@ export class TaskService {
     return await this.taskRepository.findAll(userId);
   }
 
+  async getAppointmentsByUserId(userId: string): Promise<TaskDetails[]> {
+    return await this.taskRepository.findAppointmentsByUserId(userId);
+  }
+
+  async getAppointmentsByClientId(clientId: string): Promise<TaskDetails[]> {
+    return await this.taskRepository.findAppointmentsByClientId(clientId);
+  }
+
   async getTaskById(taskId: string): Promise<TaskDetails> {
     const task = await this.taskRepository.findById(taskId);
 

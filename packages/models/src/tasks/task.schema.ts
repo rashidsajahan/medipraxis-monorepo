@@ -40,6 +40,10 @@ export const getAllTasksQuerySchema = z.object({
   user_id: z.string(),
 });
 
+export const getAppointmentsByClientQuerySchema = z.object({
+  client_id: z.string(),
+});
+
 export const createTaskSchema = z.object({
   task_title: z.string(),
   user_id: z.string(),
@@ -91,6 +95,9 @@ export type Task = z.infer<typeof taskSchema>;
 export type GetTaskParam = z.infer<typeof getTaskParamSchema>;
 export type UpdateTaskParam = z.infer<typeof updateTaskParamSchema>;
 export type GetAllTaskQuery = z.infer<typeof getAllTasksQuerySchema>;
+export type GetAppointmentsByClientQuery = z.infer<
+  typeof getAppointmentsByClientQuerySchema
+>;
 export type CreateTaskInput = z.infer<typeof createTaskSchema>;
 export type UpdateTaskInput = z.infer<typeof updateTaskSchema>;
 export type ReserveAppointmentByClientInput = z.infer<

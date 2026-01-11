@@ -602,6 +602,18 @@ export class SlotWindowService {
     return slotWindow;
   }
 
+  async getAllSlotWindowsByUserId(userId: string): Promise<SlotWindow[]> {
+    return await this.slotWindowRepository.findAllSlotWindowsByUserId(userId);
+  }
+
+  async getAllSlotWindowTemplatesByUserId(
+    userId: string
+  ): Promise<SlotWindowTemplate[]> {
+    return await this.slotWindowRepository.findSlotWindowTemplatesByUserId(
+      userId
+    );
+  }
+
   // Reserve a slot from a slot window (used when creating an appointment)
   async reserveSlotFromSlotWindow(slotWindowId: string): Promise<number> {
     const slotWindow =
