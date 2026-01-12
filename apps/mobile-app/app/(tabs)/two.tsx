@@ -1,14 +1,19 @@
 import React, { useState } from "react";
-import { StyleSheet } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 
 import EditScreenInfo from "@/components/EditScreenInfo";
 import { View } from "@/components/Themed";
 import {
   ButtonComponent,
   ButtonSize,
+  ChipComponent,
+  ChipVariant,
+  DropdownComponent,
   TextComponent,
   TextInputComponent,
   TextInputType,
+  ToggleButton,
+  ToggleSize,
 } from "@/components/basic";
 import { Icons } from "@/config";
 import { Color, TextSize, TextVariant } from "@repo/config";
@@ -17,6 +22,23 @@ import { z } from "zod";
 export default function TabTwoScreen() {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
+  const [country, setCountry] = useState("");
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [darkModeEnabled, setDarkModeEnabled] = useState(true);
+
+  // Country options
+  const countryOptions = [
+    { label: "United States", value: "us" },
+    { label: "United Kingdom", value: "uk" },
+    { label: "Canada", value: "ca" },
+    { label: "Australia", value: "au" },
+    { label: "Germany", value: "de" },
+    { label: "France", value: "fr" },
+    { label: "Japan", value: "jp" },
+    { label: "India", value: "in" },
+  ];
+
+  // Validation Schemas
   const [otp, setOtp] = useState("");
 
   const passwordSchema = z
@@ -33,16 +55,41 @@ export default function TabTwoScreen() {
       /^[a-zA-Z0-9_]+$/,
       "Username can only contain letters, numbers, and underscores"
     );
+  const countrySchema = z.string().min(1, "Please select a country");
   const otpSchema = z
     .string()
     .length(1, "Must be a single digit")
     .regex(/^[0-9]$/, "Must be a number");
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <View>
         <TextComponent variant={TextVariant.Title} size={TextSize.Large}>
           Welcome to Tab Two!
+        </TextComponent>
+        <TextComponent variant={TextVariant.Body} size={TextSize.Medium}>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+          aliquip ex ea commodo consequat.
+        </TextComponent>
+        <TextComponent variant={TextVariant.Body} size={TextSize.Medium}>
+          Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
+          dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+          proident, sunt in culpa qui officia deserunt mollit anim id est
+          laborum.
+        </TextComponent>
+        <TextComponent variant={TextVariant.Body} size={TextSize.Medium}>
+          Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+          accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae
+          ab illo inventore veritatis et quasi architecto beatae vitae dicta
+          sunt explicabo.
+        </TextComponent>
+        <TextComponent variant={TextVariant.Body} size={TextSize.Medium}>
+          Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut
+          fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem
+          sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor
+          sit amet.
         </TextComponent>
       </View>
       <View style={styles.separator} />
@@ -62,6 +109,51 @@ export default function TabTwoScreen() {
           helperText="Username must be 3-20 characters"
           validateOnChange={true}
         />
+        <View>
+          <ChipComponent
+            text="Penicillin allergy"
+            variant={ChipVariant.Danger}
+            iconName="Heart"
+            iconPosition="left"
+          />
+          <ChipComponent
+            text="Warning"
+            variant={ChipVariant.Warning}
+            iconName="Check"
+            iconPosition="right"
+          />
+          <ChipComponent
+            text="Success"
+            variant={ChipVariant.Success}
+            iconName="Star"
+            iconPosition="left"
+          />
+          <ChipComponent text="Light Theme" variant={ChipVariant.LightGreen} />
+        </View>
+        <View>
+          <DropdownComponent
+            value={country}
+            onValueChange={setCountry}
+            options={countryOptions}
+            label="Country"
+            placeholder="Select a country"
+            helperText="Choose your country of residence"
+            validationSchema={countrySchema}
+            validateOnChange={true}
+            showHelperText={true}
+          />
+          <ToggleButton
+            size={ToggleSize.Medium}
+            label="Enable toggle"
+            isActive={notificationsEnabled}
+            onToggle={setNotificationsEnabled}
+          />
+          <ToggleButton
+            size={ToggleSize.Large}
+            isActive={darkModeEnabled}
+            onToggle={setDarkModeEnabled}
+          />
+        </View>
         <TextInputComponent
           inputWrapper={{
             accessibilityHint: "Enter your password",
@@ -90,7 +182,6 @@ export default function TabTwoScreen() {
           validationSchema={otpSchema}
         />
       </View>
-
       <View style={styles.buttonContainer}>
         {/* Small button */}
         <View style={styles.centeredButton}>
@@ -143,15 +234,15 @@ export default function TabTwoScreen() {
         darkColor="rgba(255,255,255,0.1)"
       />
       <EditScreenInfo path="app/(tabs)/two.tsx" />
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     alignItems: "center",
-    justifyContent: "center",
+    paddingVertical: 20,
   },
   buttonContainer: {
     width: "100%",
