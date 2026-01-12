@@ -10,34 +10,11 @@ export class ClientReportController {
       const clientReportService = getClientReportService(c);
       const body = await c.req.parseBody();
 
-      // Extract form data
-      const file = body["file"];
-      const report_title = body["report_title"];
-      const client_id = body["client_id"];
-      const user_id = body["user_id"];
-
-      // Validate file exists
-      if (!file || !(file instanceof File)) {
-        return c.json({ error: "File is required" }, 400);
-      }
-
-      // Validate required fields
-      if (!report_title || typeof report_title !== "string") {
-        return c.json({ error: "Report title is required" }, 400);
-      }
-
-      if (!client_id || typeof client_id !== "string") {
-        return c.json({ error: "Client ID is required" }, 400);
-      }
-
-      if (!user_id || typeof user_id !== "string") {
-        return c.json({ error: "User ID is required" }, 400);
-      }
-
+      const file = body["file"] as File;
       const input: CreateClientReportInput = {
-        report_title,
-        client_id,
-        user_id,
+        report_title: body["report_title"] as string,
+        client_id: body["client_id"] as string,
+        user_id: body["user_id"] as string,
       };
 
       const report = await clientReportService.createReport(input, file);
