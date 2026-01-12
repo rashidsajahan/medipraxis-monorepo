@@ -29,4 +29,26 @@ export class UserRepository {
 
     return data;
   }
+
+  async updateUser(userId: string, updateData: any) {
+    const { data, error } = await this.db
+      .from(USER_QUERIES.USER_TABLE)
+      .update({
+        ...updateData,
+        // modified_date will automatically be updated in supabase
+      })
+      .eq("user_id", userId)
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error(`Failed to update user: ${error.message}`);
+    }
+
+    if (!data) {
+      return null;
+    }
+
+    return data;
+  }
 }

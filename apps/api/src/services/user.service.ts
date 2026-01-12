@@ -16,4 +16,25 @@ export class UserService {
 
     return user;
   }
+
+  async updateUser(userId: string, updateData: any) {
+    // Check if user exists
+    const existingUser = await this.userRepository.findUserById(userId);
+
+    if (!existingUser) {
+      throw new Error("User not found");
+    }
+
+    // Update the user
+    const updatedUser = await this.userRepository.updateUser(
+      userId,
+      updateData
+    );
+
+    if (!updatedUser) {
+      throw new Error("Failed to update user");
+    }
+
+    return updatedUser;
+  }
 }
