@@ -95,6 +95,32 @@ export class ClientRepository {
     return data as Client;
   }
 
+  async findByPhone(
+    countryCode: string,
+    contactNumber: string
+  ): Promise<Client | null> {
+    // First find the contact_id
+    const contact = await this.findContactInfo(countryCode, contactNumber);
+
+    if (!contact) {
+      return null;
+    }
+
+    // Then find the client with that contact_id
+    const { data, error } = await this.db
+      .from("client")
+      .select(CLIENT_QUERIES.FIND_BY_ID)
+      .eq("contact_id", contact.contact_id)
+      .is("deleted_date", null)
+      .single();
+
+    if (error || !data) {
+      return null;
+    }
+
+    return data as Client;
+  }
+
   async create(clientData: CreateClientInput): Promise<Client> {
     const data = {
       title: clientData.title,

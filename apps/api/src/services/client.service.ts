@@ -1,9 +1,9 @@
-import { ClientRepository } from "../repositories";
 import type {
   Client,
   CreateClientWithContactInput,
   UpdateClientInput,
 } from "@repo/models";
+import { ClientRepository } from "../repositories";
 
 export class ClientService {
   private clientRepository: ClientRepository;
@@ -24,6 +24,13 @@ export class ClientService {
     }
 
     return client;
+  }
+
+  async getClientByPhone(
+    countryCode: string,
+    contactNumber: string
+  ): Promise<Client | null> {
+    return await this.clientRepository.findByPhone(countryCode, contactNumber);
   }
 
   async createClient(input: CreateClientWithContactInput): Promise<Client> {
