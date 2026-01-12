@@ -4,14 +4,17 @@ import {
   ClientRepository,
   SlotWindowRepository,
   TaskRepository,
+  UserRepository,
 } from "../repositories";
 import {
   AIService,
   ClientReportService,
   ClientService,
-  SlotWindowService,
+  UserService,
   TaskService,
+  SlotWindowService,
 } from "../services";
+
 import type { Env } from "../types";
 import { createDatabaseClient } from "./database";
 
@@ -48,4 +51,10 @@ export function getClientReportService(c: Context<{ Bindings: Env }>) {
   const db = createDatabaseClient(c.env);
   const clientReportRepository = new ClientReportRepository(db);
   return new ClientReportService(clientReportRepository);
+}
+
+export function getUserService(c: Context<{ Bindings: Env }>) {
+  const db = createDatabaseClient(c.env);
+  const userRepository = new UserRepository(db);
+  return new UserService(userRepository);
 }
