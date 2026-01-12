@@ -7,9 +7,7 @@ import tasks from "./tasks";
 import users from "./user";
 
 const routes = new Hono()
-
   .route("/tasks", tasks)
-
   .route("/ai", ai)
   .route("/slot-windows", slotWindows)
   .route("/users", users)
