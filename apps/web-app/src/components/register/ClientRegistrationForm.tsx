@@ -1,4 +1,4 @@
-import { Check, CircleNotch } from "@phosphor-icons/react";
+import { CheckIcon, CircleNotchIcon } from "@phosphor-icons/react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -199,12 +199,12 @@ const ClientRegistrationForm = ({
           >
             {isPending ? (
               <>
-                <CircleNotch className="h-4 w-4 animate-spin" />
+                <CircleNotchIcon className="h-4 w-4 animate-spin" />
                 Saving...
               </>
             ) : (
               <>
-                <Check className="h-4 w-4" />
+                <CheckIcon className="h-4 w-4" />
                 Save
               </>
             )}
