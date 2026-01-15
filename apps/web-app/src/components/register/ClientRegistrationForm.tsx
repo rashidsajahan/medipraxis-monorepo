@@ -1,7 +1,4 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, Loader2 } from "lucide-react";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Check, CircleNotch } from "@phosphor-icons/react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -29,67 +26,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
+import type { ClientRegistrationFormValues } from "@/types/clientRegistration.types";
 import {
-  clientRegistrationFormSchema,
   GENDER_OPTIONS,
   TITLE_OPTIONS,
-  type ClientRegistrationFormValues,
-  type ClientRegistrationProps,
   type ServerMessage,
 } from "@/types/clientRegistration.types";
-import { useRegisterPatient } from "@/api/ClientRegistration";
+import type { UseFormReturn } from "react-hook-form";
 
-const ClientRegistrationForm = ({ onClose }: ClientRegistrationProps) => {
-  const [serverMessage, setServerMessage] = useState<ServerMessage | null>(
-    null
-  );
+type Props = {
+  form: UseFormReturn<ClientRegistrationFormValues>;
+  onSubmit: (values: ClientRegistrationFormValues) => void | Promise<void>;
+  isPending: boolean;
+  serverMessage: ServerMessage | null;
+  onClearMessage: () => void;
+};
 
-  const { mutate, isPending, reset } = useRegisterPatient({
-    onSuccess: () => {
-      setServerMessage({
-        type: "success",
-        text: "Patient registered successfully!",
-      });
-      setTimeout(onClose, 1500);
-    },
-    onError: (message) => {
-      setServerMessage({
-        type: "error",
-        text: message,
-      });
-    },
-  });
-
-  const defaultValues: ClientRegistrationFormValues = {
-    title: "Mr",
-    first_name: "",
-    last_name: "",
-    gender: "MALE",
-    date_of_birth: "",
-    user_id: "",
-    contact_id: "",
-  };
-
-  const form = useForm({
-    resolver: zodResolver(clientRegistrationFormSchema),
-    defaultValues,
-  });
-
-  const onSubmit = (values: ClientRegistrationFormValues) => {
-    if (isPending) return;
-
-    setServerMessage(null);
-    reset();
-
-    const payload: ClientRegistrationFormValues = {
-      ...values,
-      user_id: "2a3c19b8-d352-4b30-a2ac-1cdf993d310c",
-      contact_id: "57e0f5d8-92ad-44c9-b546-ccd3502af7d0",
-    };
-
-    mutate(payload);
-  };
-
+const ClientRegistrationForm = ({
+  form,
+  onSubmit,
+  isPending,
+  serverMessage,
+  onClearMessage,
+}: Props) => {
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <Card className="w-full max-w-md rounded-2xl shadow-xl pb-0 border-none">
@@ -115,7 +75,7 @@ const ClientRegistrationForm = ({ onClose }: ClientRegistrationProps) => {
                   <FormItem>
                     <FormLabel>Title</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
-                      <FormControl className="w-full">
+                      <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select title" />
                         </SelectTrigger>
@@ -221,7 +181,7 @@ const ClientRegistrationForm = ({ onClose }: ClientRegistrationProps) => {
                   }`}
                 >
                   <span>{serverMessage.text}</span>
-                  <button onClick={() => setServerMessage(null)}>
+                  <button type="button" onClick={onClearMessage}>
                     &times;
                   </button>
                 </div>
@@ -239,7 +199,7 @@ const ClientRegistrationForm = ({ onClose }: ClientRegistrationProps) => {
           >
             {isPending ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <CircleNotch className="h-4 w-4 animate-spin" />
                 Saving...
               </>
             ) : (
