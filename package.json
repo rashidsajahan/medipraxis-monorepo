@@ -11,7 +11,6 @@
     "prepare": "husky"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^3.0.0",
     "husky": "^9.1.7",
     "prettier": "^3.6.2",
     "turbo": "^2.6.3",
