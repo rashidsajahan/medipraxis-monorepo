@@ -1,3 +1,6 @@
+import bcrypt from "bcryptjs";
+import type { OtpRepository } from "../repositories";
+
 interface TextLKResponse {
   status: string;
   message: string;
@@ -16,9 +19,14 @@ interface TextLKResponse {
 export class OtpService {
   private apiKey: string;
   private baseUrl = "https://app.text.lk/api/v3/sms/send";
+  private isDevelopment: boolean;
+  private otpRepository: OtpRepository;
+  private saltRounds = 10;
 
-  constructor(apiKey: string) {
+  constructor(apiKey: string, otpRepository: OtpRepository) {
     this.apiKey = apiKey;
+    this.otpRepository = otpRepository;
+    this.isDevelopment = !apiKey || apiKey === "dev";
   }
 
   async sendOtp(countryCode: string, contactNumber: string): Promise<number> {
@@ -66,39 +74,29 @@ export class OtpService {
     }
   }
 
-  private otpStore = new Map<string, { otp: number; timestamp: number }>();
-
-  storeOtp(key: string, otp: number): void {
-    this.otpStore.set(key, {
-      otp,
-      timestamp: Date.now(),
-    });
-
-    setTimeout(
-      () => {
-        this.otpStore.delete(key);
-      },
-      5 * 60 * 1000
-    );
+  async storeOtp(key: string, otp: number): Promise<void> {
+    const hashedOtp = await bcrypt.hash(otp.toString(), this.saltRounds);
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+    await this.otpRepository.storeOtp(key, hashedOtp, expiresAt);
   }
 
-  verifyOtp(key: string, otp: string): boolean {
-    const stored = this.otpStore.get(key);
+  async verifyOtp(key: string, otp: string): Promise<boolean> {
+    const record = await this.otpRepository.getOtp(key);
 
-    if (!stored) {
+    if (!record) {
       return false;
     }
 
-    const isExpired = Date.now() - stored.timestamp > 5 * 60 * 1000;
+    const isExpired = new Date(record.expires_date) < new Date();
     if (isExpired) {
-      this.otpStore.delete(key);
+      await this.otpRepository.deleteOtp(key);
       return false;
     }
 
-    const isValid = stored.otp.toString() === otp;
+    const isValid = await bcrypt.compare(otp, record.otp_code);
 
     if (isValid) {
-      this.otpStore.delete(key);
+      await this.otpRepository.deleteOtp(key);
     }
 
     return isValid;

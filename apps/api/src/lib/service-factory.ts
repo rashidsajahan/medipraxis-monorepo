@@ -2,6 +2,7 @@ import type { Context } from "hono";
 import {
   ClientReportRepository,
   ClientRepository,
+  OtpRepository,
   SlotWindowRepository,
   TaskRepository,
   UserRepository,
@@ -61,11 +62,9 @@ export function getClientReportService(c: Context<{ Bindings: Env }>) {
 }
 
 export function getOtpService(c: Context<{ Bindings: Env }>) {
-  const apiKey = c.env.TEXT_LK_API_KEY;
+  const apiKey = c.env.TEXT_LK_API_KEY || "dev";
+  const db = createDatabaseClient(c.env);
+  const otpRepository = new OtpRepository(db);
 
-  if (!apiKey) {
-    throw new Error("TEXT_LK_API_KEY not configured");
-  }
-
-  return new OtpService(apiKey);
+  return new OtpService(apiKey, otpRepository);
 }
