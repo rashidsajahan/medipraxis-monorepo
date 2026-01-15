@@ -18,6 +18,8 @@ export const pendingReportSchema = z.object({
   created_date: z.string(),
   client_id: z.string().uuid(),
   client_name: z.string(),
+  user_id: z.string().uuid().nullable(),
+  user_name: z.string().nullable(),
   requested_reports: z.any().nullable(),
   form_id: z.string().uuid().nullable(),
 });

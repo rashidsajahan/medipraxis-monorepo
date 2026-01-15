@@ -3,7 +3,7 @@ import type {
   CreateClientReportInput,
   PendingReport,
 } from "@repo/models";
-import { ClientReportRepository } from "../repositories";
+import { ClientReportRepository, UserRepository } from "../repositories";
 import type { ClientRepository } from "../repositories/client.repository";
 import type { RequestReportRepository } from "../repositories/request_report.repository";
 
@@ -11,15 +11,18 @@ export class ClientReportService {
   private clientReportRepository: ClientReportRepository;
   private clientRepository: ClientRepository;
   private requestReportRepository: RequestReportRepository;
+  private userRepository: UserRepository;
 
   constructor(
     clientReportRepository: ClientReportRepository,
     clientRepository: ClientRepository,
-    requestReportRepository: RequestReportRepository
+    requestReportRepository: RequestReportRepository,
+    userRepository: UserRepository
   ) {
     this.clientReportRepository = clientReportRepository;
     this.clientRepository = clientRepository;
     this.requestReportRepository = requestReportRepository;
+    this.userRepository = userRepository;
   }
 
   async createReport(
@@ -127,11 +130,43 @@ export class ClientReportService {
         requestReportIds
       );
 
+    // Get unique user_ids and fetch user data
+    const userIds = [
+      ...new Set(
+        requestReports
+          .map((rr) => rr.user_id)
+          .filter((id): id is string => id !== null)
+      ),
+    ];
+
+    const usersMap = new Map<
+      string,
+      { first_name: string; last_name: string }
+    >();
+    for (const userId of userIds) {
+      try {
+        const user = await this.userRepository.findUserById(userId);
+        if (user) {
+          usersMap.set(userId, {
+            first_name: user.first_name,
+            last_name: user.last_name,
+          });
+        }
+      } catch (error) {
+        // Continue if user fetch fails
+        console.error(`Failed to fetch user ${userId}:`, error);
+      }
+    }
+
     // Filter to only pending (not uploaded) reports
     const pendingReports: PendingReport[] = requestReports
       .filter((rr) => !uploadedRequestReportIds.has(rr.request_report_id))
       .map((rr) => {
         const client = clients.find((c) => c.client_id === rr.client_id);
+        const user = rr.user_id ? usersMap.get(rr.user_id) : null;
+        const userName = user
+          ? `${user.first_name} ${user.last_name}`.trim()
+          : null;
         return {
           request_report_id: rr.request_report_id,
           created_date: rr.created_date,
@@ -139,6 +174,8 @@ export class ClientReportService {
           client_name: client
             ? `${client.first_name} ${client.last_name}`
             : "Unknown",
+          user_id: rr.user_id,
+          user_name: userName,
           requested_reports: rr.requested_reports,
           form_id: rr.form_id,
         };

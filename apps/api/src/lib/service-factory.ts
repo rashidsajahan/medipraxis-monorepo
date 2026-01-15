@@ -61,10 +61,12 @@ export function getClientReportService(c: Context<{ Bindings: Env }>) {
   const clientReportRepository = new ClientReportRepository(db);
   const clientRepository = new ClientRepository(db);
   const requestReportRepository = new RequestReportRepository(db);
+  const userRepository = new UserRepository(db);
   return new ClientReportService(
     clientReportRepository,
     clientRepository,
-    requestReportRepository
+    requestReportRepository,
+    userRepository
   );
 }
 
