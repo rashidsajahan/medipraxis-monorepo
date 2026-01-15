@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Bookmark } from "lucide-react";
+import { BookmarkIcon } from "@phosphor-icons/react";
 
 type SlotWindowProps = {
   id: number;
@@ -57,7 +57,7 @@ export function SlotWindow({
             onClick={() => onReserve?.(id)}
             className="bg-mp-dark-green text-white px-8 py-2 rounded-md hover:bg-mp-dark-green/90 h-auto"
           >
-            <Bookmark className="w-5 h-5" />
+            <BookmarkIcon className="w-5 h-5" />
             <span className="text-sm font-semibold font-lato">Reserve</span>
           </Button>
         )}

@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RegisterIndexRouteImport } from './routes/register/index'
+import { Route as SchedulesIdRouteImport } from './routes/schedules/$id'
 
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
@@ -28,34 +29,43 @@ const RegisterIndexRoute = RegisterIndexRouteImport.update({
   path: '/register/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SchedulesIdRoute = SchedulesIdRouteImport.update({
+  id: '/schedules/$id',
+  path: '/schedules/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/schedules/$id': typeof SchedulesIdRoute
   '/register': typeof RegisterIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/schedules/$id': typeof SchedulesIdRoute
   '/register': typeof RegisterIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/schedules/$id': typeof SchedulesIdRoute
   '/register/': typeof RegisterIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/register'
+  fullPaths: '/' | '/about' | '/schedules/$id' | '/register'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/register'
-  id: '__root__' | '/' | '/about' | '/register/'
+  to: '/' | '/about' | '/schedules/$id' | '/register'
+  id: '__root__' | '/' | '/about' | '/schedules/$id' | '/register/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  SchedulesIdRoute: typeof SchedulesIdRoute
   RegisterIndexRoute: typeof RegisterIndexRoute
 }
 
@@ -82,12 +92,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/schedules/$id': {
+      id: '/schedules/$id'
+      path: '/schedules/$id'
+      fullPath: '/schedules/$id'
+      preLoaderRoute: typeof SchedulesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  SchedulesIdRoute: SchedulesIdRoute,
   RegisterIndexRoute: RegisterIndexRoute,
 }
 export const routeTree = rootRouteImport
