@@ -1,7 +1,12 @@
-import ClientRegistrationForm from "@/components/register/ClientRegistrationForm";
 import { useClientRegistrationForm } from "@/services/ClientRegistration/useClientRegistrationForm";
+import { createFileRoute } from "@tanstack/react-router";
+import ClientRegistrationForm from "./ClientRegistrationForm";
 
-const ClientRegistration = () => {
+export const Route = createFileRoute("/register/")({
+  component: Index,
+});
+
+function Index() {
   const onClose = () => {
     console.log("close modal / navigate / whatever");
   };
@@ -18,6 +23,4 @@ const ClientRegistration = () => {
       onClearMessage={clearServerMessage}
     />
   );
-};
-
-export default ClientRegistration;
+}
