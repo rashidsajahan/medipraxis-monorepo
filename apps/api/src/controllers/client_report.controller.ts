@@ -1,4 +1,7 @@
-import type { CreateClientReportInput } from "@repo/models";
+import type {
+  CreateClientReportInput,
+  GetPendingReportsParam,
+} from "@repo/models";
 import { getClientReportService } from "../lib";
 import type { APIContext } from "../types";
 
@@ -100,6 +103,29 @@ export class ClientReportController {
           ? 404
           : 500;
       return c.json({ error: message }, status);
+    }
+  }
+
+  static async getPendingReports(
+    c: APIContext<{ param: GetPendingReportsParam }, "/pending/:contact_id">
+  ) {
+    try {
+      const clientReportService = getClientReportService(c);
+      const contactId = c.req.param("contact_id");
+
+      const pendingReports =
+        await clientReportService.getPendingReportsByContactId(contactId);
+
+      return c.json({
+        pending_reports: pendingReports,
+        count: pendingReports.length,
+      });
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch pending reports";
+      return c.json({ error: message }, 500);
     }
   }
 }

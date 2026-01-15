@@ -1,11 +1,25 @@
-import type { ClientReport, CreateClientReportInput } from "@repo/models";
+import type {
+  ClientReport,
+  CreateClientReportInput,
+  PendingReport,
+} from "@repo/models";
 import { ClientReportRepository } from "../repositories";
+import type { ClientRepository } from "../repositories/client.repository";
+import type { RequestReportRepository } from "../repositories/request_report.repository";
 
 export class ClientReportService {
   private clientReportRepository: ClientReportRepository;
+  private clientRepository: ClientRepository;
+  private requestReportRepository: RequestReportRepository;
 
-  constructor(clientReportRepository: ClientReportRepository) {
+  constructor(
+    clientReportRepository: ClientReportRepository,
+    clientRepository: ClientRepository,
+    requestReportRepository: RequestReportRepository
+  ) {
     this.clientReportRepository = clientReportRepository;
+    this.clientRepository = clientRepository;
+    this.requestReportRepository = requestReportRepository;
   }
 
   async createReport(
@@ -83,5 +97,53 @@ export class ClientReportService {
     }
 
     return deleted;
+  }
+
+  async getPendingReportsByContactId(
+    contactId: string
+  ): Promise<PendingReport[]> {
+    // Get all clients with contact_id
+    const clients = await this.clientRepository.findByContactId(contactId);
+
+    if (!clients || clients.length === 0) {
+      return [];
+    }
+
+    const clientIds = clients.map((client) => client.client_id);
+
+    // Get all request_reports for these clients (not expired, not deleted)
+    const requestReports =
+      await this.requestReportRepository.findPendingByClientIds(clientIds);
+
+    if (requestReports.length === 0) {
+      return [];
+    }
+
+    const requestReportIds = requestReports.map((rr) => rr.request_report_id);
+
+    // Check which request_reports already have uploaded reports
+    const uploadedRequestReportIds =
+      await this.clientReportRepository.findByRequestReportIds(
+        requestReportIds
+      );
+
+    // Filter to only pending (not uploaded) reports
+    const pendingReports: PendingReport[] = requestReports
+      .filter((rr) => !uploadedRequestReportIds.has(rr.request_report_id))
+      .map((rr) => {
+        const client = clients.find((c) => c.client_id === rr.client_id);
+        return {
+          request_report_id: rr.request_report_id,
+          created_date: rr.created_date,
+          client_id: rr.client_id!,
+          client_name: client
+            ? `${client.first_name} ${client.last_name}`
+            : "Unknown",
+          requested_reports: rr.requested_reports,
+          form_id: rr.form_id,
+        };
+      });
+
+    return pendingReports;
   }
 }

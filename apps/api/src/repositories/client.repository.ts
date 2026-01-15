@@ -95,6 +95,20 @@ export class ClientRepository {
     return data as Client;
   }
 
+  async findByContactId(contactId: string): Promise<Client[]> {
+    const { data, error } = await this.db
+      .from("client")
+      .select(CLIENT_QUERIES.FIND_ALL)
+      .eq("contact_id", contactId)
+      .is("deleted_date", null);
+
+    if (error) {
+      throw new Error(`Failed to fetch clients: ${error.message}`);
+    }
+
+    return (data as Client[]) || [];
+  }
+
   async findByPhone(
     countryCode: string,
     contactNumber: string

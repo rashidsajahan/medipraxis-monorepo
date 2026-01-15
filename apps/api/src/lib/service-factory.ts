@@ -3,6 +3,7 @@ import {
   ClientReportRepository,
   ClientRepository,
   OtpRepository,
+  RequestReportRepository,
   SlotWindowRepository,
   TaskRepository,
   UserRepository,
@@ -58,7 +59,13 @@ export function getClientService(c: Context<{ Bindings: Env }>) {
 export function getClientReportService(c: Context<{ Bindings: Env }>) {
   const db = createDatabaseClient(c.env);
   const clientReportRepository = new ClientReportRepository(db);
-  return new ClientReportService(clientReportRepository);
+  const clientRepository = new ClientRepository(db);
+  const requestReportRepository = new RequestReportRepository(db);
+  return new ClientReportService(
+    clientReportRepository,
+    clientRepository,
+    requestReportRepository
+  );
 }
 
 export function getOtpService(c: Context<{ Bindings: Env }>) {
