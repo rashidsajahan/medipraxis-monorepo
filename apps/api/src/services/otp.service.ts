@@ -1,4 +1,3 @@
-import bcrypt from "bcryptjs";
 import type { OtpRepository } from "../repositories";
 
 interface TextLKResponse {
@@ -21,12 +20,19 @@ export class OtpService {
   private baseUrl = "https://app.text.lk/api/v3/sms/send";
   private isDevelopment: boolean;
   private otpRepository: OtpRepository;
-  private saltRounds = 10;
 
   constructor(apiKey: string, otpRepository: OtpRepository) {
     this.apiKey = apiKey;
     this.otpRepository = otpRepository;
     this.isDevelopment = !apiKey || apiKey === "dev";
+  }
+
+  private async hashOtp(otp: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(otp);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
   }
 
   async sendOtp(countryCode: string, contactNumber: string): Promise<number> {
@@ -75,7 +81,7 @@ export class OtpService {
   }
 
   async storeOtp(key: string, otp: number): Promise<void> {
-    const hashedOtp = await bcrypt.hash(otp.toString(), this.saltRounds);
+    const hashedOtp = await this.hashOtp(otp.toString());
     const expiresAt = new Date(Date.now() + 60 * 1000);
     await this.otpRepository.storeOtp(key, hashedOtp, expiresAt);
   }
@@ -98,7 +104,8 @@ export class OtpService {
       return false;
     }
 
-    const isValid = await bcrypt.compare(otp, record.otp_code);
+    const hashedInput = await this.hashOtp(otp);
+    const isValid = hashedInput === record.otp_code;
 
     if (isValid) {
       await this.otpRepository.deleteOtp(key);
