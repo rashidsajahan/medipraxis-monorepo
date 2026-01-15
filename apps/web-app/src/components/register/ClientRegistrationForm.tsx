@@ -76,7 +76,7 @@ const ClientRegistrationForm = ({
                     <FormLabel>Title</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select title" />
                         </SelectTrigger>
                       </FormControl>
@@ -190,12 +190,12 @@ const ClientRegistrationForm = ({
           </Form>
         </CardContent>
 
-        <CardFooter className="flex justify-end bg-[#EBF4B6] h-16 rounded-b-2xl">
+        <CardFooter className="flex justify-end bg-[#E3F0AF] h-16 rounded-b-2xl">
           <Button
             type="submit"
             form="patient-form"
             disabled={isPending}
-            className="flex items-center bg-black text-white gap-2"
+            className="flex items-center bg-black text-white gap-2 hover:bg-gray-800"
           >
             {isPending ? (
               <>
