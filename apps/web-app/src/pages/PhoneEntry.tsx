@@ -65,10 +65,11 @@ export function PhoneEntry() {
         throw new Error("Failed to send OTP");
       }
 
-      // Store phone number and show OTP input
+      const otpData = await otpResponse.json();
+
       sessionStorage.setItem("client_phone_number", phoneNumber);
       sessionStorage.setItem("client_country_code", countryCode);
-      sessionStorage.setItem("client_id", checkData.client.client_id);
+      sessionStorage.setItem("contact_id", otpData.contact_id);
 
       setOtpSent(true);
     } catch (err) {
@@ -111,8 +112,15 @@ export function PhoneEntry() {
         throw new Error(data.error || "Invalid OTP");
       }
 
-      // OTP verified, navigate to next page
-      navigate({ to: "/about" });
+      const verifyData = await response.json();
+
+      const contactId =
+        verifyData.contact_id || sessionStorage.getItem("contact_id");
+      if (contactId) {
+        navigate({ to: `/${contactId}` });
+      } else {
+        throw new Error("Contact ID not found");
+      }
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Invalid OTP. Please try again."

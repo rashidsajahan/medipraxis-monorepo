@@ -9,7 +9,6 @@ export class OtpController {
       const otpService = getOtpService(c);
       const body = c.req.valid("json");
 
-      // Check if client exists
       const client = await clientService.getClientByPhone(
         body.country_code,
         body.contact_number
@@ -22,19 +21,18 @@ export class OtpController {
         );
       }
 
-      // Send OTP
       const otp = await otpService.sendOtp(
         body.country_code,
         body.contact_number
       );
 
-      // Store OTP for verification
       const otpKey = `${body.country_code}${body.contact_number}`;
       await otpService.storeOtp(otpKey, otp);
 
       return c.json({
         success: true,
         message: "OTP sent successfully",
+        contact_id: client.contact_id,
       });
     } catch (error) {
       const message =
@@ -45,6 +43,7 @@ export class OtpController {
 
   static async verifyOtp(c: APIContext<{ json: VerifyOtpInput }>) {
     try {
+      const clientService = getClientService(c);
       const otpService = getOtpService(c);
       const body = c.req.valid("json");
 
@@ -55,9 +54,15 @@ export class OtpController {
         return c.json({ error: "Invalid or expired OTP" }, 400);
       }
 
+      const client = await clientService.getClientByPhone(
+        body.country_code,
+        body.contact_number
+      );
+
       return c.json({
         success: true,
         message: "OTP verified successfully",
+        contact_id: client?.contact_id,
       });
     } catch (error) {
       const message =
