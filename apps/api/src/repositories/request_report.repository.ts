@@ -34,4 +34,20 @@ export class RequestReportRepository {
 
     return (data || []) as RequestReport[];
   }
+
+  async findById(requestReportId: string): Promise<RequestReport | null> {
+    const { data, error } = await this.db
+      .from(REQUEST_REPORT_QUERIES.REQUEST_REPORT_TABLE)
+      .select("*")
+      .eq(REQUEST_REPORT_QUERIES.REQUEST_REPORT_ID, requestReportId)
+      .eq(REQUEST_REPORT_QUERIES.EXPIRED, false)
+      .eq(REQUEST_REPORT_QUERIES.DELETED, false)
+      .single();
+
+    if (error) {
+      throw new Error(`Failed to fetch request report: ${error.message}`);
+    }
+
+    return data as RequestReport;
+  }
 }

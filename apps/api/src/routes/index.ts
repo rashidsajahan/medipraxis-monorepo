@@ -3,6 +3,7 @@ import ai from "./ai";
 import clientReports from "./client_reports";
 import clients from "./clients";
 import otp from "./otp";
+import requestReports from "./request_reports";
 import slotWindows from "./slot_windows";
 import tasks from "./tasks";
 import users from "./user";
@@ -14,6 +15,7 @@ const routes = new Hono()
   .route("/users", users)
   .route("/clients", clients)
   .route("/client-reports", clientReports)
-  .route("/otp", otp);
+  .route("/otp", otp)
+  .route("/request-reports", requestReports);
 
 export default routes;
