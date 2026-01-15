@@ -13,6 +13,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as ContactIdRouteImport } from './routes/$contactId'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RegisterIndexRouteImport } from './routes/register/index'
+import { Route as ContactIdUploadReportRequestReportIdRouteImport } from './routes/$contactId.upload-report.$requestReportId'
 
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
@@ -34,37 +35,62 @@ const RegisterIndexRoute = RegisterIndexRouteImport.update({
   path: '/register/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContactIdUploadReportRequestReportIdRoute =
+  ContactIdUploadReportRequestReportIdRouteImport.update({
+    id: '/upload-report/$requestReportId',
+    path: '/upload-report/$requestReportId',
+    getParentRoute: () => ContactIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/$contactId': typeof ContactIdRoute
+  '/$contactId': typeof ContactIdRouteWithChildren
   '/about': typeof AboutRoute
   '/register': typeof RegisterIndexRoute
+  '/$contactId/upload-report/$requestReportId': typeof ContactIdUploadReportRequestReportIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/$contactId': typeof ContactIdRoute
+  '/$contactId': typeof ContactIdRouteWithChildren
   '/about': typeof AboutRoute
   '/register': typeof RegisterIndexRoute
+  '/$contactId/upload-report/$requestReportId': typeof ContactIdUploadReportRequestReportIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/$contactId': typeof ContactIdRoute
+  '/$contactId': typeof ContactIdRouteWithChildren
   '/about': typeof AboutRoute
   '/register/': typeof RegisterIndexRoute
+  '/$contactId/upload-report/$requestReportId': typeof ContactIdUploadReportRequestReportIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$contactId' | '/about' | '/register'
+  fullPaths:
+    | '/'
+    | '/$contactId'
+    | '/about'
+    | '/register'
+    | '/$contactId/upload-report/$requestReportId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$contactId' | '/about' | '/register'
-  id: '__root__' | '/' | '/$contactId' | '/about' | '/register/'
+  to:
+    | '/'
+    | '/$contactId'
+    | '/about'
+    | '/register'
+    | '/$contactId/upload-report/$requestReportId'
+  id:
+    | '__root__'
+    | '/'
+    | '/$contactId'
+    | '/about'
+    | '/register/'
+    | '/$contactId/upload-report/$requestReportId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ContactIdRoute: typeof ContactIdRoute
+  ContactIdRoute: typeof ContactIdRouteWithChildren
   AboutRoute: typeof AboutRoute
   RegisterIndexRoute: typeof RegisterIndexRoute
 }
@@ -99,12 +125,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$contactId/upload-report/$requestReportId': {
+      id: '/$contactId/upload-report/$requestReportId'
+      path: '/upload-report/$requestReportId'
+      fullPath: '/$contactId/upload-report/$requestReportId'
+      preLoaderRoute: typeof ContactIdUploadReportRequestReportIdRouteImport
+      parentRoute: typeof ContactIdRoute
+    }
   }
 }
 
+interface ContactIdRouteChildren {
+  ContactIdUploadReportRequestReportIdRoute: typeof ContactIdUploadReportRequestReportIdRoute
+}
+
+const ContactIdRouteChildren: ContactIdRouteChildren = {
+  ContactIdUploadReportRequestReportIdRoute:
+    ContactIdUploadReportRequestReportIdRoute,
+}
+
+const ContactIdRouteWithChildren = ContactIdRoute._addFileChildren(
+  ContactIdRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ContactIdRoute: ContactIdRoute,
+  ContactIdRoute: ContactIdRouteWithChildren,
   AboutRoute: AboutRoute,
   RegisterIndexRoute: RegisterIndexRoute,
 }

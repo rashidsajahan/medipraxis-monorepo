@@ -1,3 +1,4 @@
+import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
 const API_BASE_URL = "http://localhost:8787/api";
@@ -21,6 +22,7 @@ export function ContactDashboard({ contactId }: ContactDashboardProps) {
   const [pendingReports, setPendingReports] = useState<PendingReport[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchPendingReports();
@@ -49,8 +51,13 @@ export function ContactDashboard({ contactId }: ContactDashboardProps) {
   };
 
   const handleUploadReport = (report: PendingReport) => {
-    // TODO: Implement upload functionality
-    console.log("Upload report:", report);
+    navigate({
+      to: "/$contactId/upload-report/$requestReportId",
+      params: {
+        contactId: contactId,
+        requestReportId: report.request_report_id,
+      },
+    });
   };
 
   return (
