@@ -37,7 +37,6 @@ export function UploadReport({ requestReportId }: UploadReportProps) {
   const [error, setError] = useState("");
   const [, setUploading] = useState(false);
   const navigate = useNavigate();
-  const contactId = sessionStorage.getItem("contact_id") || "";
 
   useEffect(() => {
     fetchReportDetails();
