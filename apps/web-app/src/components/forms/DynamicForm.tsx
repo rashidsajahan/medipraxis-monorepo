@@ -14,6 +14,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
 }) => {
   const [values, setValues] = useState<FormValues>({});
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [expirationDays, setExpirationDays] = useState<number>(7);
 
   const handleFieldChange = (questionId: string, value: any) => {
     setValues((prev) => ({
@@ -47,7 +48,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
     e.preventDefault();
 
     if (validate()) {
-      onSubmit(values);
+      onSubmit({ ...values, expiration_days: expirationDays });
     }
   };
 
@@ -138,6 +139,54 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
             ));
           }
         })}
+
+        <div className="expiration-period-section">
+          <h3 className="expiration-heading">
+            Select Report Expiration Period
+          </h3>
+          <p className="expiration-description">
+            Pick an expiration period based on how long you want the report to
+            remain accessible.
+          </p>
+          <div className="expiration-options">
+            <label
+              className={`expiration-option ${expirationDays === 3 ? "selected" : ""}`}
+            >
+              <input
+                type="radio"
+                name="expiration"
+                value="3"
+                checked={expirationDays === 3}
+                onChange={() => setExpirationDays(3)}
+              />
+              <span className="option-label">3 Days</span>
+            </label>
+            <label
+              className={`expiration-option ${expirationDays === 7 ? "selected" : ""}`}
+            >
+              <input
+                type="radio"
+                name="expiration"
+                value="7"
+                checked={expirationDays === 7}
+                onChange={() => setExpirationDays(7)}
+              />
+              <span className="option-label">7 Days</span>
+            </label>
+            <label
+              className={`expiration-option ${expirationDays === 30 ? "selected" : ""}`}
+            >
+              <input
+                type="radio"
+                name="expiration"
+                value="30"
+                checked={expirationDays === 30}
+                onChange={() => setExpirationDays(30)}
+              />
+              <span className="option-label">30 Days</span>
+            </label>
+          </div>
+        </div>
 
         <div className="form-actions">
           <button type="submit" className="submit-button">
