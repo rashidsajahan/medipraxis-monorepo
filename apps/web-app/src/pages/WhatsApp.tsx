@@ -1,7 +1,6 @@
 import { WhatsAppClient, WhatsAppService } from "@repo/whatsapp";
 
 const WhatsApp = () => {
-    
   const sendWhatsApp = async () => {
     // const url = `https://graph.facebook.com/v20.0/997165740137495/messages`; // busy
     const url = `https://graph.facebook.com/v20.0/977178835473013/messages`; // bot-test
