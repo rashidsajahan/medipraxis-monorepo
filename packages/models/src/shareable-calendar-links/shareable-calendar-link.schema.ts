@@ -48,4 +48,5 @@ export type ShareableCalendarLinkWithSlotWindows =
   ShareableCalendarLinkWithUser & {
     slotWindows: SlotWindowForClient[];
     clientReservedSlotWindowIds: string[];
+    clientReservedAppointments: Record<string, string>; // slotWindowId -> taskId
   };

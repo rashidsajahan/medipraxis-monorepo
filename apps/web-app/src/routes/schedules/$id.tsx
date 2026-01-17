@@ -1,3 +1,4 @@
+import { useCancelAppointment } from "@/services/ShareableCalendarLink/useCancelAppointment";
 import { useReserveAppointment } from "@/services/ShareableCalendarLink/useReserveAppointment";
 import { useShareableCalendarLink } from "@/services/ShareableCalendarLink/useShareableCalendarLink";
 import { createFileRoute } from "@tanstack/react-router";
@@ -26,6 +27,18 @@ function ScheduleDetail() {
     linkId: id,
     onSuccess: () => {
       toast.success("Your appointment has been booked successfully!");
+    },
+    onError: (errorMessage) => {
+      toast.error(errorMessage);
+    },
+  });
+
+  // Cancel appointment mutation
+  const cancelAppointment = useCancelAppointment({
+    linkId: id,
+    clientId,
+    onSuccess: () => {
+      toast.success("Your appointment has been cancelled successfully.");
     },
     onError: (errorMessage) => {
       toast.error(errorMessage);
@@ -77,6 +90,21 @@ function ScheduleDetail() {
     reserveAppointment.mutate({
       slot_window_id: slotWindowId,
       client_id: clientId,
+    });
+  };
+
+  // Handle appointment cancellation
+  const handleCancel = (slotWindowId: string) => {
+    const taskId = data?.data.clientReservedAppointments?.[slotWindowId];
+
+    if (!taskId) {
+      toast.error("Unable to cancel this appointment");
+      return;
+    }
+
+    cancelAppointment.mutate({
+      task_id: taskId,
+      slot_window_id: slotWindowId,
     });
   };
 
@@ -157,7 +185,9 @@ function ScheduleDetail() {
                 available={availableSlots > 0}
                 isReserved={isReserved}
                 isReserving={reserveAppointment.isPending}
+                isCancelling={cancelAppointment.isPending}
                 onReserve={handleReserve}
+                onCancel={handleCancel}
               />
             );
           })

@@ -68,6 +68,7 @@ export class ShareableCalendarLinkService {
 
     // Get slot windows where client has appointments
     let clientReservedSlotWindowIds: string[] = [];
+    const clientReservedAppointments: Record<string, string> = {};
     const slotWindowIds = slotWindows.map((sw) => sw.slot_window_id);
 
     if (slotWindowIds.length > 0) {
@@ -94,13 +95,17 @@ export class ShareableCalendarLinkService {
             }
           );
 
-          // Extract unique slot window IDs from appointments
+          // Extract unique slot window IDs and create mapping to task IDs
+          appointments.forEach((apt) => {
+            if (apt.slot_window_id) {
+              clientReservedSlotWindowIds.push(apt.slot_window_id);
+              clientReservedAppointments[apt.slot_window_id] = apt.task_id;
+            }
+          });
+
+          // Remove duplicates from slot window IDs
           clientReservedSlotWindowIds = [
-            ...new Set(
-              appointments
-                .map((apt) => apt.slot_window_id)
-                .filter((id): id is string => id !== null && id !== undefined)
-            ),
+            ...new Set(clientReservedSlotWindowIds),
           ];
         }
       }
@@ -110,6 +115,7 @@ export class ShareableCalendarLinkService {
       ...link,
       slotWindows: slotWindowsForClient,
       clientReservedSlotWindowIds,
+      clientReservedAppointments,
     };
   }
 }
