@@ -2,9 +2,9 @@ import { Hono } from "hono";
 import ai from "./ai";
 import clientReports from "./client_reports";
 import clients from "./clients";
-import shareableCalendarLinks from "./shareable-calendar-links";
 import otp from "./otp";
 import requestReports from "./request_reports";
+import shareableCalendarLinks from "./shareable-calendar-links";
 import slotWindows from "./slot_windows";
 import tasks from "./tasks";
 import users from "./user";
@@ -16,7 +16,7 @@ const routes = new Hono()
   .route("/users", users)
   .route("/clients", clients)
   .route("/client-reports", clientReports)
-  .route("/shareable-calendar-links", shareableCalendarLinks);
+  .route("/shareable-calendar-links", shareableCalendarLinks)
   .route("/otp", otp)
   .route("/request-reports", requestReports);
 

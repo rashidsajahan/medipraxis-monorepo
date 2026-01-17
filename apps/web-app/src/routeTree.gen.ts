@@ -8,15 +8,15 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as ContactIdRouteImport } from './routes/$contactId'
-import { Route as ContactIdUploadReportRequestReportIdRouteImport } from './routes/$contactId.upload-report.$requestReportId'
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as ContactIdRouteImport } from './routes/$contactId'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RegisterIndexRouteImport } from './routes/register/index'
-import { Route as SchedulesIdRouteImport } from './routes/schedules/$id'
 import { Route as UploadReportRequestReportIdRouteImport } from './routes/upload-report.$requestReportId'
+import { Route as SchedulesIdRouteImport } from './routes/schedules/$id'
+import { Route as ContactIdUploadReportRequestReportIdRouteImport } from './routes/$contactId.upload-report.$requestReportId'
 
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
@@ -43,17 +43,17 @@ const RegisterIndexRoute = RegisterIndexRouteImport.update({
   path: '/register/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SchedulesIdRoute = SchedulesIdRouteImport.update({
-  id: '/schedules/$id',
-  path: '/schedules/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const UploadReportRequestReportIdRoute =
   UploadReportRequestReportIdRouteImport.update({
     id: '/upload-report/$requestReportId',
     path: '/upload-report/$requestReportId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const SchedulesIdRoute = SchedulesIdRouteImport.update({
+  id: '/schedules/$id',
+  path: '/schedules/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContactIdUploadReportRequestReportIdRoute =
   ContactIdUploadReportRequestReportIdRouteImport.update({
     id: '/upload-report/$requestReportId',
@@ -65,8 +65,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$contactId': typeof ContactIdRouteWithChildren
   '/about': typeof AboutRoute
-  '/schedules/$id': typeof SchedulesIdRoute
   '/dashboard': typeof DashboardRoute
+  '/schedules/$id': typeof SchedulesIdRoute
   '/upload-report/$requestReportId': typeof UploadReportRequestReportIdRoute
   '/register': typeof RegisterIndexRoute
   '/$contactId/upload-report/$requestReportId': typeof ContactIdUploadReportRequestReportIdRoute
@@ -75,8 +75,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$contactId': typeof ContactIdRouteWithChildren
   '/about': typeof AboutRoute
-  '/schedules/$id': typeof SchedulesIdRoute
   '/dashboard': typeof DashboardRoute
+  '/schedules/$id': typeof SchedulesIdRoute
   '/upload-report/$requestReportId': typeof UploadReportRequestReportIdRoute
   '/register': typeof RegisterIndexRoute
   '/$contactId/upload-report/$requestReportId': typeof ContactIdUploadReportRequestReportIdRoute
@@ -86,23 +86,20 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/$contactId': typeof ContactIdRouteWithChildren
   '/about': typeof AboutRoute
-  '/schedules/$id': typeof SchedulesIdRoute
   '/dashboard': typeof DashboardRoute
+  '/schedules/$id': typeof SchedulesIdRoute
   '/upload-report/$requestReportId': typeof UploadReportRequestReportIdRoute
   '/register/': typeof RegisterIndexRoute
   '/$contactId/upload-report/$requestReportId': typeof ContactIdUploadReportRequestReportIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/schedules/$id' | '/register'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/schedules/$id' | '/register'
-  id: '__root__' | '/' | '/about' | '/schedules/$id' | '/register/'
   fullPaths:
     | '/'
     | '/$contactId'
     | '/about'
     | '/dashboard'
+    | '/schedules/$id'
     | '/upload-report/$requestReportId'
     | '/register'
     | '/$contactId/upload-report/$requestReportId'
@@ -112,6 +109,7 @@ export interface FileRouteTypes {
     | '/$contactId'
     | '/about'
     | '/dashboard'
+    | '/schedules/$id'
     | '/upload-report/$requestReportId'
     | '/register'
     | '/$contactId/upload-report/$requestReportId'
@@ -121,6 +119,7 @@ export interface FileRouteTypes {
     | '/$contactId'
     | '/about'
     | '/dashboard'
+    | '/schedules/$id'
     | '/upload-report/$requestReportId'
     | '/register/'
     | '/$contactId/upload-report/$requestReportId'
@@ -130,8 +129,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ContactIdRoute: typeof ContactIdRouteWithChildren
   AboutRoute: typeof AboutRoute
-  SchedulesIdRoute: typeof SchedulesIdRoute
   DashboardRoute: typeof DashboardRoute
+  SchedulesIdRoute: typeof SchedulesIdRoute
   UploadReportRequestReportIdRoute: typeof UploadReportRequestReportIdRoute
   RegisterIndexRoute: typeof RegisterIndexRoute
 }
@@ -173,18 +172,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/schedules/$id': {
-      id: '/schedules/$id'
-      path: '/schedules/$id'
-      fullPath: '/schedules/$id'
-      preLoaderRoute: typeof SchedulesIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/upload-report/$requestReportId': {
       id: '/upload-report/$requestReportId'
       path: '/upload-report/$requestReportId'
       fullPath: '/upload-report/$requestReportId'
       preLoaderRoute: typeof UploadReportRequestReportIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/schedules/$id': {
+      id: '/schedules/$id'
+      path: '/schedules/$id'
+      fullPath: '/schedules/$id'
+      preLoaderRoute: typeof SchedulesIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$contactId/upload-report/$requestReportId': {
@@ -214,8 +213,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ContactIdRoute: ContactIdRouteWithChildren,
   AboutRoute: AboutRoute,
-  SchedulesIdRoute: SchedulesIdRoute,
   DashboardRoute: DashboardRoute,
+  SchedulesIdRoute: SchedulesIdRoute,
   UploadReportRequestReportIdRoute: UploadReportRequestReportIdRoute,
   RegisterIndexRoute: RegisterIndexRoute,
 }
