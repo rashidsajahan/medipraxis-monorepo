@@ -8,6 +8,7 @@ type SlotWindowProps = {
   address: string;
   slots: number;
   available: boolean;
+  isReserving?: boolean;
   onReserve?: (id: string) => void;
 };
 
@@ -18,6 +19,7 @@ export function SlotWindow({
   address,
   slots,
   available,
+  isReserving = false,
   onReserve,
 }: SlotWindowProps) {
   return (
@@ -55,10 +57,13 @@ export function SlotWindow({
         {available && (
           <Button
             onClick={() => onReserve?.(id)}
-            className="bg-mp-dark-green text-white px-8 py-2 rounded-md hover:bg-mp-dark-green/90 h-auto"
+            disabled={isReserving}
+            className="bg-mp-dark-green text-white px-8 py-2 rounded-md hover:bg-mp-dark-green/90 h-auto disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <BookmarkSimpleIcon className="w-5 h-5" />
-            <span className="text-sm font-semibold font-lato">Reserve</span>
+            <span className="text-sm font-semibold font-lato">
+              {isReserving ? "Reserving..." : "Reserve"}
+            </span>
           </Button>
         )}
       </div>

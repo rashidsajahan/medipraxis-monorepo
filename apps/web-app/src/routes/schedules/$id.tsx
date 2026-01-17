@@ -1,8 +1,10 @@
+import { useReserveAppointment } from "@/services/ShareableCalendarLink/useReserveAppointment";
+import { useShareableCalendarLink } from "@/services/ShareableCalendarLink/useShareableCalendarLink";
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
 import { DaySelector } from "./DaySelector";
 import { SlotWindow } from "./SlotWindow";
-import { useShareableCalendarLink } from "@/services/ShareableCalendarLink/useShareableCalendarLink";
 
 export const Route = createFileRoute("/schedules/$id")({
   component: ScheduleDetail,
@@ -14,6 +16,17 @@ function ScheduleDetail() {
 
   // Fetch shareable calendar link data with slot windows
   const { data, isLoading, error } = useShareableCalendarLink(id);
+
+  // Reserve appointment mutation
+  const reserveAppointment = useReserveAppointment({
+    onSuccess: () => {
+      toast.success("Your appointment has been booked successfully!");
+      // Optionally refetch the calendar data to update available slots
+    },
+    onError: (errorMessage) => {
+      toast.error(errorMessage);
+    },
+  });
 
   // Filter slot windows for the selected day
   const filteredSlotWindows = useMemo(() => {
@@ -48,11 +61,30 @@ function ScheduleDetail() {
     return `${formatTime(start)}-${formatTime(end)}`;
   };
 
+  // Handle appointment reservation
+  const handleReserve = (slotWindowId: string) => {
+    // TODO: Get client_id from authentication context or local storage
+    // For now, using a placeholder. This should be replaced with actual client authentication
+    const clientId = "4231411e-efa4-4a1c-8e05-bf16f93c542d";
+
+    if (!clientId) {
+      toast.error(
+        "Please log in or create an account to book your appointment"
+      );
+      return;
+    }
+
+    reserveAppointment.mutate({
+      slot_window_id: slotWindowId,
+      client_id: clientId,
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-mp-white px-6 py-8 max-w-2xl mx-auto">
         <div className="text-center text-mp-dark-green font-dm-sans">
-          Loading...
+          Loading available appointments...
         </div>
       </div>
     );
@@ -62,7 +94,7 @@ function ScheduleDetail() {
     return (
       <div className="min-h-screen bg-mp-white px-6 py-8 max-w-2xl mx-auto">
         <div className="text-center text-red-600 font-dm-sans">
-          {error instanceof Error ? error.message : "Failed to load schedule"}
+          Unable to load appointments. Please try again later.
         </div>
       </div>
     );
@@ -105,7 +137,7 @@ function ScheduleDetail() {
       <div className="space-y-8">
         {filteredSlotWindows.length === 0 ? (
           <div className="text-center text-mp-dark-green font-dm-sans">
-            No available slots for this day
+            No appointments available for this day.
           </div>
         ) : (
           filteredSlotWindows.map((slot) => {
@@ -119,10 +151,8 @@ function ScheduleDetail() {
                 address={slot.note || "Address not provided"}
                 slots={availableSlots}
                 available={availableSlots > 0}
-                onReserve={(slotWindowId) => {
-                  console.log(`Reserving slot window ${slotWindowId}`);
-                  // Add your reservation logic here
-                }}
+                isReserving={reserveAppointment.isPending}
+                onReserve={handleReserve}
               />
             );
           })
