@@ -59,9 +59,10 @@
 }
 
 .help-text {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: #7d7d7d;
   margin: 0;
+  text-align: center;
 }
 
 .notes {
@@ -97,10 +98,13 @@
   cursor: pointer;
   transition: background-color 0.2s;
   outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .upload-button:hover {
-  background-color: #44b619;
+  background-color: #e3f0af;
 }
 
 .upload-button:focus {

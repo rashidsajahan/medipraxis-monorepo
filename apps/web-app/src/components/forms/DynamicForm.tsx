@@ -114,11 +114,6 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
 
   return (
     <div className="dynamic-form-container">
-      <h1 className="form-title">{formData.title}</h1>
-      {formData.description && (
-        <p className="form-description">{formData.description}</p>
-      )}
-
       <form onSubmit={handleSubmit} className="dynamic-form">
         {groupedQuestions.map((group, idx) => {
           if (group.type === "file-upload-group") {

@@ -1,6 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { DynamicForm } from "../components/forms/DynamicForm";
+import { colors } from "../constants/colors";
 import type { FormResponse, FormValues } from "../types/form.types";
 import { FormFieldType } from "../types/form.types";
 
@@ -25,6 +26,8 @@ interface RequestReportResponse {
   requested_reports: ReportField[];
   expired: boolean;
   deleted: boolean;
+  user_name?: string;
+  client_name?: string;
 }
 
 interface UploadReportProps {
@@ -36,6 +39,8 @@ export function UploadReport({ requestReportId }: UploadReportProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [, setUploading] = useState(false);
+  const [requestReport, setRequestReport] =
+    useState<RequestReportResponse | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -54,6 +59,7 @@ export function UploadReport({ requestReportId }: UploadReportProps) {
       }
 
       const data: RequestReportResponse = await response.json();
+      setRequestReport(data);
 
       // Filter active fields and sort by sequence
       const activeFields = data.requested_reports
@@ -202,6 +208,56 @@ export function UploadReport({ requestReportId }: UploadReportProps) {
           margin: "0 auto",
         }}
       >
+        {/* Header Section */}
+        <div style={{ marginBottom: "32px" }}>
+          <h1
+            style={{
+              fontSize: "32px",
+              fontWeight: "700",
+              color: "#1f2937",
+              margin: "0 0 16px 0",
+            }}
+          >
+            Upload Reports
+          </h1>
+
+          {requestReport?.user_name && (
+            <div style={{ marginBottom: "12px" }}>
+              <span
+                style={{
+                  fontSize: "16px",
+                  color: "#4b5563",
+                  marginRight: "8px",
+                }}
+              >
+                requested by
+              </span>
+              <span
+                style={{
+                  display: "inline-block",
+                  backgroundColor: colors.mp.green,
+                  color: colors.typography.black,
+                  padding: "4px 12px",
+                  borderRadius: "6px",
+                  fontSize: "16px",
+                  fontWeight: "500",
+                }}
+              >
+                {requestReport.user_name}
+              </span>
+            </div>
+          )}
+
+          {requestReport?.client_name && (
+            <p style={{ fontSize: "16px", color: "#4b5563", margin: "0" }}>
+              For:{" "}
+              <span style={{ fontWeight: "600", color: "#1f2937" }}>
+                {requestReport.client_name}
+              </span>
+            </p>
+          )}
+        </div>
+
         {error && (
           <div
             style={{
