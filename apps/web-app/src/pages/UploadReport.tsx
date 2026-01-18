@@ -2,10 +2,9 @@ import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { DynamicForm } from "../components/forms/DynamicForm";
 import { colors } from "../constants/colors";
+import { apiClient } from "../lib/api-client";
 import type { FormResponse, FormValues } from "../types/form.types";
 import { FormFieldType } from "../types/form.types";
-
-const API_BASE_URL = "http://localhost:8787/api";
 
 interface ReportField {
   id: string;
@@ -20,12 +19,12 @@ interface ReportField {
 interface RequestReportResponse {
   request_report_id: string;
   created_date: string;
-  user_id: string;
-  client_id: string;
-  form_id: string;
+  user_id: string | null;
+  client_id: string | null;
+  form_id: string | null;
   requested_reports: ReportField[];
-  expired: boolean;
-  deleted: boolean;
+  expired: boolean | null;
+  deleted: boolean | null;
   user_name?: string;
   client_name?: string;
 }
@@ -50,9 +49,9 @@ export function UploadReport({ requestReportId }: UploadReportProps) {
   const fetchReportDetails = async () => {
     try {
       setLoading(true);
-      const response = await fetch(
-        `${API_BASE_URL}/request-reports/${requestReportId}`
-      );
+      const response = await apiClient.api["request-reports"][":id"].$get({
+        param: { id: requestReportId },
+      });
 
       if (!response.ok) {
         throw new Error("Failed to fetch report details");
@@ -100,20 +99,27 @@ export function UploadReport({ requestReportId }: UploadReportProps) {
       setUploading(true);
       setError("");
 
-      const formData = new FormData();
-      formData.append("request_report_id", requestReportId);
-
-      // Add files to form data
-      Object.entries(values).forEach(([fieldId, file]) => {
+      // Extract files and create reports array
+      const files: File[] = [];
+      const reports = Object.entries(values).map(([fieldId, file]) => {
         if (file instanceof File) {
-          formData.append(`files`, file);
-          formData.append(`field_ids`, fieldId);
+          files.push(file);
+          const field = requestReport?.requested_reports.find(f => f.id === fieldId);
+          return {
+            report_title: field?.display_label || "Report",
+          };
         }
-      });
+        return null;
+      }).filter(Boolean) as { report_title: string }[];
 
-      const response = await fetch(`${API_BASE_URL}/client-reports`, {
-        method: "POST",
-        body: formData,
+      const response = await apiClient.api["client-reports"].$post({
+        form: {
+          client_id: requestReport?.client_id || "",
+          user_id: requestReport?.user_id || "",
+          request_report_id: requestReportId,
+          reports,
+          files,
+        },
       });
 
       if (!response.ok) {

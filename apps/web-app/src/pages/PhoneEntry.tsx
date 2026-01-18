@@ -1,9 +1,9 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import logo from "../assets/images/logo.png";
+import { apiClient } from "../lib/api-client";
 
 const PHONE_REGEX = /^[\d\s\+\-\(\)]+$/;
-const API_BASE_URL = "http://localhost:8787/api";
 
 const countryOptions = [
   { code: "+1", abbr: "US", name: "United States" },
@@ -67,15 +67,11 @@ export function PhoneEntry() {
     setError("");
 
     try {
-      const otpResponse = await fetch(`${API_BASE_URL}/otp/send`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      const otpResponse = await apiClient.api.otp.send.$post({
+        json: {
           country_code: countryCode,
           contact_number: phoneNumber,
-        }),
+        },
       });
 
       if (!otpResponse.ok) {
@@ -112,9 +108,12 @@ export function PhoneEntry() {
 
     try {
       // Check if client exists
-      const checkResponse = await fetch(
-        `${API_BASE_URL}/clients/check-phone?country_code=${encodeURIComponent(countryCode)}&contact_number=${encodeURIComponent(phoneNumber)}`
-      );
+      const checkResponse = await apiClient.api.clients["check-phone"].$get({
+        query: {
+          country_code: countryCode,
+          contact_number: phoneNumber,
+        },
+      });
 
       if (!checkResponse.ok) {
         throw new Error("Failed to check phone number");
@@ -130,15 +129,11 @@ export function PhoneEntry() {
       }
 
       // Send OTP
-      const otpResponse = await fetch(`${API_BASE_URL}/otp/send`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      const otpResponse = await apiClient.api.otp.send.$post({
+        json: {
           country_code: countryCode,
           contact_number: phoneNumber,
-        }),
+        },
       });
 
       if (!otpResponse.ok) {
@@ -179,21 +174,17 @@ export function PhoneEntry() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/otp/verify`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      const response = await apiClient.api.otp.verify.$post({
+        json: {
           country_code: countryCode,
           contact_number: phoneNumber,
           otp: otpValue,
-        }),
+        },
       });
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || "Invalid OTP");
+        throw new Error((data as { error?: string }).error || "Invalid OTP");
       }
 
       const verifyData = await response.json();
