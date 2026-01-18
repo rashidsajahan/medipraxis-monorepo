@@ -37,7 +37,8 @@ export function UploadReport({ requestReportId }: UploadReportProps) {
   const [formData, setFormData] = useState<FormResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [, setUploading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [requestReport, setRequestReport] =
     useState<RequestReportResponse | null>(null);
   const navigate = useNavigate();
@@ -142,10 +143,13 @@ export function UploadReport({ requestReportId }: UploadReportProps) {
         );
       }
 
-      // Navigate back to dashboard after successful upload
-      navigate({
-        to: "/dashboard",
-      });
+      // Show success popup
+      setShowSuccessPopup(true);
+
+      // Navigate to dashboard after 2 seconds
+      setTimeout(() => {
+        navigate({ to: "/dashboard" });
+      }, 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to upload reports");
     } finally {
@@ -299,6 +303,84 @@ export function UploadReport({ requestReportId }: UploadReportProps) {
 
         <DynamicForm formData={formData} onSubmit={handleSubmit} />
       </div>
+
+      {/* Success Popup */}
+      {showSuccessPopup && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              padding: "32px",
+              borderRadius: "12px",
+              boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+              textAlign: "center",
+              maxWidth: "400px",
+              width: "90%",
+            }}
+          >
+            <div
+              style={{
+                width: "64px",
+                height: "64px",
+                backgroundColor: "#90C67C",
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                margin: "0 auto 20px",
+              }}
+            >
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M20 6L9 17L4 12"
+                  stroke="white"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+            <h2
+              style={{
+                fontSize: "24px",
+                fontWeight: "600",
+                color: "#1f2937",
+                marginBottom: "8px",
+              }}
+            >
+              Success!
+            </h2>
+            <p
+              style={{
+                fontSize: "16px",
+                color: "#6b7280",
+                margin: 0,
+              }}
+            >
+              Your reports have been uploaded successfully.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
