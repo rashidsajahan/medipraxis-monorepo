@@ -37,7 +37,7 @@ export function UploadReport({ requestReportId }: UploadReportProps) {
   const [formData, setFormData] = useState<FormResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [uploading, setUploading] = useState(false);
+  const [, setUploading] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [requestReport, setRequestReport] =
     useState<RequestReportResponse | null>(null);
