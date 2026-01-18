@@ -14,7 +14,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as RegisterIndexRouteImport } from './routes/register/index'
 import { Route as UploadReportRequestReportIdRouteImport } from './routes/upload-report.$requestReportId'
 import { Route as SchedulesIdRouteImport } from './routes/schedules/$id'
-import { Route as ContactIdUploadReportRequestReportIdRouteImport } from './routes/$contactId.upload-report.$requestReportId'
 
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
@@ -42,12 +41,6 @@ const SchedulesIdRoute = SchedulesIdRouteImport.update({
   path: '/schedules/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ContactIdUploadReportRequestReportIdRoute =
-  ContactIdUploadReportRequestReportIdRouteImport.update({
-    id: '/upload-report/$requestReportId',
-    path: '/upload-report/$requestReportId',
-    getParentRoute: () => ContactIdRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -82,13 +75,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/$contactId'
-    | '/about'
     | '/dashboard'
     | '/schedules/$id'
     | '/upload-report/$requestReportId'
     | '/register'
-    | '/$contactId/upload-report/$requestReportId'
   id:
     | '__root__'
     | '/'
@@ -143,28 +133,8 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SchedulesIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/$contactId/upload-report/$requestReportId': {
-      id: '/$contactId/upload-report/$requestReportId'
-      path: '/upload-report/$requestReportId'
-      fullPath: '/$contactId/upload-report/$requestReportId'
-      preLoaderRoute: typeof ContactIdUploadReportRequestReportIdRouteImport
-      parentRoute: typeof ContactIdRoute
-    }
   }
 }
-
-interface ContactIdRouteChildren {
-  ContactIdUploadReportRequestReportIdRoute: typeof ContactIdUploadReportRequestReportIdRoute
-}
-
-const ContactIdRouteChildren: ContactIdRouteChildren = {
-  ContactIdUploadReportRequestReportIdRoute:
-    ContactIdUploadReportRequestReportIdRoute,
-}
-
-const ContactIdRouteWithChildren = ContactIdRoute._addFileChildren(
-  ContactIdRouteChildren,
-)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
