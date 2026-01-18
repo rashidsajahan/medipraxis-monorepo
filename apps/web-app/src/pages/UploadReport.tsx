@@ -2,7 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { DynamicForm } from "../components/forms/DynamicForm";
 import { colors } from "../constants/colors";
-import { apiClient } from "../lib/api-client";
+import { apiClient, API_BASE_URL } from "../lib/api-client";
 import type { FormResponse, FormValues } from "../types/form.types";
 import { FormFieldType } from "../types/form.types";
 
@@ -128,13 +128,10 @@ export function UploadReport({ requestReportId }: UploadReportProps) {
         }
       });
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/client-reports`,
-        {
-          method: "POST",
-          body: formDataToSend,
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/api/client-reports`, {
+        method: "POST",
+        body: formDataToSend,
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
