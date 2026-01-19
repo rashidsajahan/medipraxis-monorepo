@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Animated,
   Pressable,
@@ -10,6 +10,10 @@ const botAvatarClosed =
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   require("@/assets/images/ai/bot-eye-closed.png") as ImageSourcePropType;
 
+const botAvatarOpened =
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require("@/assets/images/ai/bot-eye-opened.png") as ImageSourcePropType;
+
 interface AIAssistantButtonProps {
   onPress: () => void;
 }
@@ -19,6 +23,10 @@ export function AIAssistantButton({
 }: AIAssistantButtonProps): React.JSX.Element {
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const floatAnim = useRef(new Animated.Value(0)).current;
+  const [eyesOpened, setEyesOpened] = useState(false);
+  const cycleCountRef = useRef(0);
+  const isOpenCycleRef = useRef(false);
+  const hasCountedCycleRef = useRef(false);
 
   useEffect(() => {
     const floatAnimation = Animated.loop(
@@ -36,9 +44,48 @@ export function AIAssistantButton({
       ])
     );
 
+    // Listen to animation to track cycles
+    const listenerId = floatAnim.addListener(({ value }) => {
+      // When reaching the top (value close to -4), open eyes
+      if (value <= -3.5 && !isOpenCycleRef.current) {
+        setEyesOpened(true);
+        isOpenCycleRef.current = true;
+        cycleCountRef.current = 0;
+        hasCountedCycleRef.current = false;
+      }
+
+      // When back at bottom (value close to 0), count cycle once
+      if (
+        value >= -0.5 &&
+        value <= 0.5 &&
+        isOpenCycleRef.current &&
+        !hasCountedCycleRef.current
+      ) {
+        cycleCountRef.current += 1;
+        hasCountedCycleRef.current = true;
+
+        console.log("Cycle count:", cycleCountRef.current);
+
+        // Close eyes after 3 complete cycles
+        if (cycleCountRef.current >= 3) {
+          setEyesOpened(false);
+          isOpenCycleRef.current = false;
+          cycleCountRef.current = 0;
+        }
+      }
+
+      // Reset the count flag when moving away from bottom
+      if (value < -1 && hasCountedCycleRef.current) {
+        hasCountedCycleRef.current = false;
+      }
+    });
+
     floatAnimation.start();
 
-    return () => floatAnimation.stop();
+    return () => {
+      floatAnim.removeListener(listenerId);
+      floatAnimation.stop();
+    };
   }, [floatAnim]);
 
   const handlePressIn = () => {
@@ -78,7 +125,7 @@ export function AIAssistantButton({
           }}
         >
           <Animated.Image
-            source={botAvatarClosed}
+            source={eyesOpened ? botAvatarOpened : botAvatarClosed}
             style={{
               width: 50,
               height: 50,
