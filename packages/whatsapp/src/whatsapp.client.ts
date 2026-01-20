@@ -1,5 +1,5 @@
 import axios from "axios";
-import { TemplateMessagePayload } from "./types";
+import type { TemplateMessagePayload } from "./types";
 
 export class WhatsAppClient {
   async sendTemplateMessage(

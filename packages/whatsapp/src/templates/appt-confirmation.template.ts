@@ -1,4 +1,4 @@
-import { TemplateMessagePayload } from "../types";
+import type { TemplateMessagePayload } from "../types";
 
 type AppointmentConfirmationParams = {
   clientName: string;
