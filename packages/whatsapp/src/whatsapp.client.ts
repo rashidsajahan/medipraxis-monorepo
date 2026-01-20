@@ -1,4 +1,3 @@
-import { tokens } from "./../../../node_modules/@tanstack/router-devtools-core/src/tokens";
 import axios from "axios";
 import { TemplateMessagePayload } from "./types";
 
