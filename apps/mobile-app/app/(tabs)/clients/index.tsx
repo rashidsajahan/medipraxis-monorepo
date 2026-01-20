@@ -1,5 +1,5 @@
-import { View } from "@/components/Themed";
 import { ButtonComponent, ButtonSize, TextComponent } from "@/components/basic";
+import { View } from "@/components/Themed";
 import { Input, InputField, InputSlot } from "@/components/ui/input";
 import { Icons, type IconName } from "@/config";
 import { Color, Font, TextSize, TextVariant, textStyles } from "@repo/config";
@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   type TextStyle as RNTextStyle,
 } from "react-native";
+import { AddClient } from "./addClient";
 import { ClientCardComponent } from "./ClientCard.component";
 
 // Client type
@@ -200,8 +201,9 @@ const groupClientsByLetter = (clients: Client[]) => {
 
 export default function ClientsScreen() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [clients] = useState(clientsData);
+  const [clients, setClients] = useState(clientsData);
   const [visibleSection, setVisibleSection] = useState<string>("A");
+  const [isAddClientVisible, setIsAddClientVisible] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
   const sectionRefs = useRef<Record<string, number>>({});
 
@@ -216,6 +218,12 @@ export default function ClientsScreen() {
   const handleClientPress = (clientId: string) => {
     console.log("Client pressed:", clientId);
     // Navigate to client details
+  };
+
+  // Handle save client
+  const handleSaveClient = (clientData: any) => {
+    console.log("Saving client:", clientData);
+    // TODO: Add client to the list
   };
 
   // Handle alphabet letter press to scroll to section
@@ -258,6 +266,7 @@ export default function ClientsScreen() {
             buttonColor={Color.Black}
             textColor={Color.White}
             iconColor={Color.White}
+            onPress={() => setIsAddClientVisible(true)}
           >
             Add Client
           </ButtonComponent>
@@ -397,6 +406,13 @@ export default function ClientsScreen() {
           })}
         </View>
       </View>
+
+      {/* Add Client Modal */}
+      <AddClient
+        visible={isAddClientVisible}
+        onClose={() => setIsAddClientVisible(false)}
+        onSave={handleSaveClient}
+      />
     </View>
   );
 }
