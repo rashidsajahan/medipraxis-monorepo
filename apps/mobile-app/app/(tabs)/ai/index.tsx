@@ -47,7 +47,6 @@ export default function AIAssistantModal({
   onClose,
 }: AIAssistantModalProps) {
   const [fontsLoaded] = useFonts({
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     NotoColorEmoji_400Regular,
   });
 
@@ -202,7 +201,14 @@ export default function AIAssistantModal({
                   "rgba(255, 255, 255, 0.95)",
                   "rgba(255, 255, 255, 1)",
                 ]}
-                className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: 128,
+                }}
+                pointerEvents="none"
               />
 
               {/* Fixed bottom input area */}
