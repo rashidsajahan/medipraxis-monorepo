@@ -19,7 +19,7 @@ export const CLIENT_QUERIES = {
   CREATED_DATE: "created_date",
   MODIFIED_DATE: "modified_date",
   DELETED: "deleted",
-  FIND_ALL: "*"
+  FIND_ALL: "*",
 } as const;
 
 export class ClientRepository {
