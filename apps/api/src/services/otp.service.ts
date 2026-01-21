@@ -40,7 +40,7 @@ export class OtpService {
 
     const payload = {
       recipient,
-      sender_id: "TextLKDemo",
+      sender_id: "MediPraxis",
       type: "otp",
       message: "Your MediPraxis verification code is: {{OTP5}}",
     };
