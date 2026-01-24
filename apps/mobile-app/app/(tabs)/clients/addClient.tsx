@@ -7,8 +7,10 @@ import {
   TextInputType,
 } from "@/components/basic";
 import { Icons } from "@/config";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Color, TextSize, TextVariant } from "@repo/config";
 import React, { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
   KeyboardAvoidingView,
   Modal,
@@ -30,16 +32,16 @@ const titleOptions = [
 ];
 
 const genderOptions = [
-  { label: "Male", value: "Male" },
-  { label: "Female", value: "Female" },
-  { label: "Other", value: "Other" },
-  { label: "Prefer not to say", value: "Prefer not to say" },
+  { label: "Male", value: "MALE" },
+  { label: "Female", value: "FEMALE" },
+  { label: "Other", value: "OTHER" },
 ];
 
 // Zod validation schema
 const clientSchema = z.object({
   title: z.string().min(1, "Title is required"),
   firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().optional(),
   gender: z.string().min(1, "Gender is required"),
   dateOfBirth: z
     .string()
@@ -95,7 +97,26 @@ const clientSchema = z.object({
         message: "Invalid phone number format. (e.g., +94701234567)",
       }
     ),
+  emergencyContactName: z.string().optional(),
+  emergencyContactNumber: z
+    .string()
+    .optional()
+    .refine(
+      (phone) => {
+        if (!phone || !phone.trim()) return true;
+        const cleaned = phone.replace(/[\s-]/g, "");
+        const phonePattern = /^\+[1-9]\d{1,14}$/;
+        return phonePattern.test(cleaned);
+      },
+      {
+        message: "Invalid phone number format. (e.g., +94701234567)",
+      }
+    ),
+  emergencyContactRelationship: z.string().optional(),
+  note: z.string().optional(),
 });
+
+type ClientFormData = z.infer<typeof clientSchema>;
 
 interface AddClientProps {
   visible: boolean;
@@ -103,54 +124,41 @@ interface AddClientProps {
   onSave?: (clientData: unknown) => void;
 }
 
-interface FormErrors {
-  title?: string;
-  firstName?: string;
-  gender?: string;
-  dateOfBirth?: string;
-  contactNumber?: string;
-  emergencyContactNumber?: string;
-}
-
 export const AddClient: React.FC<AddClientProps> = ({
   visible,
   onClose,
   onSave,
 }) => {
-  // Form state
-  const [title, setTitle] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [gender, setGender] = useState("");
-  const [dateOfBirth, setDateOfBirth] = useState("");
-  const [contactNumber, setContactNumber] = useState("");
-  const [emergencyContactName, setEmergencyContactName] = useState("");
-  const [emergencyContactNumber, setEmergencyContactNumber] = useState("");
-  const [emergencyContactRelationship, setEmergencyContactRelationship] =
-    useState("");
-  const [note, setNote] = useState("");
   const [conditions, setConditions] = useState<string[]>([]);
   const [conditionInput, setConditionInput] = useState("");
 
-  // Error state
-  const [errors, setErrors] = useState<FormErrors>({});
-
   const MAX_CONDITIONS = 5;
 
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<ClientFormData>({
+    resolver: zodResolver(clientSchema),
+    defaultValues: {
+      title: "",
+      firstName: "",
+      lastName: "",
+      gender: "",
+      dateOfBirth: "",
+      contactNumber: "",
+      emergencyContactName: "",
+      emergencyContactNumber: "",
+      emergencyContactRelationship: "",
+      note: "",
+    },
+  });
+
   const resetForm = (): void => {
-    setTitle("");
-    setFirstName("");
-    setLastName("");
-    setGender("");
-    setDateOfBirth("");
-    setContactNumber("");
-    setEmergencyContactName("");
-    setEmergencyContactNumber("");
-    setEmergencyContactRelationship("");
-    setNote("");
+    reset();
     setConditions([]);
     setConditionInput("");
-    setErrors({});
   };
 
   const handleAddCondition = (): void => {
@@ -173,71 +181,20 @@ export const AddClient: React.FC<AddClientProps> = ({
     onClose();
   };
 
-  const validateForm = (): boolean => {
-    try {
-      clientSchema.parse({
-        title: title.trim(),
-        firstName: firstName.trim(),
-        gender: gender.trim(),
-        dateOfBirth: dateOfBirth.trim(),
-        contactNumber: contactNumber.trim(),
-      });
-      setErrors({});
-      return true;
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const newErrors: FormErrors = {};
-        error.errors.forEach((err) => {
-          const field = err.path[0] as keyof FormErrors;
-          newErrors[field] = err.message;
-        });
-        setErrors(newErrors);
-      }
-      return false;
-    }
-  };
-
-  const validateEmergencyContactNumber = (): boolean => {
-    // Only validate if emergency contact number is provided
-    if (emergencyContactNumber.trim()) {
-      const cleaned = emergencyContactNumber.replace(/[\s-]/g, "");
-      const phonePattern = /^\+[1-9]\d{1,14}$/;
-      if (!phonePattern.test(cleaned)) {
-        setErrors({
-          ...errors,
-          emergencyContactNumber:
-            "Invalid phone number format. (e.g., +94701234567)",
-        });
-        return false;
-      }
-    }
-    return true;
-  };
-
-  const handleSave = (): void => {
-    // Validate form
-    if (!validateForm()) {
-      return;
-    }
-
-    // Validate emergency contact number if provided
-    if (!validateEmergencyContactNumber()) {
-      return;
-    }
-
+  const onSubmit = (data: ClientFormData): void => {
     // Prepare client data
     const clientData = {
-      title,
-      firstName,
-      lastName: lastName.trim() || null,
-      gender,
-      dateOfBirth,
-      contactNumber,
-      emergencyContactName: emergencyContactName.trim() || null,
-      emergencyContactNumber: emergencyContactNumber.trim() || null,
-      emergencyContactRelationship: emergencyContactRelationship.trim() || null,
-      conditions: conditions.length > 0 ? conditions : null,
-      note: note.trim() || null,
+      title: data.title,
+      firstName: data.firstName,
+      lastName: data.lastName || null,
+      gender: data.gender,
+      dateOfBirth: data.dateOfBirth,
+      contactNumber: data.contactNumber,
+      emergencyContactName: data.emergencyContactName || null,
+      emergencyContactNumber: data.emergencyContactNumber || null,
+      emergencyContactRelationship: data.emergencyContactRelationship || null,
+      knownConditions: conditions.length > 0 ? conditions : null,
+      note: data.note || null,
     };
 
     onSave?.(clientData);
@@ -289,98 +246,109 @@ export const AddClient: React.FC<AddClientProps> = ({
 
               <View className="flex-row gap-3 mb-4">
                 <View className="flex-1">
-                  <DropdownComponent
-                    label="Title *"
-                    value={title}
-                    onValueChange={(value) => {
-                      setTitle(value);
-                      if (errors.title) {
-                        setErrors({ ...errors, title: undefined });
-                      }
-                    }}
-                    options={titleOptions}
-                    placeholder="Select"
-                    errorText={errors.title}
+                  <Controller
+                    control={control}
+                    name="title"
+                    render={({ field: { onChange, value } }) => (
+                      <DropdownComponent
+                        label="Title *"
+                        value={value}
+                        onValueChange={onChange}
+                        options={titleOptions}
+                        placeholder="Select"
+                        errorText={errors.title?.message}
+                      />
+                    )}
                   />
                 </View>
                 <View className="flex-[2]">
-                  <TextInputComponent
-                    label="First Name *"
-                    inputField={{
-                      value: firstName,
-                      onChangeText: (text) => {
-                        setFirstName(text);
-                        if (errors.firstName) {
-                          setErrors({ ...errors, firstName: undefined });
-                        }
-                      },
-                      placeholder: "John",
-                    }}
-                    errorText={errors.firstName}
+                  <Controller
+                    control={control}
+                    name="firstName"
+                    render={({ field: { onChange, value } }) => (
+                      <TextInputComponent
+                        label="First Name *"
+                        inputField={{
+                          value,
+                          onChangeText: onChange,
+                          placeholder: "John",
+                        }}
+                        errorText={errors.firstName?.message}
+                      />
+                    )}
                   />
                 </View>
               </View>
 
               <View className="mb-4">
-                <TextInputComponent
-                  label="Last Name"
-                  inputField={{
-                    value: lastName,
-                    onChangeText: setLastName,
-                    placeholder: "Siriwardane",
-                  }}
+                <Controller
+                  control={control}
+                  name="lastName"
+                  render={({ field: { onChange, value } }) => (
+                    <TextInputComponent
+                      label="Last Name"
+                      inputField={{
+                        value: value || "",
+                        onChangeText: onChange,
+                        placeholder: "Siriwardane",
+                      }}
+                    />
+                  )}
                 />
               </View>
 
               <View className="flex-row gap-3 mb-4">
                 <View className="flex-1">
-                  <DropdownComponent
-                    label="Gender *"
-                    value={gender}
-                    onValueChange={(value) => {
-                      setGender(value);
-                      if (errors.gender) {
-                        setErrors({ ...errors, gender: undefined });
-                      }
-                    }}
-                    options={genderOptions}
-                    placeholder="Select"
-                    errorText={errors.gender}
+                  <Controller
+                    control={control}
+                    name="gender"
+                    render={({ field: { onChange, value } }) => (
+                      <DropdownComponent
+                        label="Gender *"
+                        value={value}
+                        onValueChange={onChange}
+                        options={genderOptions}
+                        placeholder="Select"
+                        errorText={errors.gender?.message}
+                      />
+                    )}
                   />
                 </View>
                 <View className="flex-1">
-                  <TextInputComponent
-                    label="Date of birth *"
-                    inputField={{
-                      value: dateOfBirth,
-                      onChangeText: (text) => {
-                        setDateOfBirth(text);
-                        if (errors.dateOfBirth) {
-                          setErrors({ ...errors, dateOfBirth: undefined });
-                        }
-                      },
-                      placeholder: "29/12/1998",
-                    }}
-                    errorText={errors.dateOfBirth}
+                  <Controller
+                    control={control}
+                    name="dateOfBirth"
+                    render={({ field: { onChange, value } }) => (
+                      <TextInputComponent
+                        label="Date of birth *"
+                        inputField={{
+                          value,
+                          onChangeText: onChange,
+                          placeholder: "29/12/1998",
+                        }}
+                        errorText={errors.dateOfBirth?.message}
+                      />
+                    )}
                   />
                 </View>
               </View>
 
               <View className="mb-6">
-                <TextInputComponent
-                  label="Contact Number *"
-                  inputType={TextInputType.Phone}
-                  inputField={{
-                    value: contactNumber,
-                    onChangeText: (text) => {
-                      setContactNumber(text);
-                      if (errors.contactNumber) {
-                        setErrors({ ...errors, contactNumber: undefined });
-                      }
-                    },
-                    placeholder: "+94 70 123 4567",
-                  }}
-                  errorText={errors.contactNumber}
+                <Controller
+                  control={control}
+                  name="contactNumber"
+                  render={({ field: { onChange, value } }) => (
+                    <TextInputComponent
+                      label="Contact Number *"
+                      inputType={TextInputType.Phone}
+                      inputField={{
+                        value,
+                        onChangeText: onChange,
+                        placeholder: "+94 70 123 4567",
+                      }}
+                      errorText={errors.contactNumber?.message}
+                    />
+                  )}
                 />
               </View>
 
@@ -394,45 +362,55 @@ export const AddClient: React.FC<AddClientProps> = ({
               </View>
 
               <View className="mb-4">
-                <TextInputComponent
-                  label="Emergency Contact Name"
-                  inputField={{
-                    value: emergencyContactName,
-                    onChangeText: setEmergencyContactName,
-                    placeholder: "Elena Siriwardane",
-                  }}
+                <Controller
+                  control={control}
+                  name="emergencyContactName"
+                  render={({ field: { onChange, value } }) => (
+                    <TextInputComponent
+                      label="Emergency Contact Name"
+                      inputField={{
+                        value: value || "",
+                        onChangeText: onChange,
+                        placeholder: "Elena Siriwardane",
+                      }}
+                    />
+                  )}
                 />
               </View>
 
               <View className="mb-4">
-                <TextInputComponent
-                  label="Emergency Contact Number"
-                  inputType={TextInputType.Phone}
-                  inputField={{
-                    value: emergencyContactNumber,
-                    onChangeText: (text) => {
-                      setEmergencyContactNumber(text);
-                      if (errors.emergencyContactNumber) {
-                        setErrors({
-                          ...errors,
-                          emergencyContactNumber: undefined,
-                        });
-                      }
-                    },
-                    placeholder: "+94 70 123 4567",
-                  }}
-                  errorText={errors.emergencyContactNumber}
+                <Controller
+                  control={control}
+                  name="emergencyContactNumber"
+                  render={({ field: { onChange, value } }) => (
+                    <TextInputComponent
+                      label="Emergency Contact Number"
+                      inputType={TextInputType.Phone}
+                      inputField={{
+                        value: value || "",
+                        onChangeText: onChange,
+                        placeholder: "+94 70 123 4567",
+                      }}
+                      errorText={errors.emergencyContactNumber?.message}
+                    />
+                  )}
                 />
               </View>
 
               <View className="mb-4">
-                <TextInputComponent
-                  label="Emergency Contact Relationship"
-                  inputField={{
-                    value: emergencyContactRelationship,
-                    onChangeText: setEmergencyContactRelationship,
-                    placeholder: "Wife",
-                  }}
+                <Controller
+                  control={control}
+                  name="emergencyContactRelationship"
+                  render={({ field: { onChange, value } }) => (
+                    <TextInputComponent
+                      label="Emergency Contact Relationship"
+                      inputField={{
+                        value: value || "",
+                        onChangeText: onChange,
+                        placeholder: "Wife",
+                      }}
+                    />
+                  )}
                 />
               </View>
 
@@ -511,16 +489,22 @@ export const AddClient: React.FC<AddClientProps> = ({
               </View>
 
               <View className="mb-6">
-                <TextInputComponent
-                  label="Note"
-                  inputField={{
-                    value: note,
-                    onChangeText: setNote,
-                    placeholder: "Type additional notes here",
-                    multiline: true,
-                    numberOfLines: 8,
-                    textAlignVertical: "top",
-                  }}
+                <Controller
+                  control={control}
+                  name="note"
+                  render={({ field: { onChange, value } }) => (
+                    <TextInputComponent
+                      label="Note"
+                      inputField={{
+                        value: value || "",
+                        onChangeText: onChange,
+                        placeholder: "Type additional notes here",
+                        multiline: true,
+                        numberOfLines: 8,
+                        textAlignVertical: "top",
+                      }}
+                    />
+                  )}
                 />
               </View>
             </ScrollView>
@@ -540,7 +524,7 @@ export const AddClient: React.FC<AddClientProps> = ({
                 size={ButtonSize.Large}
                 buttonColor={Color.Black}
                 textColor={Color.White}
-                onPress={handleSave}
+                onPress={handleSubmit(onSubmit)}
               >
                 Save
               </ButtonComponent>

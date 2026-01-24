@@ -3,8 +3,10 @@ import { View } from "@/components/Themed";
 import { Input, InputField, InputSlot } from "@/components/ui/input";
 import { Icons, type IconName } from "@/config";
 import { Color, Font, TextSize, TextVariant, textStyles } from "@repo/config";
-import React, { useRef, useState } from "react";
+import type { Client } from "@repo/models";
+import React, { useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   ScrollView,
   TouchableOpacity,
   type LayoutChangeEvent,
@@ -12,11 +14,12 @@ import {
   type NativeSyntheticEvent,
   type TextStyle as RNTextStyle,
 } from "react-native";
+import * as ClientHandler from "../../../services/clients/client.handler";
 import { AddClient } from "./addClient";
 import { ClientCardComponent } from "./ClientCard.component";
 
-// Client type
-interface Client {
+// Client type for UI
+interface ClientDisplay {
   id: string;
   name: string;
   initial: string;
@@ -24,171 +27,12 @@ interface Client {
   icon: IconName;
 }
 
-// Sample client data
-const clientsData: Client[] = [
-  // A
-  {
-    id: "1",
-    name: "Aaron Baker",
-    initial: "A",
-    color: "#F4D03F",
-    icon: "Heart",
-  },
-  {
-    id: "2",
-    name: "Abigail Chung",
-    initial: "A",
-    color: "#F4D03F",
-    icon: "Star",
-  },
-  {
-    id: "3",
-    name: "Adam Davis",
-    initial: "A",
-    color: "#F4D03F",
-    icon: "Check",
-  },
-  {
-    id: "4",
-    name: "Alice Garcia",
-    initial: "A",
-    color: "#F4D03F",
-    icon: "Plus",
-  },
-  // B
-  {
-    id: "5",
-    name: "Ben Carter",
-    initial: "B",
-    color: "#85C1E9",
-    icon: "Heart",
-  },
-  {
-    id: "6",
-    name: "Benjamin Chen",
-    initial: "B",
-    color: "#BB8FCE",
-    icon: "Star",
-  },
-  {
-    id: "7",
-    name: "Bethany Evans",
-    initial: "B",
-    color: "#85C1E9",
-    icon: "Check",
-  },
-  {
-    id: "8",
-    name: "Blake Gonzales",
-    initial: "B",
-    color: "#BB8FCE",
-    icon: "Plus",
-  },
-  {
-    id: "9",
-    name: "Brenda Kaur",
-    initial: "B",
-    color: "#BB8FCE",
-    icon: "Heart",
-  },
-  // C
-  {
-    id: "10",
-    name: "Carlos Martinez",
-    initial: "C",
-    color: "#F8B739",
-    icon: "Heart",
-  },
-  {
-    id: "11",
-    name: "Catherine Lee",
-    initial: "C",
-    color: "#F8B739",
-    icon: "Star",
-  },
-  // D
-  {
-    id: "12",
-    name: "Daniel Wilson",
-    initial: "D",
-    color: "#82E0AA",
-    icon: "Check",
-  },
-  {
-    id: "13",
-    name: "Diana Ross",
-    initial: "D",
-    color: "#82E0AA",
-    icon: "Plus",
-  },
-  // E
-  {
-    id: "14",
-    name: "Emma Thompson",
-    initial: "E",
-    color: "#F1948A",
-    icon: "Heart",
-  },
-  {
-    id: "15",
-    name: "Eric Johnson",
-    initial: "E",
-    color: "#F1948A",
-    icon: "Star",
-  },
-  // M
-  {
-    id: "16",
-    name: "Michael Brown",
-    initial: "M",
-    color: "#AED6F1",
-    icon: "Check",
-  },
-  {
-    id: "17",
-    name: "Maria Garcia",
-    initial: "M",
-    color: "#AED6F1",
-    icon: "Plus",
-  },
-  // S
-  {
-    id: "18",
-    name: "Sarah Miller",
-    initial: "S",
-    color: "#D7BDE2",
-    icon: "Heart",
-  },
-  {
-    id: "19",
-    name: "Steven Clark",
-    initial: "S",
-    color: "#D7BDE2",
-    icon: "Star",
-  },
-  // Z
-  {
-    id: "20",
-    name: "Zachary Turner",
-    initial: "Z",
-    color: "#F9E79F",
-    icon: "Check",
-  },
-  {
-    id: "21",
-    name: "Zoe Anderson",
-    initial: "Z",
-    color: "#F9E79F",
-    icon: "Plus",
-  },
-];
-
 // Text styles
 const textLargeStyle = textStyles[TextVariant.Body][TextSize.Large];
 
 // Group clients by first letter
-const groupClientsByLetter = (clients: Client[]) => {
-  const grouped: Record<string, Client[]> = {};
+const groupClientsByLetter = (clients: ClientDisplay[]) => {
+  const grouped: Record<string, ClientDisplay[]> = {};
   clients.forEach((client) => {
     const firstChar = client.name.charAt(0);
     if (firstChar) {
@@ -202,13 +46,89 @@ const groupClientsByLetter = (clients: Client[]) => {
   return grouped;
 };
 
-export default function ClientsScreen() {
+// Helper function to get random color
+const getRandomColor = (): string => {
+  const colors = [
+    "#F4D03F",
+    "#85C1E9",
+    "#BB8FCE",
+    "#F8B739",
+    "#82E0AA",
+    "#F1948A",
+    "#AED6F1",
+    "#D7BDE2",
+    "#F9E79F",
+  ];
+  const randomIndex = Math.floor(Math.random() * colors.length);
+  return colors[randomIndex]!;
+};
+
+// Helper function to get random icon
+const getRandomIcon = (): IconName => {
+  const icons: IconName[] = ["Heart", "Star", "Check", "Plus"];
+  return icons[Math.floor(Math.random() * icons.length)] || "Heart";
+};
+
+// Map API Client to ClientDisplay
+const mapClientToDisplay = (client: Client): ClientDisplay => {
+  // Construct full name from first_name and last_name if full_name is not available
+  const fullName =
+    client.full_name || `${client.first_name} ${client.last_name || ""}`.trim();
+
+  return {
+    id: client.client_id,
+    name: fullName,
+    initial: client.first_name.charAt(0).toUpperCase(),
+    color: getRandomColor(),
+    icon: getRandomIcon(),
+  };
+};
+
+interface ClientsScreenProps {
+  userId?: string; // Will use default if not provided
+}
+
+export default function ClientsScreen({
+  userId = "2a3c19b8-d352-4b30-a2ac-1cdf993d310c", // Default hard coded user ID
+}: ClientsScreenProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [clients, setClients] = useState(clientsData);
+  const [clients, setClients] = useState<ClientDisplay[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [visibleSection, setVisibleSection] = useState<string>("A");
   const [isAddClientVisible, setIsAddClientVisible] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
   const sectionRefs = useRef<Record<string, number>>({});
+
+  // Fetch clients from API
+  const fetchClients = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      console.log("Fetching clients for userId:", userId);
+      const apiClients = await ClientHandler.fetchAllClients(userId);
+      console.log("Received clients:", apiClients);
+      console.log("Number of clients:", apiClients.length);
+
+      const displayClients = apiClients.map(mapClientToDisplay);
+      console.log("Display clients:", displayClients);
+
+      setClients(displayClients);
+    } catch (err) {
+      console.error("Error fetching clients:", err);
+      setError(err instanceof Error ? err.message : "Failed to fetch clients");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch clients on mount
+  useEffect(() => {
+    if (userId) {
+      fetchClients();
+    }
+  }, [userId]);
 
   // Filter clients based on search
   const filteredClients = clients.filter((client) =>
@@ -224,7 +144,7 @@ export default function ClientsScreen() {
   };
 
   // Handle save client
-  const handleSaveClient = (clientData: unknown) => {
+  const handleSaveClient = async (clientData: unknown) => {
     console.log("Saving client:", clientData);
 
     // Type guard to ensure clientData has required properties
@@ -237,43 +157,36 @@ export default function ClientsScreen() {
       const data = clientData as {
         firstName: string;
         lastName?: string | null;
+        title?: string;
+        gender?: "MALE" | "FEMALE" | "OTHER";
+        dateOfBirth?: string;
+        countryCode?: string;
+        contactNumber?: string;
+        emergencyContactName?: string;
+        emergencyContactCountryCode?: string;
+        emergencyContactNumber?: string;
+        emergencyContactRelationship?: string;
+        knownConditions?: string[];
+        note?: string;
       };
 
-      // Generate new client
-      const newClient: Client = {
-        id: String(clients.length + 1),
-        name: `${data.firstName} ${data.lastName || ""}`.trim(),
-        initial: data.firstName.charAt(0).toUpperCase(),
-        color: getRandomColor(),
-        icon: getRandomIcon(),
-      };
+      try {
+        // Create client via API
+        const newClient = await ClientHandler.createNewClient(data, userId);
 
-      // Add new client to the list
-      setClients([...clients, newClient]);
+        // Add new client to the list
+        const displayClient = mapClientToDisplay(newClient);
+        setClients([...clients, displayClient]);
+
+        // Close modal
+        setIsAddClientVisible(false);
+      } catch (err) {
+        console.error("Error creating client:", err);
+        setError(
+          err instanceof Error ? err.message : "Failed to create client"
+        );
+      }
     }
-  };
-
-  // Helper function to get random color
-  const getRandomColor = (): string => {
-    const colors = [
-      "#F4D03F",
-      "#85C1E9",
-      "#BB8FCE",
-      "#F8B739",
-      "#82E0AA",
-      "#F1948A",
-      "#AED6F1",
-      "#D7BDE2",
-      "#F9E79F",
-    ];
-    const randomIndex = Math.floor(Math.random() * colors.length);
-    return colors[randomIndex]!;
-  };
-
-  // Helper function to get random icon
-  const getRandomIcon = (): IconName => {
-    const icons: IconName[] = ["Heart", "Star", "Check", "Plus"];
-    return icons[Math.floor(Math.random() * icons.length)] || "Heart";
   };
 
   // Handle alphabet letter press to scroll to section
@@ -307,6 +220,151 @@ export default function ClientsScreen() {
     const { y } = event.nativeEvent.layout;
     sectionRefs.current[letter] = y;
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" color={Color.Green} />
+        <TextComponent
+          variant={TextVariant.Body}
+          size={TextSize.Medium}
+          style={{ marginTop: 16, color: Color.Grey }}
+        >
+          Loading clients...
+        </TextComponent>
+      </View>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <View className="flex-1 justify-center items-center px-5">
+        <Icons.Info size={48} color={Color.Danger} />
+        <TextComponent
+          variant={TextVariant.Title}
+          size={TextSize.Medium}
+          style={{ marginTop: 16, color: Color.Danger }}
+        >
+          Error Loading Clients
+        </TextComponent>
+        <TextComponent
+          variant={TextVariant.Body}
+          size={TextSize.Medium}
+          style={{ marginTop: 8, color: Color.Grey, textAlign: "center" }}
+        >
+          {error}
+        </TextComponent>
+        <ButtonComponent
+          size={ButtonSize.Medium}
+          buttonColor={Color.Green}
+          textColor={Color.White}
+          onPress={fetchClients}
+          style={{ marginTop: 24 }}
+        >
+          Retry
+        </ButtonComponent>
+      </View>
+    );
+  }
+
+  // Empty state - no clients loaded
+  if (clients.length === 0) {
+    return (
+      <View className="flex-1 pt-5">
+        {/* Header */}
+        <View className="flex-row justify-between items-center px-5 mb-5">
+          <TextComponent variant={TextVariant.Title} size={TextSize.Large}>
+            Clients
+          </TextComponent>
+          <View className="items-center">
+            <ButtonComponent
+              size={ButtonSize.Small}
+              leftIcon={Icons.Plus}
+              buttonColor={Color.Black}
+              textColor={Color.White}
+              iconColor={Color.White}
+              onPress={() => setIsAddClientVisible(true)}
+            >
+              Add Client
+            </ButtonComponent>
+          </View>
+        </View>
+
+        {/* Search Bar */}
+        <View className="px-5 mb-5">
+          <Input
+            variant="outline"
+            size="md"
+            style={{
+              borderColor: Color.LightGrey,
+              borderWidth: 1.5,
+              borderRadius: 12,
+              width: "100%",
+              height: 56,
+              backgroundColor: Color.White,
+            }}
+          >
+            <InputField
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              placeholder="Search"
+              placeholderTextColor={Color.Grey}
+              style={{
+                paddingLeft: 16,
+                paddingRight: 48,
+                paddingVertical: 12,
+                fontFamily:
+                  textLargeStyle.fontFamily === Font.DMsans
+                    ? "DMSans_400Regular"
+                    : "Lato_400Regular",
+                fontSize: textLargeStyle.fontSize,
+                fontWeight: "400" as RNTextStyle["fontWeight"],
+                textAlign: "left",
+                color: Color.Black,
+              }}
+            />
+            <InputSlot className="pr-4">
+              <Icons.Search size={20} color={Color.Grey} weight="regular" />
+            </InputSlot>
+          </Input>
+        </View>
+
+        {/* Empty state message */}
+        <View className="flex-1 justify-center items-center px-5">
+          <TextComponent
+            variant={TextVariant.Title}
+            size={TextSize.Large}
+            style={{ marginTop: 16, color: Color.Grey }}
+          >
+            📋
+          </TextComponent>
+          <TextComponent
+            variant={TextVariant.Title}
+            size={TextSize.Medium}
+            style={{ marginTop: 16, color: Color.Grey }}
+          >
+            No Clients Found
+          </TextComponent>
+          <TextComponent
+            variant={TextVariant.Body}
+            size={TextSize.Medium}
+            style={{ marginTop: 8, color: Color.Grey, textAlign: "center" }}
+          >
+            Tap "Add Client" to create your first client
+          </TextComponent>
+        </View>
+
+        {/* Add Client Modal */}
+        <AddClient
+          visible={isAddClientVisible}
+          onClose={() => setIsAddClientVisible(false)}
+          onSave={handleSaveClient}
+        />
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 pt-5">

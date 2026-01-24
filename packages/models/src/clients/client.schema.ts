@@ -88,7 +88,7 @@ const createClientBaseSchema = z
     emergency_contact_relationship: z.string().optional().nullable(),
     known_conditions: z.array(z.string()).optional().nullable(),
     note: z.string().optional().nullable(),
-    contact_id: z.string(),
+    contact_id: z.string().nullable(),
     user_id: z.string(),
   })
   .strict();
