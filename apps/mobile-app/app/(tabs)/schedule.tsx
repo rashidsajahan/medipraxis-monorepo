@@ -1,6 +1,3 @@
-import { useEffect, useState } from "react";
-import { Alert, StyleSheet } from "react-native";
-
 import { View } from "@/components/Themed";
 import {
   type AgendaData,
@@ -8,23 +5,28 @@ import {
   AgendaSelectionType,
   CalendarComponent,
 } from "@/components/advanced";
+import { ViewAppointmentModal } from "@/components/advanced/shedule/ViewAppointmentModal";
+import { useEffect, useState } from "react";
+import { Alert, StyleSheet } from "react-native";
 
 export default function ScheduleScreen() {
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTask, setSelectedTask] = useState<AgendaSelection | null>(
     null
   );
+  const [modalVisible, setModalVisible] = useState(false);
 
   // Debug toast when appointment/reminder is selected
   // TODO: Implement proper navigation to detail popups/screens
   useEffect(() => {
     if (selectedTask) {
       if (selectedTask.type === AgendaSelectionType.Appointment) {
-        Alert.alert(
-          "Appointment Selected",
-          `Appointment ID: ${selectedTask.appointmentId}\nGroup ID: ${selectedTask.groupId || "null"}`,
-          [{ text: "OK", onPress: () => setSelectedTask(null) }]
-        );
+        // Alert.alert(
+        //   "Appointment Selected",
+        //   `Appointment ID: ${selectedTask.appointmentId}\nGroup ID: ${selectedTask.groupId || "null"}`,
+        //   [{ text: "OK", onPress: () => setSelectedTask(null) }]
+        // );
+        setModalVisible(true);
       } else if (selectedTask.type === AgendaSelectionType.EmptySlot) {
         Alert.alert(
           "Empty Slot Selected",
@@ -130,6 +132,22 @@ export default function ScheduleScreen() {
     ],
   };
 
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    setSelectedTask(null);
+  };
+
+  const data = {
+    title: "title",
+    slotWindow: "Sat 9-11PM",
+    slotNo: 5,
+    location: "Care - Medical Centre",
+    client: "Jennifer ( 012 3456789 )",
+    start_date: "Nov 15, 2025  08:00 am",
+    end_date: "Nov 15, 2025  11:30 am",
+    note: "",
+  };
+
   return (
     <View style={styles.container}>
       <CalendarComponent
@@ -156,6 +174,13 @@ export default function ScheduleScreen() {
             reminderId: reminder.id,
           })
         }
+      />
+      <ViewAppointmentModal
+        visible={modalVisible}
+        data={data}
+        onClose={handleCloseModal}
+        onEdit={() => Alert.alert("Edit")}
+        onCancel={handleCloseModal}
       />
     </View>
   );
