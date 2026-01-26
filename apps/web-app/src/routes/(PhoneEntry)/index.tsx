@@ -1,4 +1,4 @@
-import { PhoneEntry } from "@/routes/index/PhoneEntry";
+import { PhoneEntry } from "@/routes/(PhoneEntry)/PhoneEntry";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
