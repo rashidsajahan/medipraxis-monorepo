@@ -71,9 +71,8 @@ const getRandomIcon = (): IconName => {
 
 // Map API Client to ClientDisplay
 const mapClientToDisplay = (client: Client): ClientDisplay => {
-  // Construct full name from first_name and last_name if full_name is not available
-  const fullName =
-    client.full_name || `${client.first_name} ${client.last_name || ""}`.trim();
+  // Construct full name from first_name and last_name
+  const fullName = `${client.first_name} ${client.last_name || ""}`.trim();
 
   return {
     id: client.client_id,
@@ -117,7 +116,9 @@ export default function ClientsScreen({
       setClients(displayClients);
     } catch (err) {
       console.error("Error fetching clients:", err);
-      setError(err instanceof Error ? err.message : "Failed to fetch clients");
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch clients";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -150,7 +151,7 @@ export default function ClientsScreen({
       clientData &&
       typeof clientData === "object" &&
       "firstName" in clientData &&
-      "lastName" in clientData
+      typeof clientData.firstName === "string"
     ) {
       const data = clientData as {
         firstName: string;
@@ -158,14 +159,12 @@ export default function ClientsScreen({
         title?: string;
         gender?: "MALE" | "FEMALE" | "OTHER";
         dateOfBirth?: string;
-        countryCode?: string;
         contactNumber?: string;
         emergencyContactName?: string;
-        emergencyContactCountryCode?: string;
         emergencyContactNumber?: string;
         emergencyContactRelationship?: string;
-        knownConditions?: string[];
-        note?: string;
+        knownConditions?: string[] | null;
+        note?: string | null;
       };
 
       try {
@@ -180,9 +179,9 @@ export default function ClientsScreen({
         setIsAddClientVisible(false);
       } catch (err) {
         console.error("Error creating client:", err);
-        setError(
-          err instanceof Error ? err.message : "Failed to create client"
-        );
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to create client";
+        setError(errorMessage);
       }
     }
   };

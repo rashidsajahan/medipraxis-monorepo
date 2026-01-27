@@ -1,4 +1,5 @@
 import type { Client } from "@repo/models";
+import { parsePhoneNumber } from "libphonenumber-js";
 
 // Base URL - configure this based on your environment
 const API_BASE_URL = "http://localhost:8787"; // Hardcoded for development
@@ -68,10 +69,8 @@ export async function createNewClient(
     lastName?: string | null;
     gender?: "MALE" | "FEMALE" | "OTHER" | null;
     dateOfBirth?: string | null;
-    countryCode?: string | null;
     contactNumber?: string | null;
     emergencyContactName?: string | null;
-    emergencyContactCountryCode?: string | null;
     emergencyContactNumber?: string | null;
     emergencyContactRelationship?: string | null;
     knownConditions?: string[] | null;
@@ -80,18 +79,49 @@ export async function createNewClient(
   userId: string
 ): Promise<Client> {
   try {
+    // Parse contact number
+    let countryCode = "94";
+    let contactNumber = "0000000000";
+    
+    if (clientData.contactNumber) {
+      try {
+        const phoneNumber = parsePhoneNumber(clientData.contactNumber);
+        if (phoneNumber) {
+          countryCode = phoneNumber.countryCallingCode;
+          contactNumber = phoneNumber.nationalNumber;
+        }
+      } catch (error) {
+        console.error("Error parsing contact number:", error);
+      }
+    }
+
+    // Parse emergency contact number
+    let emergencyCountryCode = null;
+    let emergencyContactNumber = null;
+    
+    if (clientData.emergencyContactNumber) {
+      try {
+        const emergencyPhone = parsePhoneNumber(clientData.emergencyContactNumber);
+        if (emergencyPhone) {
+          emergencyCountryCode = emergencyPhone.countryCallingCode;
+          emergencyContactNumber = emergencyPhone.nationalNumber;
+        }
+      } catch (error) {
+        console.error("Error parsing emergency contact number:", error);
+      }
+    }
+
     const payload = {
       title: clientData.title || "Mr",
       first_name: clientData.firstName,
       last_name: clientData.lastName || "",
       gender: clientData.gender || "MALE",
       date_of_birth: "1900-01-01",
-      country_code: clientData.countryCode || "94",
-      contact_number: clientData.contactNumber || "0000000000",
+      country_code: countryCode,
+      contact_number: contactNumber,
       emergency_contact_name: clientData.emergencyContactName || null,
-      emergency_contact_country_code:
-        clientData.emergencyContactCountryCode || null,
-      emergency_contact_number: clientData.emergencyContactNumber || null,
+      emergency_contact_country_code: emergencyCountryCode,
+      emergency_contact_number: emergencyContactNumber,
       emergency_contact_relationship:
         clientData.emergencyContactRelationship || null,
       known_conditions: clientData.knownConditions || null,
