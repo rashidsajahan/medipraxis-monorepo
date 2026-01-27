@@ -82,7 +82,7 @@ export async function createNewClient(
     // Parse contact number
     let countryCode = "94";
     let contactNumber = "0000000000";
-    
+
     if (clientData.contactNumber) {
       try {
         const phoneNumber = parsePhoneNumber(clientData.contactNumber);
@@ -98,10 +98,12 @@ export async function createNewClient(
     // Parse emergency contact number
     let emergencyCountryCode = null;
     let emergencyContactNumber = null;
-    
+
     if (clientData.emergencyContactNumber) {
       try {
-        const emergencyPhone = parsePhoneNumber(clientData.emergencyContactNumber);
+        const emergencyPhone = parsePhoneNumber(
+          clientData.emergencyContactNumber
+        );
         if (emergencyPhone) {
           emergencyCountryCode = emergencyPhone.countryCallingCode;
           emergencyContactNumber = emergencyPhone.nationalNumber;
