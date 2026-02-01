@@ -1,8 +1,10 @@
 import type { RequestReport } from "@repo/models";
-import type { RequestReportRepository } from "../repositories";
-import type { ClientRepository } from "../repositories/client.repository";
-import type { ShareableUserLinkRepository } from "../repositories/shareable_user_link.repository";
-import type { UserRepository } from "../repositories/user.repository";
+import type {
+  ClientRepository,
+  RequestReportRepository,
+  ShareableUserLinkRepository,
+  UserRepository,
+} from "../repositories";
 import type { SmsService } from "./sms.service";
 
 export class RequestReportService {
