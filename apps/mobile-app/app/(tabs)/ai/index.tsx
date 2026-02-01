@@ -7,6 +7,7 @@ import clsx from "clsx";
 import { useFonts } from "expo-font";
 import { LinearGradient } from "expo-linear-gradient";
 import {
+  BroomIcon,
   MicrophoneIcon,
   PaperPlaneRightIcon,
   XIcon,
@@ -154,6 +155,23 @@ export default function AIAssistantModal({
               resizeMode="cover"
               imageStyle={{ opacity: 0.2 }}
             >
+              {/* Clear messages button */}
+              {messages.length > 0 && (
+                <Pressable
+                  onPress={clearMessages}
+                  className="absolute top-[1.35rem] right-16 z-10 bg-white rounded-full px-3 py-2 flex-row items-center gap-2 shadow-sm"
+                >
+                  <BroomIcon size={18} color={Color.Grey} weight="regular" />
+                  <TextComponent
+                    variant={TextVariant.Body}
+                    size={TextSize.Small}
+                    color={Color.Grey}
+                  >
+                    Clear messages
+                  </TextComponent>
+                </Pressable>
+              )}
+
               {/* Close button */}
               <Pressable
                 onPress={onClose}
