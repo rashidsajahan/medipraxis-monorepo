@@ -2,6 +2,10 @@ import type { Context } from "hono";
 import {
   ClientReportRepository,
   ClientRepository,
+  OtpRepository,
+  RequestReportRepository,
+  ShareableCalendarLinkRepository,
+  ShareableUserLinkRepository,
   SlotWindowRepository,
   TaskRepository,
   UserRepository,
@@ -10,7 +14,11 @@ import {
   AIService,
   ClientReportService,
   ClientService,
+  OtpService,
+  RequestReportService,
+  ShareableCalendarLinkService,
   SlotWindowService,
+  SmsService,
   TaskService,
   UserService,
 } from "../services";
@@ -56,5 +64,65 @@ export function getClientService(c: Context<{ Bindings: Env }>) {
 export function getClientReportService(c: Context<{ Bindings: Env }>) {
   const db = createDatabaseClient(c.env);
   const clientReportRepository = new ClientReportRepository(db);
-  return new ClientReportService(clientReportRepository);
+  const clientRepository = new ClientRepository(db);
+  const requestReportRepository = new RequestReportRepository(db);
+  const userRepository = new UserRepository(db);
+  return new ClientReportService(
+    clientReportRepository,
+    clientRepository,
+    requestReportRepository,
+    userRepository
+  );
+}
+
+export function getOtpService(c: Context<{ Bindings: Env }>) {
+  const apiKey = c.env.TEXT_LK_API_KEY || "dev";
+  const apiUrl = c.env.TEXT_LK_API_URL;
+  const db = createDatabaseClient(c.env);
+  const otpRepository = new OtpRepository(db);
+
+  return new OtpService(apiKey, otpRepository, apiUrl);
+}
+
+export function getSmsService(c: Context<{ Bindings: Env }>) {
+  const apiKey = c.env.TEXT_LK_API_KEY;
+  const apiUrl = c.env.TEXT_LK_API_URL;
+
+  if (!apiKey) {
+    throw new Error("TEXT_LK_API_KEY not configured");
+  }
+
+  return new SmsService(apiKey, apiUrl);
+}
+
+export function getRequestReportService(c: Context<{ Bindings: Env }>) {
+  const db = createDatabaseClient(c.env);
+  const requestReportRepository = new RequestReportRepository(db);
+  const userRepository = new UserRepository(db);
+  const clientRepository = new ClientRepository(db);
+  const shareableUserLinkRepository = new ShareableUserLinkRepository(db);
+  const smsService = getSmsService(c);
+  const webAppUrl = c.env.MEDIPRAXIS_WEB_URL;
+  return new RequestReportService(
+    requestReportRepository,
+    userRepository,
+    clientRepository,
+    shareableUserLinkRepository,
+    smsService,
+    webAppUrl
+  );
+}
+
+export function getShareableCalendarLinkService(c: Context<{ Bindings: Env }>) {
+  const db = createDatabaseClient(c.env);
+  const shareableCalendarLinkRepository = new ShareableCalendarLinkRepository(
+    db
+  );
+  const slotWindowRepository = new SlotWindowRepository(db);
+  const taskRepository = new TaskRepository(db);
+  return new ShareableCalendarLinkService(
+    shareableCalendarLinkRepository,
+    slotWindowRepository,
+    taskRepository
+  );
 }

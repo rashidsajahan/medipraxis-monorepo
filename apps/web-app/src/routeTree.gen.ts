@@ -8,70 +8,141 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root";
-import { Route as AboutRouteImport } from "./routes/about";
-import { Route as IndexRouteImport } from "./routes/index";
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as RegisterIndexRouteImport } from './routes/register/index'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as PhoneEntryIndexRouteImport } from './routes/(PhoneEntry)/index'
+import { Route as UploadReportRequestReportIdRouteImport } from './routes/upload-report/$requestReportId'
+import { Route as SchedulesIdRouteImport } from './routes/schedules/$id'
 
-const AboutRoute = AboutRouteImport.update({
-  id: "/about",
-  path: "/about",
+const RegisterIndexRoute = RegisterIndexRouteImport.update({
+  id: '/register/',
+  path: '/register/',
   getParentRoute: () => rootRouteImport,
-} as any);
-const IndexRoute = IndexRouteImport.update({
-  id: "/",
-  path: "/",
+} as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/dashboard/',
+  path: '/dashboard/',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
+const PhoneEntryIndexRoute = PhoneEntryIndexRouteImport.update({
+  id: '/(PhoneEntry)/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UploadReportRequestReportIdRoute =
+  UploadReportRequestReportIdRouteImport.update({
+    id: '/upload-report/$requestReportId',
+    path: '/upload-report/$requestReportId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const SchedulesIdRoute = SchedulesIdRouteImport.update({
+  id: '/schedules/$id',
+  path: '/schedules/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute;
-  "/about": typeof AboutRoute;
+  '/schedules/$id': typeof SchedulesIdRoute
+  '/upload-report/$requestReportId': typeof UploadReportRequestReportIdRoute
+  '/': typeof PhoneEntryIndexRoute
+  '/dashboard': typeof DashboardIndexRoute
+  '/register': typeof RegisterIndexRoute
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute;
-  "/about": typeof AboutRoute;
+  '/schedules/$id': typeof SchedulesIdRoute
+  '/upload-report/$requestReportId': typeof UploadReportRequestReportIdRoute
+  '/': typeof PhoneEntryIndexRoute
+  '/dashboard': typeof DashboardIndexRoute
+  '/register': typeof RegisterIndexRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport;
-  "/": typeof IndexRoute;
-  "/about": typeof AboutRoute;
+  __root__: typeof rootRouteImport
+  '/schedules/$id': typeof SchedulesIdRoute
+  '/upload-report/$requestReportId': typeof UploadReportRequestReportIdRoute
+  '/(PhoneEntry)/': typeof PhoneEntryIndexRoute
+  '/dashboard/': typeof DashboardIndexRoute
+  '/register/': typeof RegisterIndexRoute
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: "/" | "/about";
-  fileRoutesByTo: FileRoutesByTo;
-  to: "/" | "/about";
-  id: "__root__" | "/" | "/about";
-  fileRoutesById: FileRoutesById;
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths:
+    | '/schedules/$id'
+    | '/upload-report/$requestReportId'
+    | '/'
+    | '/dashboard'
+    | '/register'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/schedules/$id'
+    | '/upload-report/$requestReportId'
+    | '/'
+    | '/dashboard'
+    | '/register'
+  id:
+    | '__root__'
+    | '/schedules/$id'
+    | '/upload-report/$requestReportId'
+    | '/(PhoneEntry)/'
+    | '/dashboard/'
+    | '/register/'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  AboutRoute: typeof AboutRoute;
+  SchedulesIdRoute: typeof SchedulesIdRoute
+  UploadReportRequestReportIdRoute: typeof UploadReportRequestReportIdRoute
+  PhoneEntryIndexRoute: typeof PhoneEntryIndexRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
+  RegisterIndexRoute: typeof RegisterIndexRoute
 }
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/about": {
-      id: "/about";
-      path: "/about";
-      fullPath: "/about";
-      preLoaderRoute: typeof AboutRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/": {
-      id: "/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof IndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+    '/register/': {
+      id: '/register/'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(PhoneEntry)/': {
+      id: '/(PhoneEntry)/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof PhoneEntryIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/upload-report/$requestReportId': {
+      id: '/upload-report/$requestReportId'
+      path: '/upload-report/$requestReportId'
+      fullPath: '/upload-report/$requestReportId'
+      preLoaderRoute: typeof UploadReportRequestReportIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/schedules/$id': {
+      id: '/schedules/$id'
+      path: '/schedules/$id'
+      fullPath: '/schedules/$id'
+      preLoaderRoute: typeof SchedulesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
-};
+  SchedulesIdRoute: SchedulesIdRoute,
+  UploadReportRequestReportIdRoute: UploadReportRequestReportIdRoute,
+  PhoneEntryIndexRoute: PhoneEntryIndexRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
+  RegisterIndexRoute: RegisterIndexRoute,
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()
