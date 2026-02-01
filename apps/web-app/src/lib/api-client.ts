@@ -1,10 +1,11 @@
 import { createApiClient } from "@repo/api-client";
 
-export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8787";
+const API_BASE_URL_ROOT = import.meta.env.VITE_API_BASE_URL;
 
-export const apiClient = createApiClient(API_BASE_URL);
+export const API_BASE_URL = `${API_BASE_URL_ROOT}/api`;
+
+export const apiClient = createApiClient(API_BASE_URL_ROOT);
 
 export function updateApiClientToken(token: string) {
-  return createApiClient(API_BASE_URL, token);
+  return createApiClient(API_BASE_URL_ROOT, token);
 }
