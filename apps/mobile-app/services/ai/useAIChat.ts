@@ -1,7 +1,7 @@
 import { apiClient } from "@/lib/api-client";
 import { AIChatRole, type UIChatMessage } from "@repo/models";
 import { useCallback, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
+import uuid from "react-native-uuid";
 
 export interface AIConversation {
   messages: UIChatMessage[];
@@ -12,7 +12,7 @@ export interface AIConversation {
 
 function createUserMessage(content: string): UIChatMessage {
   return {
-    id: uuidv4(),
+    id: uuid.v4(),
     role: AIChatRole.User,
     content,
     timestamp: new Date(),
@@ -25,7 +25,7 @@ function createAssistantMessage(
   { isError }: { isError?: boolean } = { isError: false }
 ): UIChatMessage {
   return {
-    id: uuidv4(),
+    id: uuid.v4(),
     role: AIChatRole.Assistant,
     content,
     isError,
