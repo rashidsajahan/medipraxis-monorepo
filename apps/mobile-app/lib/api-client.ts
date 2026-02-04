@@ -1,10 +1,10 @@
 import { createApiClient } from "@repo/api-client";
 
-const API_BASE_URL: string =
-  process.env.EXPO_PUBLIC_API_BASE_URL || "http://localhost:8787";
+// Use environment variable or default to localhost
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
+
+if (!API_BASE_URL) {
+  throw new Error("API_BASE_URL is not defined");
+}
 
 export const apiClient = createApiClient(API_BASE_URL);
-
-export function updateApiClientToken(token: string) {
-  return createApiClient(API_BASE_URL, token);
-}
