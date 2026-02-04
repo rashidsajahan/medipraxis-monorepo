@@ -7,8 +7,8 @@ import {
 import { Lato_400Regular, Lato_700Bold } from "@expo-google-fonts/lato";
 import { Color, TextSize, TextVariant } from "@repo/config";
 import { useFonts } from "expo-font";
-import { PencilSimple } from "phosphor-react-native";
-import React from "react";
+import { PencilSimpleIcon } from "phosphor-react-native";
+import React, { useState } from "react";
 import {
   Image,
   Modal,
@@ -18,6 +18,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { FormConfig } from "./FormConfig.component";
 import { FORM_TILES } from "./formSetupCenter.constants";
 import type { FormSetupCenterProps } from "./formSetupCenter.types";
 
@@ -30,9 +31,12 @@ export function FormSetupCenter({ visible, onClose }: FormSetupCenterProps) {
     Lato_700Bold,
   });
 
-  const handleTilePress = (tileId: string) => {
-    console.log(`Tile pressed: ${tileId}`);
-    // TODO: Navigate to specific form configuration page
+  const [showFormConfig, setShowFormConfig] = useState(false);
+  const [selectedFormTitle, setSelectedFormTitle] = useState("");
+
+  const handleTilePress = (tileTitle: string) => {
+    setSelectedFormTitle(tileTitle);
+    setShowFormConfig(true);
   };
 
   if (!fontsLoaded) {
@@ -84,10 +88,10 @@ export function FormSetupCenter({ visible, onClose }: FormSetupCenterProps) {
                   <Text style={styles.tileDescription}>{tile.description}</Text>
                   <TouchableOpacity
                     style={styles.editButton}
-                    onPress={() => handleTilePress(tile.id)}
+                    onPress={() => handleTilePress(tile.title)}
                     activeOpacity={0.7}
                   >
-                    <PencilSimple
+                    <PencilSimpleIcon
                       size={20}
                       color={Color.White}
                       weight="regular"
@@ -107,6 +111,13 @@ export function FormSetupCenter({ visible, onClose }: FormSetupCenterProps) {
           </View>
         </ScrollView>
       </View>
+
+      {/* Form Config Modal */}
+      <FormConfig
+        visible={showFormConfig}
+        onClose={() => setShowFormConfig(false)}
+        formTitle={selectedFormTitle}
+      />
     </Modal>
   );
 }
