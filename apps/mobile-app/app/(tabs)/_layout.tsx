@@ -1,19 +1,19 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, Tabs } from "expo-router";
-import React, { useState } from "react";
-import { Pressable, View, StyleSheet } from "react-native";
 import {
-  HouseLineIcon,
   CalendarIcon,
-  UsersIcon,
   FoldersIcon,
+  HouseLineIcon,
+  UsersIcon,
 } from "phosphor-react-native";
+import React, { useState } from "react";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
 import { useColorScheme } from "@/components/useColorScheme";
 import Colors from "@/constants/Colors";
-import AIAssistantModal from "./ai/index";
 import { AIAssistantButton } from "./ai/AIAssistantButton";
+import AIAssistantModal from "./ai/index";
 
 function CustomTabIcon({
   name,
@@ -24,7 +24,7 @@ function CustomTabIcon({
 }) {
   return (
     <View
-      className={`h-[45px] w-[45px] rounded-[14px] items-center justify-center mt-3 ${
+      className={`h-[45px] w-[45px] rounded-[14px] items-center justify-center ${
         focused ? "bg-[#FDFDF5] border-[1.5px] border-[#CFFF5E]" : ""
       }`}
     >
@@ -61,6 +61,35 @@ export default function TabLayout() {
           tabBarItemStyle: styles.tabBarItemStyle,
           tabBarIconStyle: styles.tabBarIconStyle,
           tabBarBackground: undefined,
+          tabBarButton: ({
+            accessibilityLabel,
+            accessibilityState,
+            onLongPress,
+            onPress,
+            testID,
+            children,
+          }) => (
+            <Pressable
+              accessibilityLabel={accessibilityLabel}
+              accessibilityState={accessibilityState}
+              onLongPress={onLongPress}
+              onPress={onPress}
+              testID={testID}
+              style={({ pressed }) => [
+                {
+                  flex: 1,
+                  height: 72,
+                  padding: 0,
+                  margin: 0,
+                  alignItems: "center",
+                  justifyContent: "center",
+                },
+                pressed && { opacity: 0.7 },
+              ]}
+            >
+              {children}
+            </Pressable>
+          ),
         }}
       >
         <Tabs.Screen
@@ -148,8 +177,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 10,
-    width: "60%",
-    marginLeft: 30,
+    width: "65%",
+    alignSelf: "center",
     alignItems: "center",
     justifyContent: "center",
     paddingBottom: 0,
@@ -163,6 +192,7 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
     paddingBottom: 0,
     paddingTop: 0,
+    paddingHorizontal: 12,
   },
 
   tabBarIconStyle: {

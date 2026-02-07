@@ -105,7 +105,10 @@ export function AIAssistantButton({
   };
 
   return (
-    <View className="absolute bottom-24 right-6 z-50">
+    <View
+      className="absolute z-50"
+      style={{ bottom: 24, right: "12%", alignItems: "center" }}
+    >
       <Pressable
         onPress={onPress}
         onPressIn={handlePressIn}
