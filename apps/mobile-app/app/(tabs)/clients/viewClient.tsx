@@ -101,7 +101,7 @@ export const ViewClient: React.FC<ViewClientProps> = ({
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={{ flex: 1 }}
         >
-          <View style={{ flex: 1, backgroundColor: Color.White }}>
+          <View style={{ flex: 1, backgroundColor: "#F5F5F5" }}>
             {/* Header Section */}
             <View
               style={{
@@ -182,53 +182,56 @@ export const ViewClient: React.FC<ViewClientProps> = ({
               </View>
 
               {/* Action Buttons */}
-              <View style={{ flexDirection: "row", gap: 8 }}>
-                <View style={{ flex: 1 }}>
-                  <ButtonComponent
-                    size={ButtonSize.Small}
-                    leftIcon={Icons.Eye}
-                    buttonColor={Color.Black}
-                    textColor={Color.White}
-                    iconColor={Color.White}
-                    onPress={onViewProfile}
-                  >
-                    View Profile
-                  </ButtonComponent>
-                </View>
-
-                <View style={{ flex: 1 }}>
-                  <ButtonComponent
-                    size={ButtonSize.Small}
-                    leftIcon={Icons.ShareNetwork}
-                    buttonColor={Color.Black}
-                    textColor={Color.White}
-                    iconColor={Color.White}
-                    onPress={onShareCalendar}
-                  >
-                    Share Calendar
-                  </ButtonComponent>
-                </View>
-
-                <TouchableOpacity
-                  style={{
-                    backgroundColor: Color.Black,
-                    paddingHorizontal: 12,
-                    paddingVertical: 8,
-                    minWidth: 44,
-                    borderRadius: 8,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                  onPress={onCall}
-                  activeOpacity={0.8}
+              <View
+                style={{
+                  flexDirection: "row",
+                  gap: 8,
+                  justifyContent: "space-between",
+                }}
+              >
+                <ButtonComponent
+                  size={ButtonSize.Small}
+                  leftIcon={Icons.Eye}
+                  buttonColor={Color.Black}
+                  textColor={Color.White}
+                  iconColor={Color.White}
+                  onPress={onViewProfile}
                 >
-                  <Icons.Phone size={16} color={Color.White} weight="regular" />
-                </TouchableOpacity>
+                  Profile
+                </ButtonComponent>
+
+                <ButtonComponent
+                  size={ButtonSize.Small}
+                  leftIcon={Icons.ShareNetwork}
+                  buttonColor={Color.Black}
+                  textColor={Color.White}
+                  iconColor={Color.White}
+                  onPress={onShareCalendar}
+                >
+                  Share Calendar
+                </ButtonComponent>
+
+                <ButtonComponent
+                  size={ButtonSize.Small}
+                  leftIcon={Icons.Phone}
+                  buttonColor={Color.Black}
+                  textColor={Color.White}
+                  iconColor={Color.White}
+                  onPress={onCall}
+                >
+                  Call
+                </ButtonComponent>
               </View>
             </View>
 
             {/* Tab Section */}
-            <View style={{ paddingHorizontal: 20, paddingTop: 20 }}>
+            <View
+              style={{
+                paddingHorizontal: 20,
+                paddingTop: 20,
+                backgroundColor: "#F5F5F5",
+              }}
+            >
               <View style={{ flexDirection: "row", gap: 8, marginBottom: 16 }}>
                 {/* Appointments Tab */}
                 <TouchableOpacity
@@ -238,13 +241,8 @@ export const ViewClient: React.FC<ViewClientProps> = ({
                     borderRadius: 9999,
                     backgroundColor:
                       activeTab === ClientDetailTab.Appointments
-                        ? Color.LightGreen
-                        : Color.White,
-                    borderWidth: 1,
-                    borderColor:
-                      activeTab === ClientDetailTab.Appointments
-                        ? "transparent"
-                        : Color.LightGrey,
+                        ? Color.Green
+                        : "transparent",
                   }}
                   onPress={() => setActiveTab(ClientDetailTab.Appointments)}
                   activeOpacity={0.7}
@@ -266,13 +264,8 @@ export const ViewClient: React.FC<ViewClientProps> = ({
                     borderRadius: 9999,
                     backgroundColor:
                       activeTab === ClientDetailTab.Reports
-                        ? Color.LightGreen
-                        : Color.White,
-                    borderWidth: 1,
-                    borderColor:
-                      activeTab === ClientDetailTab.Reports
-                        ? "transparent"
-                        : Color.LightGrey,
+                        ? Color.Green
+                        : "transparent",
                   }}
                   onPress={() => setActiveTab(ClientDetailTab.Reports)}
                   activeOpacity={0.7}
@@ -351,9 +344,13 @@ export const ViewClient: React.FC<ViewClientProps> = ({
 
             {/* Content Section */}
             <ScrollView
-              style={{ flex: 1, paddingHorizontal: 20 }}
+              style={{
+                flex: 1,
+                paddingHorizontal: 20,
+                backgroundColor: "#F5F5F5",
+              }}
               showsVerticalScrollIndicator={false}
-              contentContainerStyle={{ paddingBottom: 20 }}
+              contentContainerStyle={{ paddingBottom: 20, flexGrow: 1 }}
             >
               {loading ? (
                 <View
@@ -367,7 +364,7 @@ export const ViewClient: React.FC<ViewClientProps> = ({
                   <ActivityIndicator size="large" color={Color.Green} />
                 </View>
               ) : (
-                <View style={{ paddingBottom: 24 }}>
+                <View style={{ flex: 1 }}>
                   {activeTab === ClientDetailTab.Appointments ? (
                     <View>
                       {/* Appointments content would go here */}
