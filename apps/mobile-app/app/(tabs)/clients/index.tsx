@@ -17,6 +17,7 @@ import {
 import * as ClientHandler from "../../../services/clients/client.handler";
 import { AddClient } from "./addClient";
 import { ClientCardComponent } from "./ClientCard.component";
+import { ViewClient } from "./viewClient";
 
 // Client type for UI
 interface ClientDisplay {
@@ -92,10 +93,12 @@ export default function ClientsScreen({
 }: ClientsScreenProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [clients, setClients] = useState<ClientDisplay[]>([]);
+  const [allClients, setAllClients] = useState<Client[]>([]); // Store client data
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [visibleSection, setVisibleSection] = useState<string>("A");
   const [isAddClientVisible, setIsAddClientVisible] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const scrollViewRef = useRef<ScrollView>(null);
   const sectionRefs = useRef<Record<string, number>>({});
 
@@ -109,6 +112,9 @@ export default function ClientsScreen({
       const apiClients = await ClientHandler.fetchAllClients(userId);
       console.log("Received clients:", apiClients);
       console.log("Number of clients:", apiClients.length);
+
+      // Store client data
+      setAllClients(apiClients);
 
       const displayClients = apiClients.map(mapClientToDisplay);
       console.log("Display clients:", displayClients);
@@ -139,7 +145,16 @@ export default function ClientsScreen({
 
   const handleClientPress = (clientId: string) => {
     console.log("Client pressed:", clientId);
-    // Navigate to client details
+    // Find the client data
+    const client = allClients.find((c) => c.client_id === clientId);
+    if (client) {
+      setSelectedClient(client);
+    }
+  };
+
+  // Handle close from detail view
+  const handleCloseDetail = () => {
+    setSelectedClient(null);
   };
 
   // Handle save client
@@ -171,7 +186,8 @@ export default function ClientsScreen({
         // Create client via API
         const newClient = await ClientHandler.createNewClient(data, userId);
 
-        // Add new client to the list
+        // Add new client to the lists
+        setAllClients([...allClients, newClient]);
         const displayClient = mapClientToDisplay(newClient);
         setClients([...clients, displayClient]);
 
@@ -521,6 +537,27 @@ export default function ClientsScreen({
         onClose={() => setIsAddClientVisible(false)}
         onSave={(data) => void handleSaveClient(data)}
       />
+
+      {/* View Client Modal */}
+      {selectedClient && (
+        <ViewClient
+          client={selectedClient}
+          visible={!!selectedClient}
+          onClose={handleCloseDetail}
+          onViewProfile={() => {
+            console.log("View profile for:", selectedClient.client_id);
+            // Navigate to full profile view
+          }}
+          onShareCalendar={() => {
+            console.log("Share calendar for:", selectedClient.client_id);
+            // Handle calendar sharing
+          }}
+          onCall={() => {
+            console.log("Call client:", selectedClient.contact_number);
+            // Handle call action
+          }}
+        />
+      )}
     </View>
   );
 }
