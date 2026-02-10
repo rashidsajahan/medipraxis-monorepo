@@ -37,7 +37,10 @@ export function buildActionTools(): AIActionTools {
       },
       execute: async (params: Record<string, unknown>) => {
         console.log("[ACTION] manage_client called with:", params);
-        return { success: true, message: "Client management action logged (stub)" };
+        return {
+          success: true,
+          message: "Client management action logged (stub)",
+        };
       },
     },
   };
