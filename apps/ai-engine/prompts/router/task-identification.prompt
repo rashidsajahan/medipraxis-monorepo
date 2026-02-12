@@ -1,5 +1,8 @@
 ---
-model: googleai/gemini-2.5-flash-lite
+model: googleai/gemini-3-flash-preview
+config:
+  thinkingConfig:
+    thinkingLevel: LOW
 input:
   schema:
     message: string
@@ -20,7 +23,7 @@ Based on the medical practitioner's message and conversation history, identify w
 
 If the history shows an ongoing workflow (e.g. an appointment is being booked), classify accordingly even if the latest message is just providing a detail like a name or date.
 
-Respond with ONLY the task category name.
+Respond with the task category name in the "task" field.
 
 Conversation history: {{history}}
 Latest message: "{{message}}"
