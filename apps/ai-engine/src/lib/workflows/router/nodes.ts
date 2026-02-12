@@ -1,6 +1,6 @@
 import type { AIActionType, ChatMessage } from "@repo/models";
 import type { ActionTool } from "./actions";
-import { ai } from "./models";
+import { ai } from "../../models";
 
 export const VALID_TASKS = [
   "greeting",

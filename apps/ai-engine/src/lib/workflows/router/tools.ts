@@ -1,6 +1,6 @@
 import type { AIActionTools } from "./actions";
 
-export function buildActionTools(): AIActionTools {
+export function buildTools(): AIActionTools {
   return {
     appointment: {
       name: "create_appointment",

@@ -1,6 +1,6 @@
 import type { AIActionType, ChatMessage, RouterResponse } from "@repo/models";
 import type { AIActionTools } from "./actions";
-import { ai } from "./models";
+import { ai } from "../../models";
 import {
   generateResponse,
   guardRailCheck,
@@ -20,7 +20,7 @@ export function registerTools(tools: AIActionTools): void {
 async function _processAIQuery(
   query: string,
   history: ChatMessage[],
-  userId?: string
+  userId: string
 ): Promise<RouterResponse> {
   // Node 1: guard rail check
   const guardResult = await ai.run("guardRailCheck", () =>
