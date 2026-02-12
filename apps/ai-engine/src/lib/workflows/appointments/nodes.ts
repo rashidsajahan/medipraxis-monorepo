@@ -1,35 +1,23 @@
-import type { ToolAction } from "genkit";
-import { appointmentTools } from "./tools";
+import type { ChatMessage } from "@repo/models";
+import { ai } from "../../models";
+import "./tools";
 
-interface ToolInfo {
-  name: string;
-  description: string;
-}
+export async function runAgent(
+  query: string,
+  history: ChatMessage[]
+): Promise<{ message: string }> {
+  const prompt = ai.prompt("appointments/appointment-agent");
+  const response = await prompt({
+    query,
+    history:
+      history.length > 0 ? JSON.stringify(history.slice(-5)) : undefined,
+  });
 
-/**
- * Resolves which tools are available for a given intent.
- * Tools are defined at module level and read userId from AsyncLocalStorage context.
- */
-export function resolveTools(
-  intent: "get" | "check" | "all"
-): { tools: ToolAction[]; available: ToolInfo[] } {
-  const intentMap: Record<string, string[]> = {
-    get: ["getAllAppointments"],
-    check: ["checkDateTime"],
-    all: appointmentTools.map((t) => t.__action.name),
-  };
-
-  const names = intentMap[intent] ?? [];
-
-  const matched = appointmentTools.filter((t) =>
-    names.includes(t.__action.name)
-  );
+  const text = response.text;
 
   return {
-    tools: matched,
-    available: matched.map((t) => ({
-      name: t.__action.name,
-      description: t.__action.description ?? "",
-    })),
+    message:
+      text ||
+      "I couldn't process your appointment request. Could you provide more details?",
   };
 }

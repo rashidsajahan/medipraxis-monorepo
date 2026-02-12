@@ -1,7 +1,12 @@
 import type { AIActionType, ChatMessage, RouterResponse } from "@repo/models";
 import { ai } from "../../models";
-import { generateResponse, guardRailCheck, identifyTask, VALID_TASKS } from "./nodes";
-import { runAppointmentWorkflow } from "../appointments/graph";
+import { processAppointments } from "../appointments/graph";
+import {
+  generateResponse,
+  guardRailCheck,
+  identifyTask,
+  VALID_TASKS,
+} from "./nodes";
 
 const WORKFLOW_TASKS: AIActionType[] = ["appointment"];
 const NOT_IMPLEMENTED_TASKS: AIActionType[] = ["client_management"];
@@ -38,14 +43,11 @@ async function _processAIQuery(
     const workflowMap: Partial<
       Record<
         AIActionType,
-        (
-          q: string,
-          h: ChatMessage[],
-          u: string
-        ) => Promise<{ message: string }>
+        (q: string, h: ChatMessage[], u: string) => Promise<{ message: string }>
       >
     > = {
-      appointment: runAppointmentWorkflow,
+      appointment: (q, h, u) =>
+        processAppointments({ query: q, history: h, userId: u }),
     };
 
     const workflow = workflowMap[task];
@@ -79,7 +81,7 @@ async function _processAIQuery(
 }
 
 export const processAIQuery = ai.defineFlow(
-  { name: "processAIQuery" },
+  { name: "aiRouterFlow" },
   ({
     query,
     history = [],
