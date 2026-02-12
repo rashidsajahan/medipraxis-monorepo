@@ -28,7 +28,10 @@ async function sendQuery(userId: string) {
 
   const data = await res.json();
   const elapsed = Date.now() - start;
-  console.log(`[${userId}] Response (${elapsed}ms):`, JSON.stringify(data, null, 2));
+  console.log(
+    `[${userId}] Response (${elapsed}ms):`,
+    JSON.stringify(data, null, 2)
+  );
   return { userId, data };
 }
 

@@ -9,8 +9,7 @@ export async function runAgent(
   const prompt = ai.prompt("appointments/appointment-agent");
   const response = await prompt({
     query,
-    history:
-      history.length > 0 ? JSON.stringify(history.slice(-5)) : undefined,
+    history: history.length > 0 ? JSON.stringify(history.slice(-5)) : undefined,
   });
 
   const text = response.text;

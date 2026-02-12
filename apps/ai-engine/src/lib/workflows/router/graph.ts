@@ -87,7 +87,9 @@ export const processAIQuery = ai.defineFlow(
     inputSchema: z.object({
       query: z.string(),
       history: z
-        .array(z.object({ role: z.enum(["user", "assistant"]), content: z.string() }))
+        .array(
+          z.object({ role: z.enum(["user", "assistant"]), content: z.string() })
+        )
         .optional(),
       userId: z.string(),
     }),
@@ -98,11 +100,7 @@ export const processAIQuery = ai.defineFlow(
       guardRailViolation: z.string().optional(),
     }),
   },
-  ({
-    query,
-    history = [],
-    userId,
-  }) => _processAIQuery(query, history, userId)
+  ({ query, history = [], userId }) => _processAIQuery(query, history, userId)
 );
 
 export { VALID_TASKS };
