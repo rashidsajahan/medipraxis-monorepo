@@ -8,8 +8,10 @@ import {
   runActionChain,
   VALID_TASKS,
 } from "./nodes";
+import { runAppointmentWorkflow } from "../appointments/graph";
 
-const ACTION_TASKS: AIActionType[] = ["appointment", "client_management"];
+const WORKFLOW_TASKS: AIActionType[] = ["appointment"];
+const ACTION_TASKS: AIActionType[] = ["client_management"];
 
 let _registeredTools: AIActionTools = {};
 
@@ -43,6 +45,30 @@ async function _processAIQuery(
   const { task } = await ai.run("identifyTask", () =>
     identifyTask(query, history)
   );
+
+  // Route to dedicated workflows
+  if (WORKFLOW_TASKS.includes(task)) {
+    const workflowMap: Partial<
+      Record<
+        AIActionType,
+        (
+          q: string,
+          h: ChatMessage[],
+          u: string
+        ) => Promise<{ message: string }>
+      >
+    > = {
+      appointment: runAppointmentWorkflow,
+    };
+
+    const workflow = workflowMap[task];
+    if (workflow) {
+      const { message } = await ai.run(`workflow:${task}`, () =>
+        workflow(query, history, userId)
+      );
+      return { task, message, isValid: true };
+    }
+  }
 
   // Route action tasks to their node chains
   if (ACTION_TASKS.includes(task)) {

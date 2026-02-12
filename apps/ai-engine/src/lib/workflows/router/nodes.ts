@@ -13,7 +13,7 @@ export const VALID_TASKS = [
 export async function guardRailCheck(
   message: string
 ): Promise<{ isValid: boolean; violation?: string }> {
-  const prompt = ai.prompt("ai-router/guard-rail-check");
+  const prompt = ai.prompt("router/guard-rail-check");
   const result = await prompt({ message });
   return result.output as { isValid: boolean; violation?: string };
 }
@@ -22,7 +22,7 @@ export async function identifyTask(
   message: string,
   history: ChatMessage[] = []
 ): Promise<{ task: AIActionType }> {
-  const prompt = ai.prompt("ai-router/task-identification");
+  const prompt = ai.prompt("router/task-identification");
   const result = await prompt({
     message,
     history: history.length > 0 ? JSON.stringify(history.slice(-5)) : undefined,
@@ -42,11 +42,11 @@ export async function generateResponse(
   task: AIActionType
 ): Promise<{ message: string }> {
   const promptNameMap: Record<string, string | null> = {
-    greeting: "ai-router/greeting-response",
+    greeting: "router/greeting-response",
     appointment: null,
     client_management: null,
-    general: "ai-router/general-response",
-    unknown: "ai-router/unknown-response",
+    general: "router/general-response",
+    unknown: "router/unknown-response",
   };
 
   const promptName = promptNameMap[task];
@@ -67,7 +67,7 @@ export async function runActionChain(
   userId: string
 ): Promise<{ message: string }> {
   console.log("[ACTION CHAIN] userId:", userId);
-  const prompt = ai.prompt("ai-router/action-chain");
+  const prompt = ai.prompt("router/action-chain");
   const result = await prompt({
     query,
     task,
@@ -98,7 +98,7 @@ export async function generateActionResponse(
   task: AIActionType,
   executionResult: unknown
 ): Promise<{ message: string }> {
-  const prompt = ai.prompt("ai-router/action-response");
+  const prompt = ai.prompt("router/action-response");
   const result = await prompt({
     task,
     result: JSON.stringify(executionResult),
