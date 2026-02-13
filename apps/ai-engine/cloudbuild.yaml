@@ -50,4 +50,4 @@ substitutions:
   _REPO: ai-engine
 
 options:
-  logging: GCS_ONLY
+  logging: CLOUD_LOGGING_ONLY
