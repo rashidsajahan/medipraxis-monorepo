@@ -6,6 +6,8 @@ steps:
         "build",
         "-f",
         "apps/ai-engine/Dockerfile",
+        "--cache-from",
+        "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/ai-engine:latest",
         "-t",
         "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/ai-engine:$BUILD_ID",
         "-t",
