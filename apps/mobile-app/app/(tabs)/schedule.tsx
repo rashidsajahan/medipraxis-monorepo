@@ -6,6 +6,7 @@ import {
   CalendarComponent,
 } from "@/components/advanced";
 import { ViewAppointmentModal } from "@/components/advanced/shedule/ViewAppointmentModal";
+import { useGetTaskById } from "@/services/tasks/useGetTaskById";
 import { useEffect, useState } from "react";
 import { Alert, StyleSheet } from "react-native";
 
@@ -15,31 +16,36 @@ export default function ScheduleScreen() {
     null
   );
   const [modalVisible, setModalVisible] = useState(false);
+  const [viewApptReadOnly, setViewApptReadOnly] = useState(true);
 
-  // Debug toast when appointment/reminder is selected
-  // TODO: Implement proper navigation to detail popups/screens
+  // Use the mutation hook to fetch task by ID
+  const { mutate: fetchTask, data: appointmentData } = useGetTaskById({
+    onSuccess: () => {
+      setModalVisible(true);
+    },
+    onError: (message) => {
+      console.error("Failed to load appointment:", message);
+      Alert.alert("Error", message);
+      setSelectedTask(null);
+    },
+  });
+
+  // Trigger fetch when appointment is selected
   useEffect(() => {
-    if (selectedTask) {
-      if (selectedTask.type === AgendaSelectionType.Appointment) {
-        // Alert.alert(
-        //   "Appointment Selected",
-        //   `Appointment ID: ${selectedTask.appointmentId}\nGroup ID: ${selectedTask.groupId || "null"}`,
-        //   [{ text: "OK", onPress: () => setSelectedTask(null) }]
-        // );
-        setModalVisible(true);
-      } else if (selectedTask.type === AgendaSelectionType.EmptySlot) {
-        Alert.alert(
-          "Empty Slot Selected",
-          `Group ID: ${selectedTask.groupId}\nSlot Number: ${selectedTask.slotNumber}`,
-          [{ text: "OK", onPress: () => setSelectedTask(null) }]
-        );
-      } else if (selectedTask.type === AgendaSelectionType.Reminder) {
-        Alert.alert(
-          "Reminder Selected",
-          `Reminder ID: ${selectedTask.reminderId}`,
-          [{ text: "OK", onPress: () => setSelectedTask(null) }]
-        );
-      }
+    if (selectedTask?.type === AgendaSelectionType.Appointment) {
+      fetchTask({ task_id: selectedTask.appointmentId });
+    } else if (selectedTask?.type === AgendaSelectionType.EmptySlot) {
+      Alert.alert(
+        "Empty Slot Selected",
+        `Group ID: ${selectedTask.groupId}\nSlot Number: ${selectedTask.slotNumber}`,
+        [{ text: "OK", onPress: () => setSelectedTask(null) }]
+      );
+    } else if (selectedTask?.type === AgendaSelectionType.Reminder) {
+      Alert.alert(
+        "Reminder Selected",
+        `Reminder ID: ${selectedTask.reminderId}`,
+        [{ text: "OK", onPress: () => setSelectedTask(null) }]
+      );
     }
   }, [selectedTask]);
 
@@ -135,18 +141,29 @@ export default function ScheduleScreen() {
   const handleCloseModal = () => {
     setModalVisible(false);
     setSelectedTask(null);
+    // setAppointmentData(null);
   };
 
-  const data = {
-    title: "title",
-    slotWindow: "Sat 9-11PM",
-    slotNo: 5,
-    location: "Care - Medical Centre",
-    client: "Jennifer ( 012 3456789 )",
-    start_date: "Nov 15, 2025  08:00 am",
-    end_date: "Nov 15, 2025  11:30 am",
-    note: "",
-  };
+  // Format task data for modal display
+  //   const modalData = appointmentData
+  //     ? {
+  //         title: appointmentData.task_title || "Appointment",
+  //         slotWindow: appointmentData.slot_window_id || "N/A",
+  //         slotNo: appointmentData.appointment_number || 0,
+  //         client: appointmentData.client_id || "N/A",
+  //         start_date: appointmentData.start_date || "N/A",
+  //         end_date: appointmentData.end_date || "N/A",
+  //         note: appointmentData.note || "",
+  //       }
+  //     : {
+  //         title: "Loading...",
+  //         slotWindow: "",
+  //         slotNo: 0,
+  //         client: "",
+  //         start_date: "",
+  //         end_date: "",
+  //         note: "",
+  //       };
 
   return (
     <View style={styles.container}>
@@ -157,7 +174,8 @@ export default function ScheduleScreen() {
         onAppointmentPress={(appointment, groupId) =>
           setSelectedTask({
             type: AgendaSelectionType.Appointment,
-            appointmentId: appointment.id,
+            // appointmentId: appointment.id,
+            appointmentId: "08c6d070-7d58-48d5-8cc1-7486952b5cd2",
             groupId,
           })
         }
@@ -177,10 +195,13 @@ export default function ScheduleScreen() {
       />
       <ViewAppointmentModal
         visible={modalVisible}
-        data={data}
+        data={appointmentData?.task!}
         onClose={handleCloseModal}
-        onEdit={() => Alert.alert("Edit")}
+        onEdit={() => {
+          setViewApptReadOnly(false);
+        }}
         onCancel={handleCloseModal}
+        readOnly={viewApptReadOnly}
       />
     </View>
   );

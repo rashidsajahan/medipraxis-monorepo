@@ -94,6 +94,7 @@ const usernameSchema = z
     validationSchema={passwordSchema}
     helperText="Password must be at least 8 characters with uppercase, lowercase, and number"
     validateOnChange={true}
+    startIcon={<Icons.CalendarDotsIcon size={20} weight="bold" color="#4B5563"/>}
 />
 
 <TextInputComponent.OTPField
@@ -181,6 +182,7 @@ const countryOptions = [
     placeholder="Select a country"
     validationSchema={requiredSchema}
     validateOnChange={true}
+    readOnly={true}
 />
 ```
 

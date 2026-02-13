@@ -1,24 +1,16 @@
+import { DropdownComponent, TextInputComponent } from "@/components/basic";
 import { Text, View } from "@/components/Themed";
 import { Icons } from "@/config";
+import { Task, TaskDetails } from "@repo/models";
 import { Modal, Pressable, ScrollView, StyleSheet } from "react-native";
-
-interface AppointmentData {
-  title: string;
-  slotWindow: string;
-  slotNo: number;
-  location: string;
-  client: string;
-  start_date: string;
-  end_date: string;
-  note: string;
-}
 
 interface ViewAppointmentModalProps {
   visible: boolean;
-  data: AppointmentData;
+  data: TaskDetails;
   onClose: () => void;
   onEdit?: () => void;
   onCancel?: () => void;
+  readOnly?: boolean;
 }
 
 export const ViewAppointmentModal = ({
@@ -27,6 +19,7 @@ export const ViewAppointmentModal = ({
   onClose,
   onEdit,
   onCancel,
+  readOnly = false,
 }: ViewAppointmentModalProps) => {
   const handleEdit = () => {
     onEdit?.();
@@ -50,61 +43,110 @@ export const ViewAppointmentModal = ({
             contentContainerStyle={styles.cardContent}
             showsVerticalScrollIndicator={false}
           >
-            <Text style={styles.headerTitle}>{data.title}</Text>
-
+            <Text style={styles.headerTitle}>{data?.task_title}</Text>
             {/* Row 1: Slot Window & Slot No */}
             <View style={styles.row}>
               <View style={{ flex: 1, marginRight: 10 }}>
-                <Text style={styles.label}>Slot Window</Text>
-                <View style={[styles.inputContainer, styles.dropdown]}>
-                  <Text style={styles.inputText}>{data.slotWindow}</Text>
-                  <Icons.CaretDown size={16} color="#6B7280" />
-                </View>
+                <DropdownComponent
+                  value={data?.slot_window_id!.toString()}
+                  onValueChange={() => {}}
+                  options={[
+                    {
+                      value: data?.slot_window_id!.toString() ?? "",
+                      label: data?.slot_window_id!.toString() ?? "",
+                    },
+                  ]}
+                  label="Slot Window"
+                  readOnly={readOnly}
+                />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.label}>Slot No.</Text>
-                <View style={[styles.inputContainer, styles.dropdown]}>
-                  <Text style={styles.inputText}>{data.slotNo}</Text>
-                  <Icons.CaretDown size={16} color="#6B7280" />
-                </View>
+                <DropdownComponent
+                  value={data?.appointment_number!.toString()}
+                  onValueChange={() => {}}
+                  options={[
+                    {
+                      value: data?.appointment_number!.toString() ?? "",
+                      label: data?.appointment_number!.toString() ?? "",
+                    },
+                  ]}
+                  label="Slot No."
+                  readOnly={readOnly}
+                />
               </View>
             </View>
-
             {/* Client Details */}
-            <Text style={styles.label}>Client Details</Text>
-            <View style={[styles.inputContainer, styles.dropdown]}>
-              <Text style={styles.inputText}>{data.client}</Text>
-              <Icons.CaretDown size={16} color="#6B7280" />
+            <View style={styles.row}>
+              <DropdownComponent
+                value={data?.client_id!}
+                onValueChange={() => {}}
+                options={[
+                  {
+                    value: data?.client_id ?? "",
+                    label: `${data?.client_first_name ?? ""} ${data?.client_last_name ?? ""}`,
+                  },
+                ]}
+                label="Client Details"
+                readOnly={readOnly}
+              />
             </View>
-
             {/* Start Date */}
-            <Text style={styles.label}>Start Date & time</Text>
-            <View style={styles.inputContainer}>
-              <Icons.CalendarDotsIcon
-                size={20}
-                color="#4B5563"
-                weight="bold"
-                style={styles.iconLeft}
+            <View style={styles.row}>
+              <TextInputComponent
+                label="Start Date & time"
+                startIcon={
+                  <Icons.CalendarDotsIcon
+                    size={20}
+                    weight="bold"
+                    color="#4B5563"
+                  />
+                }
+                inputField={{
+                  placeholder: "Enter Start Date & time",
+                  value: data?.start_date,
+                  onChangeText: () => {},
+                }}
+                inputWrapper={{
+                  accessibilityHint: "Enter Start Date & time",
+                  isDisabled: readOnly,
+                }}
               />
-              <Text style={styles.inputText}>{data.start_date}</Text>
             </View>
-
             {/* End Date */}
-            <Text style={styles.label}>End Date & time</Text>
-            <View style={styles.inputContainer}>
-              <Icons.CalendarDotsIcon
-                size={20}
-                color="#4B5563"
-                weight="bold"
-                style={styles.iconLeft}
+            <View style={styles.row}>
+              <TextInputComponent
+                label="End Date & time"
+                startIcon={
+                  <Icons.CalendarDotsIcon
+                    size={20}
+                    weight="bold"
+                    color="#4B5563"
+                  />
+                }
+                inputField={{
+                  placeholder: "Enter End Date & time",
+                  value: data?.start_date,
+                  onChangeText: () => {},
+                }}
+                inputWrapper={{
+                  accessibilityHint: "Enter End Date & time",
+                  isDisabled: readOnly,
+                }}
               />
-              <Text style={styles.inputText}>{data.end_date}</Text>
             </View>
-
             {/* Note */}
-            <Text style={styles.label}>Note</Text>
-            <View style={[styles.inputContainer, styles.textAreaContainer]}>
-              <Text style={styles.noteText}>{data.note}</Text>
+            <View style={styles.row}>
+              <TextInputComponent
+                inputWrapper={{
+                  accessibilityHint: "Enter your note",
+                }}
+                inputField={{
+                  value: data?.note ?? undefined,
+                  onChangeText: () => {},
+                  placeholder: "Enter note",
+                }}
+                label="Note"
+              />
             </View>
           </ScrollView>
 
