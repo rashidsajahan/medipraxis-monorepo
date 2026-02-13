@@ -1,7 +1,7 @@
 import { DropdownComponent, TextInputComponent } from "@/components/basic";
 import { Text, View } from "@/components/Themed";
 import { Icons } from "@/config";
-import { Task, TaskDetails } from "@repo/models";
+import { TaskDetails } from "@repo/models";
 import { Modal, Pressable, ScrollView, StyleSheet } from "react-native";
 
 interface ViewAppointmentModalProps {

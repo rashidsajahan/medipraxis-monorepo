@@ -174,8 +174,8 @@ export default function ScheduleScreen() {
         onAppointmentPress={(appointment, groupId) =>
           setSelectedTask({
             type: AgendaSelectionType.Appointment,
-            // appointmentId: appointment.id,
-            appointmentId: "08c6d070-7d58-48d5-8cc1-7486952b5cd2",
+            appointmentId: appointment.id,
+            // appointmentId: "08c6d070-7d58-48d5-8cc1-7486952b5cd2",
             groupId,
           })
         }
