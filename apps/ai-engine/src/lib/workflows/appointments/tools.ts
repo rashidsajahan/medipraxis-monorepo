@@ -51,9 +51,10 @@ export const getAllAppointments = ai.defineTool(
       .filter((task) => task.start_date.startsWith(targetDate))
       .map((task) => ({
         id: task.task_id,
-        clientName: [task.client_first_name, task.client_last_name]
-          .filter(Boolean)
-          .join(" ") || "Unknown",
+        clientName:
+          [task.client_first_name, task.client_last_name]
+            .filter(Boolean)
+            .join(" ") || "Unknown",
         date: task.start_date.split("T")[0]!,
         startTime: task.start_date.split("T")[1]?.slice(0, 5) ?? "",
         endTime: task.end_date.split("T")[1]?.slice(0, 5) ?? "",
