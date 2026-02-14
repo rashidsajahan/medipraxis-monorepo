@@ -1,21 +1,41 @@
-import { processAIQuery, type RouterResponse } from "@repo/ai-lib";
+import type { ChatMessage, RouterResponse } from "@repo/models";
 
 export class AIService {
-  private apiKey: string;
+  constructor(
+    private readonly aiEngineUrl: string,
+    private readonly aiEngineApiKey: string
+  ) {}
 
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
-  }
+  async query(
+    query: string,
+    history: ChatMessage[] = [],
+    userId: string
+  ): Promise<RouterResponse> {
+    const response = await fetch(`${this.aiEngineUrl}/api/ai/query`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": this.aiEngineApiKey,
+      },
+      body: JSON.stringify({ query, history, userId }),
+    });
 
-  async processQuery(query: string): Promise<RouterResponse> {
-    if (!this.apiKey) {
-      throw new Error("AI service is not available");
+    if (!response.ok) {
+      const errorBody = await response.text();
+      throw new Error(
+        `AI Engine request failed (${response.status}): ${errorBody}`
+      );
     }
 
-    const response = await processAIQuery(query, this.apiKey);
+    const result = (await response.json()) as {
+      success: boolean;
+      data: RouterResponse;
+    };
 
-    // TODO: Implement necessary workflows based on response.shouldCallWorkflow
+    if (!result.success) {
+      throw new Error("AI Engine returned unsuccessful response");
+    }
 
-    return response;
+    return result.data;
   }
 }
