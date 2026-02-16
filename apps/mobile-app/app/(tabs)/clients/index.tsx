@@ -1,10 +1,9 @@
 import { ButtonComponent, ButtonSize, TextComponent } from "@/components/basic";
 import { View } from "@/components/Themed";
 import { Input, InputField, InputSlot } from "@/components/ui/input";
-import { Icons, type IconName } from "@/config";
+import { Icons } from "@/config";
 import { Color, Font, TextSize, TextVariant, textStyles } from "@repo/config";
-import type { Client } from "@repo/models";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   ActivityIndicator,
   ScrollView,
@@ -14,74 +13,16 @@ import {
   type NativeSyntheticEvent,
   type TextStyle as RNTextStyle,
 } from "react-native";
-import * as ClientHandler from "../../../services/clients/client.handler";
+import {
+  groupClientsByLetter,
+  useCreateClient,
+  useFetchClients,
+} from "../../../services/clients";
 import { AddClient } from "./addClient";
 import { ClientCardComponent } from "./ClientCard.component";
 
-// Client type for UI
-interface ClientDisplay {
-  id: string;
-  name: string;
-  initial: string;
-  color: string;
-  icon: IconName;
-}
-
 // Text styles
 const textLargeStyle = textStyles[TextVariant.Body][TextSize.Large];
-
-// Group clients by first letter
-const groupClientsByLetter = (clients: ClientDisplay[]) => {
-  const grouped: Record<string, ClientDisplay[]> = {};
-  clients.forEach((client) => {
-    const firstChar = client.name.charAt(0);
-    if (firstChar) {
-      const letter = firstChar.toUpperCase();
-      if (!grouped[letter]) {
-        grouped[letter] = [];
-      }
-      grouped[letter].push(client);
-    }
-  });
-  return grouped;
-};
-
-// Helper function to get random color
-const getRandomColor = (): string => {
-  const colors = [
-    "#F4D03F",
-    "#85C1E9",
-    "#BB8FCE",
-    "#F8B739",
-    "#82E0AA",
-    "#F1948A",
-    "#AED6F1",
-    "#D7BDE2",
-    "#F9E79F",
-  ];
-  const randomIndex = Math.floor(Math.random() * colors.length);
-  return colors[randomIndex]!;
-};
-
-// Helper function to get random icon
-const getRandomIcon = (): IconName => {
-  const icons: IconName[] = ["Heart", "Star", "Check", "Plus"];
-  return icons[Math.floor(Math.random() * icons.length)] || "Heart";
-};
-
-// Map API Client to ClientDisplay
-const mapClientToDisplay = (client: Client): ClientDisplay => {
-  // Construct full name from first_name and last_name
-  const fullName = `${client.first_name} ${client.last_name || ""}`.trim();
-
-  return {
-    id: client.client_id,
-    name: fullName,
-    initial: client.first_name.charAt(0).toUpperCase(),
-    color: getRandomColor(),
-    icon: getRandomIcon(),
-  };
-};
 
 interface ClientsScreenProps {
   userId?: string; // Will use default if not provided
@@ -91,43 +32,16 @@ export default function ClientsScreen({
   userId = "2a3c19b8-d352-4b30-a2ac-1cdf993d310c", // Default hard coded user ID
 }: ClientsScreenProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [clients, setClients] = useState<ClientDisplay[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [visibleSection, setVisibleSection] = useState<string>("A");
   const [isAddClientVisible, setIsAddClientVisible] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
   const sectionRefs = useRef<Record<string, number>>({});
 
-  // Fetch clients from API
-  const fetchClients = useCallback(async (): Promise<void> => {
-    try {
-      setLoading(true);
-      setError(null);
+  // Fetch clients using React Query
+  const { data: clients = [], isLoading } = useFetchClients(userId);
 
-      console.log("Fetching clients for userId:", userId);
-      const apiClients = await ClientHandler.fetchAllClients(userId);
-      console.log("Received clients:", apiClients);
-      console.log("Number of clients:", apiClients.length);
-
-      const displayClients = apiClients.map(mapClientToDisplay);
-      console.log("Display clients:", displayClients);
-
-      setClients(displayClients);
-    } catch (err) {
-      console.error("Error fetching clients:", err);
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to fetch clients";
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  }, [userId]);
-
-  // Fetch clients on mount
-  useEffect(() => {
-    void fetchClients();
-  }, [fetchClients]);
+  // Create client mutation
+  const createClientMutation = useCreateClient(userId);
 
   // Filter clients based on search
   const filteredClients = clients.filter((client) =>
@@ -144,46 +58,8 @@ export default function ClientsScreen({
 
   // Handle save client
   const handleSaveClient = async (clientData: unknown): Promise<void> => {
-    console.log("Saving client:", clientData);
-
-    // Type guard to ensure clientData has required properties
-    if (
-      clientData &&
-      typeof clientData === "object" &&
-      "firstName" in clientData &&
-      typeof clientData.firstName === "string"
-    ) {
-      const data = clientData as {
-        firstName: string;
-        lastName?: string | null;
-        title?: string;
-        gender?: "MALE" | "FEMALE" | "OTHER";
-        dateOfBirth?: string;
-        contactNumber?: string;
-        emergencyContactName?: string;
-        emergencyContactNumber?: string;
-        emergencyContactRelationship?: string;
-        knownConditions?: string[] | null;
-        note?: string | null;
-      };
-
-      try {
-        // Create client via API
-        const newClient = await ClientHandler.createNewClient(data, userId);
-
-        // Add new client to the list
-        const displayClient = mapClientToDisplay(newClient);
-        setClients([...clients, displayClient]);
-
-        // Close modal
-        setIsAddClientVisible(false);
-      } catch (err) {
-        console.error("Error creating client:", err);
-        const errorMessage =
-          err instanceof Error ? err.message : "Failed to create client";
-        setError(errorMessage);
-      }
-    }
+    await createClientMutation.mutateAsync(clientData as any);
+    setIsAddClientVisible(false);
   };
 
   // Handle alphabet letter press to scroll to section
@@ -219,7 +95,7 @@ export default function ClientsScreen({
   };
 
   // Loading state
-  if (loading) {
+  if (isLoading) {
     return (
       <View className="flex-1 justify-center items-center">
         <ActivityIndicator size="large" color={Color.Green} />
@@ -230,38 +106,6 @@ export default function ClientsScreen({
         >
           Loading clients...
         </TextComponent>
-      </View>
-    );
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <View className="flex-1 justify-center items-center px-5">
-        <Icons.Info size={48} color={Color.Danger} />
-        <TextComponent
-          variant={TextVariant.Title}
-          size={TextSize.Medium}
-          style={{ marginTop: 16, color: Color.Danger }}
-        >
-          Error Loading Clients
-        </TextComponent>
-        <TextComponent
-          variant={TextVariant.Body}
-          size={TextSize.Medium}
-          style={{ marginTop: 8, color: Color.Grey, textAlign: "center" }}
-        >
-          {error}
-        </TextComponent>
-        <ButtonComponent
-          size={ButtonSize.Medium}
-          buttonColor={Color.Green}
-          textColor={Color.White}
-          onPress={() => void fetchClients()}
-          style={{ marginTop: 24 }}
-        >
-          Retry
-        </ButtonComponent>
       </View>
     );
   }

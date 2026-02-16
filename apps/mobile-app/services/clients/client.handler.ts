@@ -1,8 +1,6 @@
+import { apiClient } from "@/lib/api-client";
 import type { Client } from "@repo/models";
 import { parsePhoneNumber } from "libphonenumber-js";
-
-// Base URL - configure this based on your environment
-const API_BASE_URL = "http://localhost:8787"; // Hardcoded for development
 
 // API Response types
 interface FetchClientsResponse {
@@ -26,26 +24,20 @@ interface CheckPhoneResponse {
 // Fetch all clients for a user
 export async function fetchAllClients(userId: string): Promise<Client[]> {
   try {
-    console.log(
-      `Fetching clients from: ${API_BASE_URL}/api/clients?user_id=${userId}`
-    );
+    console.log(`Fetching clients for user_id: ${userId}`);
 
-    const response = await fetch(
-      `${API_BASE_URL}/api/clients?user_id=${userId}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await apiClient.api.clients.$get({
+      query: {
+        user_id: userId,
+      },
+    });
 
     console.log("Response status:", response.status);
     console.log("Response ok:", response.ok);
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Error response:", errorText);
+      const errorData = await response.json();
+      console.error("Error response:", errorData);
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
@@ -61,7 +53,7 @@ export async function fetchAllClients(userId: string): Promise<Client[]> {
   }
 }
 
-//Create a new client
+// Create a new client
 export async function createNewClient(
   clientData: {
     title?: string | null;
@@ -132,12 +124,8 @@ export async function createNewClient(
       contact_id: null,
     };
 
-    const response = await fetch(`${API_BASE_URL}/api/clients`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
+    const response = await apiClient.api.clients.$post({
+      json: payload,
     });
 
     if (!response.ok) {
@@ -157,10 +145,9 @@ export async function createNewClient(
 // Get a single client by ID
 export async function getClientById(clientId: string): Promise<Client | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/clients/${clientId}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await apiClient.api.clients[":id"].$get({
+      param: {
+        id: clientId,
       },
     });
 
@@ -182,17 +169,12 @@ export async function checkPhoneExists(
   contactNumber: string
 ): Promise<{ exists: boolean; clients: Client[] }> {
   try {
-    const response = await fetch(
-      `${API_BASE_URL}/api/clients/check-phone?country_code=${encodeURIComponent(
-        countryCode
-      )}&contact_number=${encodeURIComponent(contactNumber)}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await apiClient.api.clients["check-phone"].$get({
+      query: {
+        country_code: countryCode,
+        contact_number: contactNumber,
+      },
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
