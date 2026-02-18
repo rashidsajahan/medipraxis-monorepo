@@ -30,6 +30,7 @@ export interface Field {
   icon: Icon;
   isRequired: boolean;
   isShareEnabled: boolean;
+  sequence: number;
 }
 
 export interface AddFieldModalProps {
@@ -52,4 +53,8 @@ export interface AddFieldModalProps {
 export interface FieldItemProps {
   field: Field;
   onPress: () => void;
+  onDragStart?: () => void;
+  onDragMove?: (y: number) => void;
+  onDragEnd?: () => void;
+  isDragging?: boolean;
 }

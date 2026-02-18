@@ -33,6 +33,8 @@ export function FormConfig({ visible, onClose, formTitle }: FormConfigProps) {
   const [fields, setFields] = useState<Field[]>([]);
   const [showAddFieldModal, setShowAddFieldModal] = useState(false);
   const [editingFieldId, setEditingFieldId] = useState<string | null>(null);
+  const [draggingFieldId, setDraggingFieldId] = useState<string | null>(null);
+  const [dragStartY, setDragStartY] = useState<number>(0);
 
   const handleAddNewField = () => {
     setEditingFieldId(null);
@@ -74,6 +76,8 @@ export function FormConfig({ visible, onClose, formTitle }: FormConfigProps) {
       );
     } else {
       // Add new field
+      const maxSequence =
+        fields.length > 0 ? Math.max(...fields.map((f) => f.sequence)) : 0;
       const newField: Field = {
         id: Date.now().toString(),
         fieldType: fieldData.fieldType,
@@ -81,9 +85,87 @@ export function FormConfig({ visible, onClose, formTitle }: FormConfigProps) {
         icon: fieldTypeOption.icon,
         isRequired: fieldData.isRequired,
         isShareEnabled: fieldData.isShareEnabled,
+        sequence: maxSequence + 1,
       };
-      setFields((prev) => [...prev, newField]);
+      setFields((prev) =>
+        [...prev, newField].sort((a, b) => a.sequence - b.sequence)
+      );
     }
+  };
+
+  const moveFieldUp = (fieldId: string) => {
+    const sortedFields = [...fields].sort((a, b) => a.sequence - b.sequence);
+    const currentIndex = sortedFields.findIndex((f) => f.id === fieldId);
+
+    if (currentIndex <= 0 || currentIndex >= sortedFields.length) return;
+
+    const currentField = sortedFields[currentIndex];
+    const previousField = sortedFields[currentIndex - 1];
+
+    // Swap sequences with previous field
+    const updatedFields = fields.map((f) => {
+      if (f.id === currentField?.id) {
+        return { ...f, sequence: previousField?.sequence ?? f.sequence };
+      }
+      if (f.id === previousField?.id) {
+        return { ...f, sequence: currentField?.sequence ?? f.sequence };
+      }
+      return f;
+    });
+
+    setFields(updatedFields);
+  };
+
+  const moveFieldDown = (fieldId: string) => {
+    const sortedFields = [...fields].sort((a, b) => a.sequence - b.sequence);
+    const currentIndex = sortedFields.findIndex((f) => f.id === fieldId);
+
+    if (currentIndex < 0 || currentIndex >= sortedFields.length - 1) return;
+
+    const currentField = sortedFields[currentIndex];
+    const nextField = sortedFields[currentIndex + 1];
+
+    // Swap sequences with next field
+    const updatedFields = fields.map((f) => {
+      if (f.id === currentField?.id) {
+        return { ...f, sequence: nextField?.sequence ?? f.sequence };
+      }
+      if (f.id === nextField?.id) {
+        return { ...f, sequence: currentField?.sequence ?? f.sequence };
+      }
+      return f;
+    });
+
+    setFields(updatedFields);
+  };
+
+  const handleDragStart = (fieldId: string) => {
+    setDraggingFieldId(fieldId);
+    setDragStartY(0);
+  };
+
+  const handleDragMove = (_fieldId: string, y: number) => {
+    if (dragStartY === 0) {
+      setDragStartY(y);
+    } else if (draggingFieldId) {
+      const deltaY = y - dragStartY;
+      const threshold = 60; // Pixels to move before swapping
+
+      if (deltaY < -threshold) {
+        // Dragged up
+        moveFieldUp(draggingFieldId);
+        setDragStartY(y);
+      } else if (deltaY > threshold) {
+        // Dragged down
+        moveFieldDown(draggingFieldId);
+        setDragStartY(y);
+      }
+    }
+  };
+
+  const handleDragEnd = (_fieldId: string) => {
+    setDraggingFieldId(null);
+    setDragStartY(0);
   };
 
   const getEditingFieldData = () => {
@@ -130,13 +212,19 @@ export function FormConfig({ visible, onClose, formTitle }: FormConfigProps) {
             </TouchableOpacity>
 
             {/* Display Fields */}
-            {fields.map((field) => (
-              <FieldItem
-                key={field.id}
-                field={field}
-                onPress={() => handleEditField(field.id)}
-              />
-            ))}
+            {[...fields]
+              .sort((a, b) => a.sequence - b.sequence)
+              .map((field) => (
+                <FieldItem
+                  key={field.id}
+                  field={field}
+                  onPress={() => handleEditField(field.id)}
+                  onDragStart={() => handleDragStart(field.id)}
+                  onDragMove={(y) => handleDragMove(field.id, y)}
+                  onDragEnd={() => handleDragEnd(field.id)}
+                  isDragging={draggingFieldId === field.id}
+                />
+              ))}
 
             {/* Add New Field Button */}
             <TouchableOpacity
