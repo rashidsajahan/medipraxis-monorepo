@@ -7,7 +7,7 @@ import {
 import { Lato_400Regular, Lato_700Bold } from "@expo-google-fonts/lato";
 import { Color, TextSize, TextVariant } from "@repo/config";
 import { useFonts } from "expo-font";
-import React from "react";
+import React, { useState } from "react";
 import {
   Modal,
   ScrollView,
@@ -16,7 +16,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import type { FormConfigProps } from "./FormConfig.types";
+import { AddFieldModal } from "./AddFieldModal.component";
+import type { FormConfigProps } from "./formConfig.types";
 
 export function FormConfig({ visible, onClose, formTitle }: FormConfigProps) {
   const [fontsLoaded] = useFonts({
@@ -27,50 +28,78 @@ export function FormConfig({ visible, onClose, formTitle }: FormConfigProps) {
     Lato_700Bold,
   });
 
+  const [showAddFieldModal, setShowAddFieldModal] = useState(false);
+
+  const handleAddNewField = () => {
+    setShowAddFieldModal(true);
+  };
+
+  const handleSaveField = (fieldData: {
+    fieldType: string;
+    fieldName: string;
+    isRequired: boolean;
+    isShareEnabled: boolean;
+  }) => {
+    console.log("Field saved:", fieldData);
+    // TODO: Add field to form configuration
+  };
+
   if (!fontsLoaded) {
     return null;
   }
 
   return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      presentationStyle="pageSheet"
-    >
-      <View style={styles.container}>
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-        >
-          {/* Title */}
-          <TextComponent
-            variant={TextVariant.Title}
-            size={TextSize.Large}
-            color={Color.Black}
-            style={styles.heading}
+    <>
+      <Modal
+        visible={visible}
+        animationType="slide"
+        presentationStyle="pageSheet"
+      >
+        <View style={styles.container}>
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
           >
-            {formTitle}
-          </TextComponent>
+            {/* Title */}
+            <TextComponent
+              variant={TextVariant.Title}
+              size={TextSize.Large}
+              color={Color.Black}
+              style={styles.heading}
+            >
+              {formTitle}
+            </TextComponent>
 
-          {/* Add Description Button */}
-          <TouchableOpacity style={styles.addDescriptionButton}>
-            <Text style={styles.addDescriptionText}>+ Add Description</Text>
-          </TouchableOpacity>
+            {/* Add Description Button */}
+            <TouchableOpacity style={styles.addDescriptionButton}>
+              <Text style={styles.addDescriptionText}>+ Add Description</Text>
+            </TouchableOpacity>
 
-          {/* Add New Field Button */}
-          <TouchableOpacity style={styles.addFieldButton}>
-            <Text style={styles.addFieldText}>+ Add New Field</Text>
-          </TouchableOpacity>
-        </ScrollView>
+            {/* Add New Field Button */}
+            <TouchableOpacity
+              style={styles.addFieldButton}
+              onPress={handleAddNewField}
+            >
+              <Text style={styles.addFieldText}>+ Add New Field</Text>
+            </TouchableOpacity>
+          </ScrollView>
 
-        {/* Action Footer */}
-        <View style={styles.actionSection}>
-          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <Text style={styles.closeButtonText}>Close</Text>
-          </TouchableOpacity>
+          {/* Action Footer */}
+          <View style={styles.actionSection}>
+            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-    </Modal>
+      </Modal>
+
+      {/* Add Field Modal */}
+      <AddFieldModal
+        visible={showAddFieldModal}
+        onClose={() => setShowAddFieldModal(false)}
+        onSave={handleSaveField}
+      />
+    </>
   );
 }
 

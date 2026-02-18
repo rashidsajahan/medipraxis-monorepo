@@ -1,5 +1,35 @@
+import type { Icon } from "phosphor-react-native";
+
 export type FormConfigProps = {
   visible: boolean;
   onClose: () => void;
   formTitle: string;
 };
+
+export interface FieldTypeOption {
+  id: string;
+  label: string;
+  icon: Icon;
+  disabled?: boolean;
+  disabledForForms?: string[]; // Form IDs where this field type is disabled
+}
+
+export interface FieldTypePickerProps {
+  value: string;
+  onValueChange: (value: string) => void;
+  options: FieldTypeOption[];
+  placeholder?: string;
+  label?: string;
+  formType?: string; // Used to determine which fields should be disabled
+}
+
+export interface AddFieldModalProps {
+  visible: boolean;
+  onClose: () => void;
+  onSave?: (fieldData: {
+    fieldType: string;
+    fieldName: string;
+    isRequired: boolean;
+    isShareEnabled: boolean;
+  }) => void;
+}
