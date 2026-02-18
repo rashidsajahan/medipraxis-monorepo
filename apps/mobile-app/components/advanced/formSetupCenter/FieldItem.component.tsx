@@ -70,12 +70,14 @@ export function FieldItem({
   const handleMouseDown = (e: any) => {
     if (Platform.OS === "web") {
       e.preventDefault();
+      e.stopPropagation();
       isDraggingRef.current = true;
       dragStartY.current = e.clientY || e.pageY;
       onDragStart?.();
 
       const handleMouseMove = (e: MouseEvent) => {
         if (isDraggingRef.current) {
+          e.preventDefault();
           onDragMove?.(e.clientY || e.pageY);
         }
       };
@@ -117,7 +119,7 @@ export function FieldItem({
       </TouchableOpacity>
 
       {/* Drag Handle Section */}
-      <TouchableOpacity
+      <View
         style={[
           styles.dragHandle,
           isDragging && styles.dragHandleActive,
@@ -126,13 +128,12 @@ export function FieldItem({
             Platform.OS === "web" &&
             ({ cursor: "grabbing" } as any),
         ]}
-        activeOpacity={0.8}
         {...(Platform.OS !== "web" ? panResponder.panHandlers : {})}
         // @ts-ignore - web-specific event
-        onMouseDown={handleMouseDown}
+        onMouseDown={Platform.OS === "web" ? handleMouseDown : undefined}
       >
         <DotsSixVerticalIcon size={20} color={Color.Grey} weight="bold" />
-      </TouchableOpacity>
+      </View>
     </View>
   );
 }

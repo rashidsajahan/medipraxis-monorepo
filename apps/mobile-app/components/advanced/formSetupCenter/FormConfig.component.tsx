@@ -7,7 +7,7 @@ import {
 import { Lato_400Regular, Lato_700Bold } from "@expo-google-fonts/lato";
 import { Color, TextSize, TextVariant } from "@repo/config";
 import { useFonts } from "expo-font";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Modal,
   ScrollView,
@@ -34,7 +34,8 @@ export function FormConfig({ visible, onClose, formTitle }: FormConfigProps) {
   const [showAddFieldModal, setShowAddFieldModal] = useState(false);
   const [editingFieldId, setEditingFieldId] = useState<string | null>(null);
   const [draggingFieldId, setDraggingFieldId] = useState<string | null>(null);
-  const [dragStartY, setDragStartY] = useState<number>(0);
+  const draggingFieldIdRef = useRef<string | null>(null);
+  const dragStartYRef = useRef<number>(0);
 
   const handleAddNewField = () => {
     setEditingFieldId(null);
@@ -148,32 +149,35 @@ export function FormConfig({ visible, onClose, formTitle }: FormConfigProps) {
   };
 
   const handleDragStart = (fieldId: string) => {
+    draggingFieldIdRef.current = fieldId;
+    dragStartYRef.current = 0;
     setDraggingFieldId(fieldId);
-    setDragStartY(0);
   };
 
   const handleDragMove = (_fieldId: string, y: number) => {
-    if (dragStartY === 0) {
-      setDragStartY(y);
-    } else if (draggingFieldId) {
-      const deltaY = y - dragStartY;
-      const threshold = 60; // Pixels to move before swapping
+    if (dragStartYRef.current === 0) {
+      dragStartYRef.current = y;
+    } else if (draggingFieldIdRef.current) {
+      const deltaY = y - dragStartYRef.current;
+      const threshold = 30; // Pixels to move before swapping (reduced for better responsiveness)
 
       if (deltaY < -threshold) {
         // Dragged up
-        moveFieldUp(draggingFieldId);
-        setDragStartY(y);
+        moveFieldUp(draggingFieldIdRef.current);
+        dragStartYRef.current = y;
       } else if (deltaY > threshold) {
         // Dragged down
-        moveFieldDown(draggingFieldId);
-        setDragStartY(y);
+        moveFieldDown(draggingFieldIdRef.current);
+        dragStartYRef.current = y;
       }
     }
   };
 
   const handleDragEnd = (_fieldId: string) => {
+    console.log("Drag ended for field:", _fieldId);
+    draggingFieldIdRef.current = null;
+    dragStartYRef.current = 0;
     setDraggingFieldId(null);
-    setDragStartY(0);
   };
 
   const getEditingFieldData = () => {
@@ -203,6 +207,7 @@ export function FormConfig({ visible, onClose, formTitle }: FormConfigProps) {
           <ScrollView
             contentContainerStyle={styles.scrollContent}
             keyboardShouldPersistTaps="handled"
+            scrollEnabled={!draggingFieldId}
           >
             {/* Title */}
             <TextComponent
