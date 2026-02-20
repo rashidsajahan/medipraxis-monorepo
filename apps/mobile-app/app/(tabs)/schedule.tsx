@@ -6,6 +6,7 @@ import {
   CalendarComponent,
 } from "@/components/advanced";
 import { ViewAppointmentModal } from "@/components/advanced/shedule/ViewAppointmentModal";
+import { ViewReminderModal } from "@/components/advanced/shedule/ViewReminderModal";
 import { useGetTaskById } from "@/services/tasks/useGetTaskById";
 import { useEffect, useState } from "react";
 import { Alert, StyleSheet } from "react-native";
@@ -15,13 +16,22 @@ export default function ScheduleScreen() {
   const [selectedTask, setSelectedTask] = useState<AgendaSelection | null>(
     null
   );
-  const [modalVisible, setModalVisible] = useState(false);
+  const [viewApptModalVisible, setViewApptModalVisible] = useState(false);
   const [viewApptReadOnly, setViewApptReadOnly] = useState(true);
+
+  const [viewReminderModalVisible, setViewReminderModalVisible] =
+    useState(false);
+  const [viewReminderReadOnly, setViewReminderReadOnly] = useState(true);
+
+  console.log(viewReminderModalVisible, selectedTask);
 
   // Use the mutation hook to fetch task by ID
   const { mutate: fetchTask, data: appointmentData } = useGetTaskById({
     onSuccess: () => {
-      setModalVisible(true);
+      selectedTask?.type == AgendaSelectionType.Appointment &&
+        setViewApptModalVisible(true);
+      selectedTask?.type == AgendaSelectionType.Reminder &&
+        setViewReminderModalVisible(true);
     },
     onError: (message) => {
       console.error("Failed to load appointment:", message);
@@ -41,11 +51,12 @@ export default function ScheduleScreen() {
         [{ text: "OK", onPress: () => setSelectedTask(null) }]
       );
     } else if (selectedTask?.type === AgendaSelectionType.Reminder) {
-      Alert.alert(
-        "Reminder Selected",
-        `Reminder ID: ${selectedTask.reminderId}`,
-        [{ text: "OK", onPress: () => setSelectedTask(null) }]
-      );
+      fetchTask({ task_id: selectedTask.reminderId });
+      //   Alert.alert(
+      //     "Reminder Selected",
+      //     `Reminder ID: ${selectedTask.reminderId}`,
+      //     [{ text: "OK", onPress: () => setSelectedTask(null) }]
+      //   );
     }
   }, [selectedTask]);
 
@@ -103,7 +114,10 @@ export default function ScheduleScreen() {
     ],
     reminders: [
       {
-        content: { id: "rem-001", title: "Check records" },
+        content: {
+          id: "d6bb74bd-8d22-47a4-8171-a7d327685b4d",
+          title: "Check records",
+        },
         startTime: "2:30 am",
       },
       {
@@ -142,8 +156,14 @@ export default function ScheduleScreen() {
     ],
   };
 
-  const handleCloseModal = () => {
-    setModalVisible(false);
+  const handleCloseViewApptModal = () => {
+    setViewApptModalVisible(false);
+    setSelectedTask(null);
+    // setAppointmentData(null);
+  };
+
+  const handleCloseViewReminderModal = () => {
+    setViewReminderModalVisible(false);
     setSelectedTask(null);
     // setAppointmentData(null);
   };
@@ -197,14 +217,24 @@ export default function ScheduleScreen() {
         }
       />
       <ViewAppointmentModal
-        visible={modalVisible}
+        visible={viewApptModalVisible}
         data={appointmentData?.task!}
-        onClose={handleCloseModal}
+        onClose={handleCloseViewApptModal}
         onEdit={() => {
           setViewApptReadOnly(false);
         }}
-        onCancel={handleCloseModal}
+        onCancel={handleCloseViewApptModal}
         readOnly={viewApptReadOnly}
+      />
+      <ViewReminderModal
+        visible={viewReminderModalVisible}
+        data={appointmentData?.task!}
+        onClose={handleCloseViewReminderModal}
+        onEdit={() => {
+          setViewReminderReadOnly(false);
+        }}
+        onCancel={handleCloseViewReminderModal}
+        readOnly={viewReminderReadOnly}
       />
     </View>
   );
