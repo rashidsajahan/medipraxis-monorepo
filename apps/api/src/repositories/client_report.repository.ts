@@ -20,7 +20,6 @@ export const CLIENT_REPORT_QUERIES = {
   // Select queries
   FIND_ALL: "*",
   FIND_BY_ID: "*",
-  FIND_BY_CLIENT_ID: "*",
 } as const;
 
 export class ClientReportRepository {
@@ -142,7 +141,7 @@ export class ClientReportRepository {
   async findByClientId(clientId: string): Promise<ClientReport[]> {
     const { data, error } = await this.db
       .from(CLIENT_REPORT_QUERIES.CLIENT_REPORT_TABLE)
-      .select(CLIENT_REPORT_QUERIES.FIND_BY_CLIENT_ID)
+      .select(CLIENT_REPORT_QUERIES.FIND_ALL)
       .eq(CLIENT_REPORT_QUERIES.CLIENT_ID, clientId);
 
     if (error) {
