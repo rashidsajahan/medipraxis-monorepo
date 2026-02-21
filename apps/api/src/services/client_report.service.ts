@@ -111,6 +111,17 @@ export class ClientReportService {
     return report;
   }
 
+  async getReportsByClientId(clientId: string): Promise<ClientReport[]> {
+    const report = await this.clientReportRepository.findByClientId(clientId);
+    console.log("service", report);
+
+    if (!report) {
+      throw new Error("Reports not found");
+    }
+
+    return report;
+  }
+
   async getReportFileUrl(reportId: string): Promise<string> {
     const report = await this.clientReportRepository.findById(reportId);
 
