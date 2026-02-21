@@ -111,10 +111,12 @@ export class ClientReportService {
     return report;
   }
 
-  async getReportsByClientId(clientId: string): Promise<(ClientReport & { status: string | null })[]> {
+  async getReportsByClientId(
+    clientId: string
+  ): Promise<(ClientReport & { status: string | null })[]> {
     const reports = await this.clientReportRepository.findByClientId(clientId);
 
-    const reportsWithStatus = reports.map(report => {
+    const reportsWithStatus = reports.map((report) => {
       let status: string | null = null;
 
       if (report.file_path) {
