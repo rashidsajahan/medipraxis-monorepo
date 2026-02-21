@@ -149,7 +149,7 @@ export class ClientReportController {
   }
 
   static async getReportsByClientId(
-    c: APIContext<{ param: { clientId: string } }, "/clietntId/:clientId">
+    c: APIContext<{ param: { clientId: string } }, "/clientId/:clientId">
   ) {
     try {
       const clientReportService = getClientReportService(c);
