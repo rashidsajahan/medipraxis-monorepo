@@ -22,7 +22,7 @@ jobs:
           cache: "yarn"
 
       - name: Install dependencies
-        run: yarn install --immutable
+        run: yarn install --frozen-lockfile
 
       - name: Setup Turbo cache
         uses: actions/cache@v4
@@ -40,6 +40,36 @@ jobs:
 
       - name: Type check all workspaces
         run: yarn check-types
+
+      - name: Run tests for web-app
+        run: yarn workspace web-app test:ci
+        continue-on-error: false
+
+      - name: Run tests for api
+        run: yarn workspace api test:ci
+        continue-on-error: false
+
+      - name: Run tests for mobile-app
+        run: yarn workspace mobile-app test:ci
+        continue-on-error: false
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: |
+            apps/*/junit.xml
+          retention-days: 7
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-reports
+          path: |
+            apps/*/coverage
+          retention-days: 7
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4

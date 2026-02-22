@@ -7,9 +7,12 @@ module.exports = {
     "node_modules/(?!(react-native|@react-native|@react-navigation|expo|@expo|phosphor-react-native)/)",
   ],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx"],
+  coverageDirectory: "<rootDir>/coverage",
   collectCoverageFrom: [
     "app/**/*.{ts,tsx}",
     "components/**/*.{ts,tsx}",
     "!**/*.d.ts",
+    "!**/*.test.{ts,tsx}",
+    "!**/__tests__/**",
   ],
 };
