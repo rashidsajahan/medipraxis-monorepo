@@ -2,4 +2,10 @@ import { config } from "@repo/eslint-config/react-internal";
 import reactRefresh from "eslint-plugin-react-refresh";
 
 /** @type {import("eslint").Linter.Config[]} */
-export default [...config, reactRefresh.configs.vite];
+export default [
+  ...config,
+  reactRefresh.configs.vite,
+  {
+    ignores: ["jest.setup.cjs", "jest.config.cjs"],
+  },
+];
