@@ -157,13 +157,23 @@ export default function ScheduleScreen() {
   const handleCloseViewApptModal = () => {
     setViewApptModalVisible(false);
     setSelectedTask(null);
-    // setAppointmentData(null);
+    setViewApptReadOnly(true);
   };
 
   const handleCloseViewReminderModal = () => {
     setViewReminderModalVisible(false);
     setSelectedTask(null);
-    // setAppointmentData(null);
+    setViewReminderReadOnly(true);
+  };
+
+  const handleEditViewApptModal = () => {
+    setViewApptReadOnly(false);
+    setSelectedTask(null);
+  };
+
+  const handleEditViewReminderModal = () => {
+    setViewReminderReadOnly(false);
+    setSelectedTask(null);
   };
 
   return (
@@ -197,19 +207,16 @@ export default function ScheduleScreen() {
         visible={viewApptModalVisible}
         data={appointmentData?.task!}
         onClose={handleCloseViewApptModal}
-        onEdit={() => {
-          setViewApptReadOnly(false);
-        }}
+        onEdit={handleEditViewApptModal}
         onCancel={handleCloseViewApptModal}
         readOnly={viewApptReadOnly}
       />
+
       <ViewReminderModal
         visible={viewReminderModalVisible}
         data={appointmentData?.task!}
         onClose={handleCloseViewReminderModal}
-        onEdit={() => {
-          setViewReminderReadOnly(false);
-        }}
+        onEdit={handleEditViewReminderModal}
         onCancel={handleCloseViewReminderModal}
         readOnly={viewReminderReadOnly}
       />
