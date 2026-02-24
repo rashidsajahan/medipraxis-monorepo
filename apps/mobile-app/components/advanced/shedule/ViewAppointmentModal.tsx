@@ -154,6 +154,7 @@ export const ViewAppointmentModal = ({
                   <TextInputComponent
                     inputWrapper={{
                       accessibilityHint: "Enter your note",
+                      isDisabled: readOnly,
                     }}
                     inputField={{
                       value: data?.note ?? undefined,
