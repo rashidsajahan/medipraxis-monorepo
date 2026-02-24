@@ -42,8 +42,14 @@ jobs:
       - name: Typecheck
         run: yarn check-types
 
-      - name: Test
-        run: yarn test:ci
+      - name: Test web-app
+        run: yarn workspace web-app test:ci
+
+      - name: Test api
+        run: yarn workspace api test:ci
+
+      - name: Test mobile-app
+        run: yarn workspace mobile-app test:ci
 
       - name: Upload test results
         if: always()
