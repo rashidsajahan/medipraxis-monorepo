@@ -44,76 +44,70 @@ export function FormSetupCenter({ visible, onClose }: FormSetupCenterProps) {
     return null;
   }
 
-  return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      presentationStyle="pageSheet"
-    >
-      <View className="flex-1 bg-white">
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1, paddingVertical: 20 }}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Header Section */}
-          <View className="px-5 mb-[30px]">
-            <TextComponent
-              variant={TextVariant.Title}
-              size={TextSize.Large}
-              color={Color.Black}
-              className="mb-2"
-            >
-              Form Setup Center
-            </TextComponent>
-            <TextComponent
-              variant={TextVariant.Body}
-              size={TextSize.Medium}
-              color={Color.Grey}
-              className="mt-1"
-            >
-              Forms that adapt to your needs
-            </TextComponent>
-          </View>
+  const content = (
+    <View className="flex-1 bg-white">
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1, paddingVertical: 20 }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header Section */}
+        <View className="px-5 mb-[30px]">
+          <TextComponent
+            variant={TextVariant.Title}
+            size={TextSize.Large}
+            color={Color.Black}
+            className="mb-2"
+          >
+            Form Setup Center
+          </TextComponent>
+          <TextComponent
+            variant={TextVariant.Body}
+            size={TextSize.Medium}
+            color={Color.Grey}
+            className="mt-1"
+          >
+            Forms that adapt to your needs
+          </TextComponent>
+        </View>
 
-          {/* Tiles Section */}
-          <View className="px-4 gap-4">
-            {FORM_TILES.map((tile) => (
-              <View
-                key={tile.id}
-                className="bg-[#FFF8F0] rounded-xl p-4 border border-gray-400 shadow-sm"
-              >
-                <Image
-                  source={tile.image}
-                  className="w-20 h-20 mr-4"
-                  resizeMode="contain"
-                />
-                <View className="flex-1 justify-start">
-                  <Text className="font-semibold text-lg text-black mb-1">
-                    {tile.title}
-                  </Text>
-                  <Text className="text-sm text-gray-600 leading-5 mb-3">
-                    {tile.description}
-                  </Text>
-                  <TouchableOpacity
-                    className="flex-row items-center justify-center bg-black py-2.5 px-4 rounded-md gap-2"
-                    onPress={() => handleTilePress(tile.id, tile.title)}
-                    activeOpacity={0.7}
-                  >
-                    <PencilSimpleIcon
-                      size={20}
-                      color={Color.White}
-                      weight="regular"
-                    />
-                    <Text className="font-semibold text-sm text-white">
-                      Edit
-                    </Text>
-                  </TouchableOpacity>
-                </View>
+        {/* Tiles Section */}
+        <View className="px-4 gap-4">
+          {FORM_TILES.map((tile) => (
+            <View
+              key={tile.id}
+              className="bg-[#FFF8F0] rounded-xl p-4 border border-gray-400 shadow-sm"
+            >
+              <Image
+                source={tile.image}
+                className="w-20 h-20 mr-4"
+                resizeMode="contain"
+              />
+              <View className="flex-1 justify-start">
+                <Text className="font-semibold text-lg text-black mb-1">
+                  {tile.title}
+                </Text>
+                <Text className="text-sm text-gray-600 leading-5 mb-3">
+                  {tile.description}
+                </Text>
+                <TouchableOpacity
+                  className="flex-row items-center justify-center bg-black py-2.5 px-4 rounded-md gap-2"
+                  onPress={() => handleTilePress(tile.id, tile.title)}
+                  activeOpacity={0.7}
+                >
+                  <PencilSimpleIcon
+                    size={20}
+                    color={Color.White}
+                    weight="regular"
+                  />
+                  <Text className="font-semibold text-sm text-white">Edit</Text>
+                </TouchableOpacity>
               </View>
-            ))}
-          </View>
+            </View>
+          ))}
+        </View>
 
-          {/* Close Button */}
+        {/* Close Button - only show in modal mode */}
+        {onClose && (
           <View className="px-4 py-5 border-t border-gray-400 bg-white">
             <TouchableOpacity
               className="bg-black py-3 px-6 rounded-lg items-center"
@@ -122,8 +116,24 @@ export function FormSetupCenter({ visible, onClose }: FormSetupCenterProps) {
               <Text className="font-semibold text-white text-base">Close</Text>
             </TouchableOpacity>
           </View>
-        </ScrollView>
-      </View>
+        )}
+      </ScrollView>
+    </View>
+  );
+
+  return (
+    <>
+      {visible !== undefined ? (
+        <Modal
+          visible={visible}
+          animationType="slide"
+          presentationStyle="pageSheet"
+        >
+          {content}
+        </Modal>
+      ) : (
+        content
+      )}
 
       {/* Form Config Modal */}
       <FormConfig
@@ -132,6 +142,6 @@ export function FormSetupCenter({ visible, onClose }: FormSetupCenterProps) {
         formTitle={selectedFormTitle}
         formType={selectedFormId}
       />
-    </Modal>
+    </>
   );
 }
