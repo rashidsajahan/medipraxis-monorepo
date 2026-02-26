@@ -13,7 +13,6 @@ import {
   Image,
   Modal,
   ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -51,18 +50,18 @@ export function FormSetupCenter({ visible, onClose }: FormSetupCenterProps) {
       animationType="slide"
       presentationStyle="pageSheet"
     >
-      <View style={styles.container}>
+      <View className="flex-1 bg-white">
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={{ flexGrow: 1, paddingVertical: 20 }}
           showsVerticalScrollIndicator={false}
         >
           {/* Header Section */}
-          <View style={styles.headerSection}>
+          <View className="px-5 mb-[30px]">
             <TextComponent
               variant={TextVariant.Title}
               size={TextSize.Large}
               color={Color.Black}
-              style={styles.heading}
+              className="mb-2"
             >
               Form Setup Center
             </TextComponent>
@@ -70,26 +69,33 @@ export function FormSetupCenter({ visible, onClose }: FormSetupCenterProps) {
               variant={TextVariant.Body}
               size={TextSize.Medium}
               color={Color.Grey}
-              style={styles.subheading}
+              className="mt-1"
             >
               Forms that adapt to your needs
             </TextComponent>
           </View>
 
           {/* Tiles Section */}
-          <View style={styles.tilesContainer}>
+          <View className="px-4 gap-4">
             {FORM_TILES.map((tile) => (
-              <View key={tile.id} style={styles.tile}>
+              <View
+                key={tile.id}
+                className="bg-[#FFF8F0] rounded-xl p-4 border border-gray-400 shadow-sm"
+              >
                 <Image
                   source={tile.image}
-                  style={styles.tileImage}
+                  className="w-20 h-20 mr-4"
                   resizeMode="contain"
                 />
-                <View style={styles.tileContent}>
-                  <Text style={styles.tileTitle}>{tile.title}</Text>
-                  <Text style={styles.tileDescription}>{tile.description}</Text>
+                <View className="flex-1 justify-start">
+                  <Text className="font-semibold text-lg text-black mb-1">
+                    {tile.title}
+                  </Text>
+                  <Text className="text-sm text-gray-600 leading-5 mb-3">
+                    {tile.description}
+                  </Text>
                   <TouchableOpacity
-                    style={styles.editButton}
+                    className="flex-row items-center justify-center bg-black py-2.5 px-4 rounded-md gap-2"
                     onPress={() => handleTilePress(tile.id, tile.title)}
                     activeOpacity={0.7}
                   >
@@ -98,7 +104,9 @@ export function FormSetupCenter({ visible, onClose }: FormSetupCenterProps) {
                       color={Color.White}
                       weight="regular"
                     />
-                    <Text style={styles.editButtonText}>Edit</Text>
+                    <Text className="font-semibold text-sm text-white">
+                      Edit
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -106,9 +114,12 @@ export function FormSetupCenter({ visible, onClose }: FormSetupCenterProps) {
           </View>
 
           {/* Close Button */}
-          <View style={styles.actionSection}>
-            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-              <Text style={styles.closeButtonText}>Close</Text>
+          <View className="px-4 py-5 border-t border-gray-400 bg-white">
+            <TouchableOpacity
+              className="bg-black py-3 px-6 rounded-lg items-center"
+              onPress={onClose}
+            >
+              <Text className="font-semibold text-white text-base">Close</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -124,99 +135,3 @@ export function FormSetupCenter({ visible, onClose }: FormSetupCenterProps) {
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Color.White,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingVertical: 20,
-  },
-  headerSection: {
-    paddingHorizontal: 20,
-    marginBottom: 30,
-  },
-  heading: {
-    marginBottom: 8,
-  },
-  subheading: {
-    marginTop: 4,
-  },
-  tilesContainer: {
-    paddingHorizontal: 16,
-    gap: 16,
-  },
-  tile: {
-    backgroundColor: Color.LightCream,
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: Color.Grey,
-    shadowColor: Color.Black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  tileImage: {
-    width: 80,
-    height: 80,
-    marginRight: 16,
-  },
-  tileContent: {
-    flex: 1,
-    justifyContent: "flex-start",
-  },
-  tileTitle: {
-    fontFamily: "DMSans_600SemiBold",
-    fontSize: 18,
-    color: Color.Black,
-    marginBottom: 4,
-  },
-  tileDescription: {
-    fontFamily: "DMSans_400Regular",
-    fontSize: 14,
-    color: Color.Grey,
-    lineHeight: 20,
-    marginBottom: 12,
-  },
-  editButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: Color.Black,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 6,
-    gap: 8,
-  },
-  editButtonText: {
-    fontFamily: "DMSans_600SemiBold",
-    fontSize: 14,
-    color: Color.White,
-  },
-  actionSection: {
-    paddingHorizontal: 16,
-    paddingVertical: 20,
-    borderTopWidth: 1,
-    borderTopColor: Color.Grey,
-    backgroundColor: Color.White,
-  },
-  closeButton: {
-    backgroundColor: Color.Black,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  closeButtonText: {
-    fontFamily: "DMSans_600SemiBold",
-    color: Color.White,
-    fontSize: 16,
-  },
-});

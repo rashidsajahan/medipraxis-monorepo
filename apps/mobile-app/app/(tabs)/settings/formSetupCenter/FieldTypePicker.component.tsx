@@ -8,14 +8,7 @@ import { Color } from "@repo/config";
 import { useFonts } from "expo-font";
 import { CaretDownIcon } from "phosphor-react-native";
 import { useEffect, useRef, useState } from "react";
-import {
-  Modal,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Modal, Pressable, ScrollView, Text, View } from "react-native";
 import type { FieldTypePickerProps } from "./formConfig.types";
 
 export function FieldTypePicker({
@@ -80,34 +73,42 @@ export function FieldTypePicker({
   }
 
   return (
-    <View style={styles.container}>
-      {label && <Text style={styles.label}>{label}</Text>}
+    <View className="mb-4">
+      {label && (
+        <Text className="font-semibold text-sm text-black mb-2">{label}</Text>
+      )}
 
       <Pressable
         ref={triggerRef}
         onPress={() => setIsOpen(!isOpen)}
-        style={[styles.trigger, isOpen && styles.triggerOpen]}
+        className={`flex-row items-center justify-between py-3.5 px-4 border rounded-lg bg-white ${
+          isOpen ? "border-black" : "border-gray-400"
+        }`}
       >
-        <View style={styles.triggerContent}>
+        <View className="flex-1">
           {selectedOption ? (
-            <View style={styles.selectedOption}>
+            <View className="flex-row items-center gap-3">
               <selectedOption.icon
                 size={20}
                 color={Color.Black}
                 weight="regular"
               />
-              <Text style={styles.selectedText}>{selectedOption.label}</Text>
+              <Text className="font-medium text-base text-black">
+                {selectedOption.label}
+              </Text>
             </View>
           ) : (
-            <Text style={styles.placeholder}>{placeholder}</Text>
+            <Text className="text-base text-gray-600">{placeholder}</Text>
           )}
         </View>
-        <CaretDownIcon
-          size={20}
-          color={Color.Grey}
-          weight="bold"
-          style={[styles.caret, isOpen && styles.caretOpen]}
-        />
+        <View className="ml-2">
+          <CaretDownIcon
+            size={20}
+            color={Color.Grey}
+            weight="bold"
+            style={isOpen ? { transform: [{ rotate: "180deg" }] } : undefined}
+          />
+        </View>
       </Pressable>
 
       <Modal
@@ -116,13 +117,24 @@ export function FieldTypePicker({
         animationType="none"
         onRequestClose={() => setIsOpen(false)}
       >
-        <Pressable style={styles.overlay} onPress={() => setIsOpen(false)}>
+        <Pressable
+          className="flex-1 bg-transparent"
+          onPress={() => setIsOpen(false)}
+        >
           <View
-            style={[styles.dropdown, getDropdownPosition()]}
+            className="absolute bg-white rounded-lg border border-gray-400 max-h-[300px] shadow-lg"
+            style={{
+              ...getDropdownPosition(),
+              shadowColor: Color.Black,
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.15,
+              shadowRadius: 8,
+              elevation: 5,
+            }}
             onStartShouldSetResponder={() => true}
           >
             <ScrollView
-              style={styles.optionsList}
+              className="max-h-[300px]"
               nestedScrollEnabled={true}
               showsVerticalScrollIndicator={false}
             >
@@ -133,11 +145,9 @@ export function FieldTypePicker({
                   <Pressable
                     key={option.id}
                     onPress={() => !disabled && handleSelect(option.id)}
-                    style={[
-                      styles.option,
-                      value === option.id && styles.optionSelected,
-                      disabled && styles.optionDisabled,
-                    ]}
+                    className={`flex-row items-center py-3 px-4 gap-3 border-b border-gray-100 ${
+                      value === option.id ? "bg-[#FFF8F0]" : ""
+                    } ${disabled ? "opacity-40" : ""}`}
                     disabled={disabled}
                   >
                     <IconComponent
@@ -146,10 +156,9 @@ export function FieldTypePicker({
                       weight="regular"
                     />
                     <Text
-                      style={[
-                        styles.optionText,
-                        disabled && styles.optionTextDisabled,
-                      ]}
+                      className={`font-medium text-base ${
+                        disabled ? "text-gray-600" : "text-black"
+                      }`}
                     >
                       {option.label}
                     </Text>
@@ -163,99 +172,3 @@ export function FieldTypePicker({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: 16,
-  },
-  label: {
-    fontFamily: "DMSans_600SemiBold",
-    fontSize: 14,
-    color: Color.Black,
-    marginBottom: 8,
-  },
-  trigger: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderWidth: 1,
-    borderColor: Color.Grey,
-    borderRadius: 8,
-    backgroundColor: Color.White,
-  },
-  triggerOpen: {
-    borderColor: Color.Black,
-  },
-  triggerContent: {
-    flex: 1,
-  },
-  selectedOption: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  selectedText: {
-    fontFamily: "DMSans_500Medium",
-    fontSize: 16,
-    color: Color.Black,
-  },
-  placeholder: {
-    fontFamily: "DMSans_400Regular",
-    fontSize: 16,
-    color: Color.Grey,
-  },
-  caret: {
-    marginLeft: 8,
-  },
-  caretOpen: {
-    transform: [{ rotate: "180deg" }],
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: "transparent",
-  },
-  dropdown: {
-    position: "absolute",
-    backgroundColor: Color.White,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: Color.Grey,
-    maxHeight: 300,
-    shadowColor: Color.Black,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  optionsList: {
-    maxHeight: 300,
-  },
-  option: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    gap: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-  },
-  optionSelected: {
-    backgroundColor: Color.LightCream,
-  },
-  optionDisabled: {
-    opacity: 0.4,
-  },
-  optionText: {
-    fontFamily: "DMSans_500Medium",
-    fontSize: 16,
-    color: Color.Black,
-  },
-  optionTextDisabled: {
-    color: Color.Grey,
-  },
-});

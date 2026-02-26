@@ -8,14 +8,7 @@ import { Lato_400Regular, Lato_700Bold } from "@expo-google-fonts/lato";
 import { Color, TextSize, TextVariant } from "@repo/config";
 import { useFonts } from "expo-font";
 import React, { useRef, useState } from "react";
-import {
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Modal, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { AddFieldModal } from "./AddFieldModal.component";
 import { FieldItem } from "./FieldItem.component";
 import { FIELD_TYPES } from "./formConfig.constants";
@@ -164,7 +157,7 @@ export function FormConfig({
       dragStartYRef.current = y;
     } else if (draggingFieldIdRef.current) {
       const deltaY = y - dragStartYRef.current;
-      const threshold = 30; // Pixels to move before swapping (reduced for better responsiveness)
+      const threshold = 30;
 
       if (deltaY < -threshold) {
         // Dragged up
@@ -207,9 +200,9 @@ export function FormConfig({
         animationType="slide"
         presentationStyle="pageSheet"
       >
-        <View style={styles.container}>
+        <View className="flex-1 bg-white">
           <ScrollView
-            contentContainerStyle={styles.scrollContent}
+            contentContainerStyle={{ padding: 20, paddingBottom: 100 }}
             keyboardShouldPersistTaps="handled"
             scrollEnabled={!draggingFieldId}
           >
@@ -218,14 +211,14 @@ export function FormConfig({
               variant={TextVariant.Title}
               size={TextSize.Large}
               color={Color.Black}
-              style={styles.heading}
+              className="mb-6"
             >
               {formTitle}
             </TextComponent>
 
             {/* Add Description Button */}
-            <TouchableOpacity style={styles.addDescriptionButton}>
-              <Text style={styles.addDescriptionText}>+ Add Description</Text>
+            <TouchableOpacity className="py-4 px-4 rounded-lg bg-white mb-4">
+              <Text className="text-base text-gray-600">+ Add Description</Text>
             </TouchableOpacity>
 
             {/* Display Fields */}
@@ -237,7 +230,7 @@ export function FormConfig({
                   field={field}
                   onPress={() => handleEditField(field.id)}
                   onDragStart={() => handleDragStart(field.id)}
-                  onDragMove={(y) => handleDragMove(field.id, y)}
+                  onDragMove={(y: number) => handleDragMove(field.id, y)}
                   onDragEnd={() => handleDragEnd(field.id)}
                   isDragging={draggingFieldId === field.id}
                 />
@@ -245,17 +238,22 @@ export function FormConfig({
 
             {/* Add New Field Button */}
             <TouchableOpacity
-              style={styles.addFieldButton}
+              className="py-4 px-4 rounded-lg bg-black items-center"
               onPress={handleAddNewField}
             >
-              <Text style={styles.addFieldText}>+ Add New Field</Text>
+              <Text className="font-semibold text-base text-white">
+                + Add New Field
+              </Text>
             </TouchableOpacity>
           </ScrollView>
 
           {/* Action Footer */}
-          <View style={styles.actionSection}>
-            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-              <Text style={styles.closeButtonText}>Close</Text>
+          <View className="absolute bottom-0 w-full px-4 py-5 border-t border-gray-400 bg-white">
+            <TouchableOpacity
+              className="bg-black py-3 px-6 rounded-lg items-center"
+              onPress={onClose}
+            >
+              <Text className="font-semibold text-white text-base">Close</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -276,63 +274,3 @@ export function FormConfig({
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Color.White,
-  },
-  scrollContent: {
-    padding: 20,
-    paddingBottom: 100,
-  },
-  heading: {
-    marginBottom: 24,
-  },
-  addDescriptionButton: {
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: Color.White,
-    marginBottom: 16,
-  },
-  addDescriptionText: {
-    fontFamily: "DMSans_400Regular",
-    fontSize: 16,
-    color: Color.Grey,
-  },
-  addFieldButton: {
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: Color.Black,
-    alignItems: "center",
-  },
-  addFieldText: {
-    fontFamily: "DMSans_600SemiBold",
-    fontSize: 16,
-    color: Color.White,
-  },
-  actionSection: {
-    position: "absolute",
-    bottom: 0,
-    width: "100%",
-    paddingHorizontal: 16,
-    paddingVertical: 20,
-    borderTopWidth: 1,
-    borderTopColor: Color.Grey,
-    backgroundColor: Color.White,
-  },
-  closeButton: {
-    backgroundColor: Color.Black,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  closeButtonText: {
-    fontFamily: "DMSans_600SemiBold",
-    color: Color.White,
-    fontSize: 16,
-  },
-});

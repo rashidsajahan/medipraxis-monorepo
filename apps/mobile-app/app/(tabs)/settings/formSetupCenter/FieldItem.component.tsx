@@ -10,7 +10,6 @@ import {
   Animated,
   PanResponder,
   Platform,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -146,19 +145,20 @@ export function FieldItem({
 
   return (
     <Animated.View
-      style={[
-        styles.container,
-        {
-          transform: [{ scaleX: scaleXAnim }],
-          elevation: elevationValue,
-          shadowOpacity: shadowOpacity,
-          zIndex: isDragging ? 1000 : 1,
-        },
-      ]}
+      className="flex-row items-stretch rounded-lg border border-gray-300 mb-3 overflow-hidden bg-white shadow-sm"
+      style={{
+        transform: [{ scaleX: scaleXAnim }],
+        elevation: elevationValue,
+        shadowOpacity: shadowOpacity,
+        shadowColor: Color.Black,
+        shadowOffset: { width: 0, height: 2 },
+        shadowRadius: 4,
+        zIndex: isDragging ? 1000 : 1,
+      }}
     >
       {/* Field Icon Section */}
       <TouchableOpacity
-        style={styles.iconContainer}
+        className="w-14 py-4 px-3 bg-green-600 justify-center items-center border-r border-gray-300"
         onPress={onPress}
         activeOpacity={0.7}
       >
@@ -167,26 +167,28 @@ export function FieldItem({
 
       {/* Field Name Section */}
       <TouchableOpacity
-        style={styles.fieldNameSection}
+        className="flex-1 py-4 px-4 justify-center border-r border-gray-300"
         onPress={onPress}
         activeOpacity={0.7}
       >
-        <View style={styles.fieldNameContainer}>
-          <Text style={styles.fieldName}>{field.fieldName}</Text>
-          {field.isRequired && <Text style={styles.requiredStar}>*</Text>}
+        <View className="flex-row items-center">
+          <Text className="text-base font-medium text-black">
+            {field.fieldName}
+          </Text>
+          {field.isRequired && (
+            <Text className="text-base font-medium text-red-600 ml-0.5">*</Text>
+          )}
         </View>
       </TouchableOpacity>
 
       {/* Drag Handle Section */}
       <View
-        style={[
-          styles.dragHandle,
-          isDragging && styles.dragHandleActive,
-          Platform.OS === "web" && ({ cursor: "grab" } as any),
-          isDragging &&
-            Platform.OS === "web" &&
-            ({ cursor: "grabbing" } as any),
-        ]}
+        className={`w-12 py-4 px-3 justify-center items-center ${isDragging ? "bg-gray-600 opacity-80" : "bg-[#FFF8F0]"}`}
+        style={
+          Platform.OS === "web"
+            ? ({ cursor: isDragging ? "grabbing" : "grab" } as any)
+            : undefined
+        }
         {...(Platform.OS !== "web" ? panResponder.panHandlers : {})}
         // @ts-ignore - web-specific event
         onMouseDown={Platform.OS === "web" ? handleMouseDown : undefined}
@@ -196,64 +198,3 @@ export function FieldItem({
     </Animated.View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    alignItems: "stretch",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: Color.LightGrey,
-    marginBottom: 12,
-    overflow: "hidden",
-    backgroundColor: Color.White,
-    shadowColor: Color.Black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-  },
-  iconContainer: {
-    width: 56,
-    paddingVertical: 16,
-    paddingHorizontal: 12,
-    backgroundColor: Color.Green,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRightWidth: 1,
-    borderRightColor: Color.LightGrey,
-  },
-  fieldNameSection: {
-    flex: 1,
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    justifyContent: "center",
-    borderRightWidth: 1,
-    borderRightColor: Color.LightGrey,
-  },
-  fieldNameContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  fieldName: {
-    fontFamily: "DMSans_500Medium",
-    fontSize: 16,
-    color: Color.Black,
-  },
-  requiredStar: {
-    fontFamily: "DMSans_500Medium",
-    fontSize: 16,
-    color: Color.Danger,
-    marginLeft: 2,
-  },
-  dragHandle: {
-    width: 48,
-    paddingVertical: 16,
-    paddingHorizontal: 12,
-    backgroundColor: Color.LightCream,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  dragHandleActive: {
-    backgroundColor: Color.Grey,
-    opacity: 0.8,
-  },
-});

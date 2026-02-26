@@ -5,18 +5,10 @@ import {
   DMSans_600SemiBold,
 } from "@expo-google-fonts/dm-sans";
 import { Lato_400Regular, Lato_700Bold } from "@expo-google-fonts/lato";
-import { Color } from "@repo/config";
 import { useFonts } from "expo-font";
 import { Trash } from "phosphor-react-native";
 import React, { useEffect, useState } from "react";
-import {
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Modal, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { FieldTypePicker } from "./FieldTypePicker.component";
 import { FIELD_TYPES } from "./formConfig.constants";
 import type { AddFieldModalProps } from "./formConfig.types";
@@ -88,26 +80,23 @@ export function AddFieldModal({
 
   return (
     <Modal visible={visible} transparent animationType="fade">
-      <View style={styles.overlay}>
-        <View style={styles.modalContainer}>
+      <View className="flex-1 bg-black/50 justify-center items-center p-5">
+        <View className="bg-white rounded-xl w-full max-w-[500px] max-h-[80%] overflow-hidden">
           {/* Header with Delete Icon */}
-          <View style={styles.header}>
-            <Text style={styles.headerTitle}>
+          <View className="flex-row justify-between items-center px-5 py-4 border-b border-gray-300/30">
+            <Text className="font-semibold text-xl text-black">
               {editingField ? "Edit Field" : "Add New Field"}
             </Text>
             {editingField && (
-              <TouchableOpacity
-                onPress={handleDelete}
-                style={styles.deleteButton}
-              >
+              <TouchableOpacity onPress={handleDelete} className="p-1">
                 <Trash size={24} color="#EF4444" weight="regular" />
               </TouchableOpacity>
             )}
           </View>
 
           <ScrollView
-            style={styles.scrollView}
-            contentContainerStyle={styles.scrollContent}
+            className="flex-1"
+            contentContainerStyle={{ padding: 20 }}
             keyboardShouldPersistTaps="handled"
           >
             {/* Field Type Dropdown */}
@@ -121,8 +110,10 @@ export function AddFieldModal({
             />
 
             {/* Field Name Section */}
-            <View style={styles.fieldNameSection}>
-              <Text style={styles.fieldNameHeading}>Field Name</Text>
+            <View className="mt-5 mb-5">
+              <Text className="font-medium text-sm text-black mb-2">
+                Field Name
+              </Text>
               <TextInput
                 inputField={{
                   value: fieldName,
@@ -133,12 +124,12 @@ export function AddFieldModal({
             </View>
 
             {/* Horizontal Line */}
-            <View style={styles.divider} />
+            <View className="h-[1px] bg-gray-300/30 my-5" />
 
             {/* Toggles Section */}
-            <View style={styles.togglesContainer}>
-              <View style={styles.toggleItem}>
-                <Text style={styles.toggleLabel}>Required</Text>
+            <View className="flex-row justify-between gap-4">
+              <View className="flex-1 flex-row justify-between items-center py-3 px-4 rounded-lg">
+                <Text className="font-medium text-sm text-black">Required</Text>
                 <ToggleButton
                   size={ToggleSize.Medium}
                   isActive={isRequired}
@@ -146,8 +137,10 @@ export function AddFieldModal({
                 />
               </View>
 
-              <View style={styles.toggleItem}>
-                <Text style={styles.toggleLabel}>Enable Share</Text>
+              <View className="flex-1 flex-row justify-between items-center py-3 px-4 rounded-lg">
+                <Text className="font-medium text-sm text-black">
+                  Enable Share
+                </Text>
                 <ToggleButton
                   size={ToggleSize.Medium}
                   isActive={isShareEnabled}
@@ -158,20 +151,23 @@ export function AddFieldModal({
           </ScrollView>
 
           {/* Action Buttons */}
-          <View style={styles.actionButtons}>
-            <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-              <Text style={styles.cancelButtonText}>Cancel</Text>
+          <View className="flex-row gap-3 px-5 py-4 border-t border-gray-300/30">
+            <TouchableOpacity
+              className="flex-1 py-3 rounded-lg bg-white border border-black items-center"
+              onPress={onClose}
+            >
+              <Text className="font-semibold text-base text-black">Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[
-                styles.saveButton,
-                (!selectedFieldType || !fieldName.trim()) &&
-                  styles.saveButtonDisabled,
-              ]}
+              className={`flex-1 py-3 rounded-lg items-center ${
+                !selectedFieldType || !fieldName.trim()
+                  ? "bg-gray-400 opacity-50"
+                  : "bg-black"
+              }`}
               onPress={handleSave}
               disabled={!selectedFieldType || !fieldName.trim()}
             >
-              <Text style={styles.saveButtonText}>Save</Text>
+              <Text className="font-semibold text-base text-white">Save</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -179,116 +175,3 @@ export function AddFieldModal({
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  modalContainer: {
-    backgroundColor: Color.White,
-    borderRadius: 12,
-    width: "100%",
-    maxWidth: 500,
-    maxHeight: "80%",
-    overflow: "hidden",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: Color.Grey + "30",
-  },
-  headerTitle: {
-    fontFamily: "DMSans_600SemiBold",
-    fontSize: 20,
-    color: Color.Black,
-  },
-  deleteButton: {
-    padding: 4,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: 20,
-  },
-  fieldNameSection: {
-    marginTop: 20,
-    marginBottom: 20,
-  },
-  fieldNameHeading: {
-    fontFamily: "DMSans_500Medium",
-    fontSize: 14,
-    color: Color.Black,
-    marginBottom: 8,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: Color.Grey + "30",
-    marginVertical: 20,
-  },
-  togglesContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 16,
-  },
-  toggleItem: {
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-  },
-  toggleLabel: {
-    fontFamily: "DMSans_500Medium",
-    fontSize: 14,
-    color: Color.Black,
-  },
-  actionButtons: {
-    flexDirection: "row",
-    gap: 12,
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderTopWidth: 1,
-    borderTopColor: Color.Grey + "30",
-  },
-  cancelButton: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 8,
-    backgroundColor: Color.White,
-    borderWidth: 1,
-    borderColor: Color.Black,
-    alignItems: "center",
-  },
-  cancelButtonText: {
-    fontFamily: "DMSans_600SemiBold",
-    fontSize: 16,
-    color: Color.Black,
-  },
-  saveButton: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 8,
-    backgroundColor: Color.Black,
-    alignItems: "center",
-  },
-  saveButtonDisabled: {
-    backgroundColor: Color.Grey,
-    opacity: 0.5,
-  },
-  saveButtonText: {
-    fontFamily: "DMSans_600SemiBold",
-    fontSize: 16,
-    color: Color.White,
-  },
-});
