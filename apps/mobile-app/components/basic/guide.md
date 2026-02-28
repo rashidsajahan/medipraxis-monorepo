@@ -209,3 +209,9 @@ const countryOptions = [
 />
 <ChipComponent text="Light Theme" variant={ChipVariant.LightGreen} />
 ```
+
+# Loader Component
+
+```ts
+<Loader />
+```

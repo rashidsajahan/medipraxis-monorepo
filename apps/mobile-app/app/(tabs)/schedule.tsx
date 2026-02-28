@@ -9,10 +9,10 @@ import {
   ViewAppointmentModal,
   ViewReminderModal,
 } from "@/components/advanced/schedule";
+import Loader from "@/components/basic/Loader.component";
 import { useGetTaskById } from "@/services/tasks/useGetTaskById";
-import { Color } from "@repo/config";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, StyleSheet } from "react-native";
+import { Alert, StyleSheet } from "react-native";
 
 export default function ScheduleScreen() {
   const [selectedDate, setSelectedDate] = useState("");
@@ -223,14 +223,7 @@ export default function ScheduleScreen() {
         readOnly={viewReminderReadOnly}
       />
 
-      {isLoading && (
-        <View
-          className="absolute inset-0 justify-center items-center bg-transparent z-[1000]"
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.2)" }}
-        >
-          <ActivityIndicator size="large" color={Color.TextGreen} />
-        </View>
-      )}
+      {isLoading && <Loader />}
     </View>
   );
 }

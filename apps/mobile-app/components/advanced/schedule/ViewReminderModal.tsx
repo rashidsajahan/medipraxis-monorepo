@@ -3,15 +3,14 @@ import {
   ToggleButton,
   ToggleSize,
 } from "@/components/basic";
+import Loader from "@/components/basic/Loader.component";
 import { Text } from "@/components/Themed";
 import { Icons } from "@/config";
 import { useUpdateTask } from "@/services/tasks/useUpdateTask";
 import { formatISOToSimple } from "@/utils/timeUtils";
-import { Color } from "@repo/config";
 import { TaskDetails } from "@repo/models";
 import { useState } from "react";
 import {
-  ActivityIndicator,
   Alert,
   Modal,
   Pressable,
@@ -189,14 +188,7 @@ export const ViewReminderModal = ({
         </View>
       </TouchableWithoutFeedback>
 
-      {isLoading && (
-        <View
-          className="absolute inset-0 justify-center items-center bg-transparent z-[1000]"
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.2)" }}
-        >
-          <ActivityIndicator size="large" color={Color.TextGreen} />
-        </View>
-      )}
+      {isLoading && <Loader />}
     </Modal>
   );
 };
