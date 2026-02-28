@@ -5,9 +5,14 @@ import {
 } from "@/components/basic";
 import { Text } from "@/components/Themed";
 import { Icons } from "@/config";
+import { useUpdateTask } from "@/services/tasks/useUpdateTask";
 import { formatISOToSimple } from "@/utils/timeUtils";
+import { Color } from "@repo/config";
 import { TaskDetails } from "@repo/models";
+import { useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
   Modal,
   Pressable,
   ScrollView,
@@ -32,12 +37,39 @@ export const ViewReminderModal = ({
   onCancel,
   readOnly = false,
 }: ViewReminderModalProps) => {
+  const { mutate: updateTask, isLoading } = useUpdateTask({
+    onSuccess: () => {
+      setIsChecked((prev) => !prev);
+    },
+    onError: (message) => {
+      Alert.alert("Error", message ?? "Failed to update task");
+    },
+  });
+
+  const [isChecked, setIsChecked] = useState(
+    data?.task_status_name == "IN_PROGRESS" ||
+      data?.task_status_name == "NOT_STARTED"
+      ? false
+      : data?.task_status_name == "COMPLETED"
+  );
+
   const handleEdit = () => {
     onEdit?.();
   };
 
   const handleCancel = () => {
     onCancel?.();
+  };
+
+  const handleReminderCheck = () => {
+    updateTask({
+      task_id: data.task_id,
+      data: {
+        task_status_id: isChecked
+          ? "dbbdc7fa-aba7-43ab-8252-4766c1fbcfc1" // completed
+          : "6fe35772-6214-468c-ae26-1b2f2f067740", // inprogress
+      },
+    });
   };
 
   return (
@@ -56,9 +88,23 @@ export const ViewReminderModal = ({
                 contentContainerStyle={{ padding: 20, paddingBottom: 10 }}
                 showsVerticalScrollIndicator={true}
               >
-                <Text className="text-xl font-bold text-black mb-5">
-                  {data?.task_title}dggggggggggg
-                </Text>
+                <View className="flex-row items-center gap-3 mb-5">
+                  <Pressable
+                    onPress={handleReminderCheck}
+                    className="w-6 h-6 rounded border-2 border-gray-400 justify-center items-center"
+                    style={{
+                      backgroundColor: isChecked ? "#1f2937" : "transparent",
+                    }}
+                    disabled={data?.task_status_name == "CANCELLED"}
+                  >
+                    {isChecked && (
+                      <Icons.Check size={16} color="white" weight="bold" />
+                    )}
+                  </Pressable>
+                  <Text className="text-xl font-bold text-black flex-1">
+                    {data?.task_title}
+                  </Text>
+                </View>
 
                 {/* Date */}
                 <View className="flex-row justify-between mb-4">
@@ -142,6 +188,15 @@ export const ViewReminderModal = ({
           </TouchableWithoutFeedback>
         </View>
       </TouchableWithoutFeedback>
+
+      {isLoading && (
+        <View
+          className="absolute inset-0 justify-center items-center bg-transparent z-[1000]"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.2)" }}
+        >
+          <ActivityIndicator size="large" color={Color.TextGreen} />
+        </View>
+      )}
     </Modal>
   );
 };
