@@ -145,8 +145,12 @@ export function FieldItem({
 
   return (
     <Animated.View
-      className="flex-row items-stretch rounded-lg border border-gray-300 mb-3 overflow-hidden bg-white shadow-sm"
+      className="flex-row items-stretch rounded-lg border border-gray-300 mb-6 overflow-hidden bg-white"
       style={{
+        flexDirection: "row",
+        borderWidth: 1,
+        borderColor: Color.LightGrey,
+        marginBottom: 24,
         transform: [{ scaleX: scaleXAnim }],
         elevation: elevationValue,
         shadowOpacity: shadowOpacity,
@@ -158,7 +162,12 @@ export function FieldItem({
     >
       {/* Field Icon Section */}
       <TouchableOpacity
-        className="w-14 py-4 px-3 bg-green-600 justify-center items-center border-r border-gray-300"
+        className="w-14 py-4 px-3 justify-center items-center border-r border-gray-300"
+        style={{
+          backgroundColor: Color.Green,
+          borderRightColor: Color.LightGrey,
+          borderRightWidth: 1,
+        }}
         onPress={onPress}
         activeOpacity={0.7}
       >
@@ -168,6 +177,7 @@ export function FieldItem({
       {/* Field Name Section */}
       <TouchableOpacity
         className="flex-1 py-4 px-4 justify-center border-r border-gray-300"
+        style={{ borderRightColor: Color.LightGrey, borderRightWidth: 1 }}
         onPress={onPress}
         activeOpacity={0.7}
       >
@@ -183,7 +193,7 @@ export function FieldItem({
 
       {/* Drag Handle Section */}
       <View
-        className={`w-12 py-4 px-3 justify-center items-center ${isDragging ? "bg-gray-600 opacity-80" : "bg-[#FFF8F0]"}`}
+        className={`w-12 py-4 px-3 justify-center items-center ${isDragging ? "bg-[#E6D5B8]" : "bg-[#FFF8F0]"}`}
         style={
           Platform.OS === "web"
             ? ({ cursor: isDragging ? "grabbing" : "grab" } as any)

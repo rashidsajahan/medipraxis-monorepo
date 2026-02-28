@@ -75,7 +75,7 @@ export function FormSetupCenter({ visible, onClose }: FormSetupCenterProps) {
           {FORM_TILES.map((tile) => (
             <View
               key={tile.id}
-              className="bg-[#FFF8F0] rounded-xl p-4 border border-gray-400 shadow-sm"
+              className="flex-row bg-[#FFF8F0] rounded-xl p-4 border border-gray-400 shadow-sm"
             >
               <Image
                 source={tile.image}
