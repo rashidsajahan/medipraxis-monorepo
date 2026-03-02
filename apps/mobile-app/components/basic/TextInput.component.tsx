@@ -224,8 +224,6 @@ export const TextInput: React.FC<TextInputProps> = ({
               textLargeStyle.fontWeight
             ) as RNTextStyle["fontWeight"],
             textAlign: "left",
-            //                         backgroundColor: inputWrapper.isDisabled ? 'green' : 'yellow',
-            //   opacity: inputWrapper.isDisabled ? 0.6 : 1,
           }}
         />
         {shouldShowToggle && (
