@@ -41,9 +41,9 @@ type FormState = {
 const DEFAULT_FORM_STATE: FormState = {
   eventType: EVENT_TYPES.TASK,
   taskTitle: "",
-  client: "Jennifer",
-  startDate: "2025-11-15T08:00",
-  endDate: "2025-11-15T11:30",
+  client: "",
+  startDate: "",
+  endDate: "",
   note: "",
   alarm: true,
   userId: "",
@@ -58,10 +58,10 @@ const DEFAULT_FORM_STATE: FormState = {
 
 const DEFAULT_APPOINTMENT_SLOT_STATE: FormState = {
   eventType: EVENT_TYPES.APPOINTMENT_SLOT_WINDOW,
-  startDate: "2025-11-15T08:00",
-  endDate: "2025-11-15T11:30",
+  startDate: "",
+  endDate: "",
   note: "",
-  location: "Care - Medical Centre",
+  location: "",
   userId: "",
   totalSlots: 1,
   repeatDays: [],
