@@ -33,6 +33,7 @@ interface TextInputProps {
   helperText?: string;
   hideHelperText?: boolean;
   validateOnChange?: boolean;
+  startIcon?: React.ReactNode;
 }
 
 // Props for OTP Input Field
@@ -84,6 +85,7 @@ export const TextInput: React.FC<TextInputProps> = ({
   helperText,
   hideHelperText = false,
   validateOnChange = true,
+  startIcon,
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -103,6 +105,7 @@ export const TextInput: React.FC<TextInputProps> = ({
 
   const shouldShowToggle = inputType === TextInputType.Password;
   const isSecureEntry = shouldShowToggle && !isPasswordVisible;
+  const hasStartIcon = !!startIcon;
 
   // Validate input - automatically gets error message from Zod schema
   useEffect(() => {
@@ -193,8 +196,13 @@ export const TextInput: React.FC<TextInputProps> = ({
           borderRadius: 8,
           width: "100%",
           height: 50,
+          backgroundColor: inputWrapper.isDisabled
+            ? Color.LightGrey
+            : Color.White,
+          opacity: inputWrapper.isDisabled ? 0.6 : 1,
         }}
       >
+        {hasStartIcon && <InputSlot className="pl-4">{startIcon}</InputSlot>}
         <InputField
           value={value}
           onChangeText={onChangeText}
@@ -205,6 +213,7 @@ export const TextInput: React.FC<TextInputProps> = ({
           style={{
             paddingHorizontal: 16,
             paddingVertical: 8,
+            paddingLeft: hasStartIcon ? 8 : 16,
             paddingRight: shouldShowToggle ? 48 : 16,
             fontFamily:
               textLargeStyle.fontFamily === Font.DMsans

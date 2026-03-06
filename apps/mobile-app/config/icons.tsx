@@ -10,6 +10,9 @@ import {
   PlusIcon,
   ShoppingCartIcon,
   StarIcon,
+  CalendarDotsIcon,
+  PencilSimpleIcon,
+  TrashSimpleIcon,
 } from "phosphor-react-native";
 
 // Export the Icon type from phosphor-react-native
@@ -27,6 +30,9 @@ export const Icons = {
   Eye: EyeIcon,
   EyeSlash: EyeSlashIcon,
   Search: MagnifyingGlassIcon,
+  CalendarDotsIcon: CalendarDotsIcon,
+  Pencil: PencilSimpleIcon,
+  Trash: TrashSimpleIcon,
 } as const;
 
 export type IconName = keyof typeof Icons;

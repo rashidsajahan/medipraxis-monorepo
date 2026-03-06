@@ -30,6 +30,7 @@ interface DropdownProps {
   isInvalid?: boolean;
   validationSchema?: z.ZodString;
   validateOnChange?: boolean;
+  readOnly?: boolean;
 }
 
 // Text styles
@@ -153,6 +154,7 @@ const DropdownComponent = ({
   isInvalid = false,
   validationSchema,
   validateOnChange = true,
+  readOnly = false,
 }: DropdownProps) => {
   const [validationError, setValidationError] = useState<string | null>(null);
   const [isValid, setIsValid] = useState(false);
@@ -249,8 +251,10 @@ const DropdownComponent = ({
         className="border rounded-lg w-full h-[50px] flex-row items-center justify-between px-4"
         style={{
           borderColor: getBorderColor(),
-          backgroundColor: Color.White,
+          backgroundColor: readOnly ? Color.LightGrey : Color.White,
+          opacity: readOnly ? 0.6 : 1,
         }}
+        disabled={readOnly}
       >
         <Text
           className="flex-1"
