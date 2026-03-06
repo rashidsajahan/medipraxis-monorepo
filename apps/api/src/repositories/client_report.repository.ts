@@ -12,6 +12,7 @@ export const CLIENT_REPORT_QUERIES = {
   REPORT_ID: "report_id",
   REPORT_TITLE: "report_title",
   FILE_PATH: "file_path",
+  FILE_TYPE: "file_type",
   CLIENT_ID: "client_id",
   USER_ID: "user_id",
   CREATED_DATE: "created_date",
@@ -228,5 +229,57 @@ export class ClientReportRepository {
         .map((row) => row.request_report_id)
         .filter((id): id is string => id !== null)
     );
+  }
+
+  /**
+   * Find reports by user ID, grouped by client ID and date
+   * Filters out expired reports (expiry_date <= today)
+   * Joins with client table to get client names
+   */
+  async findGroupedByUserIdAndDate(
+    userId: string,
+    completed?: boolean
+  ): Promise<any[]> {
+    const today = new Date().toISOString().split("T")[0];
+
+    let query = this.db
+      .from(CLIENT_REPORT_QUERIES.CLIENT_REPORT_TABLE)
+      .select(
+        `
+        ${CLIENT_REPORT_QUERIES.REPORT_ID},
+        ${CLIENT_REPORT_QUERIES.REPORT_TITLE},
+        ${CLIENT_REPORT_QUERIES.FILE_PATH},
+        ${CLIENT_REPORT_QUERIES.FILE_TYPE},
+        ${CLIENT_REPORT_QUERIES.CLIENT_ID},
+        ${CLIENT_REPORT_QUERIES.CREATED_DATE},
+        client:client_id (
+          client_id,
+          first_name,
+          last_name
+        )
+      `
+      )
+      .eq(CLIENT_REPORT_QUERIES.USER_ID, userId)
+      .gt("expiry_date", today)
+      .order(CLIENT_REPORT_QUERIES.CREATED_DATE, { ascending: false });
+
+    // Filter by completed status if provided
+    if (completed !== undefined) {
+      if (completed) {
+        // Completed reports have file_path
+        query = query.not(CLIENT_REPORT_QUERIES.FILE_PATH, "is", null);
+      } else {
+        // Incomplete reports don't have file_path
+        query = query.is(CLIENT_REPORT_QUERIES.FILE_PATH, null);
+      }
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      throw new Error(`Failed to fetch grouped reports: ${error.message}`);
+    }
+
+    return data || [];
   }
 }

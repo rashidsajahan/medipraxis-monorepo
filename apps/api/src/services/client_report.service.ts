@@ -245,4 +245,59 @@ export class ClientReportService {
 
     return pendingReports;
   }
+
+  async getGroupedReportsByUserId(
+    userId: string,
+    completed?: boolean
+  ): Promise<any[]> {
+    const rawReports =
+      await this.clientReportRepository.findGroupedByUserIdAndDate(
+        userId,
+        completed
+      );
+
+    const groupedMap = new Map<
+      string,
+      {
+        client_id: string;
+        client_first_name: string;
+        client_last_name: string;
+        report_date: string;
+        reports: Array<{
+          report_id: string;
+          report_title: string | null;
+          file_path: string | null;
+          file_type: string | null;
+        }>;
+      }
+    >();
+
+    for (const report of rawReports) {
+      const client = report.client;
+      if (!client) continue;
+
+      const reportDate = report.created_date.split("T")[0]; // Extract date part
+      const key = `${report.client_id}_${reportDate}`;
+
+      if (!groupedMap.has(key)) {
+        groupedMap.set(key, {
+          client_id: report.client_id,
+          client_first_name: client.first_name,
+          client_last_name: client.last_name,
+          report_date: reportDate,
+          reports: [],
+        });
+      }
+
+      const group = groupedMap.get(key)!;
+      group.reports.push({
+        report_id: report.report_id,
+        report_title: report.report_title,
+        file_path: report.file_path,
+        file_type: report.file_type,
+      });
+    }
+
+    return Array.from(groupedMap.values());
+  }
 }
