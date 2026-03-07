@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Alert } from "react-native";
 import { useCreateAppointmentSlot } from "./useCreateAppointmentSlot";
 import { useCreateTask } from "./useCreateTask";
+import { useReserveAppointment } from "./useReserveAppointment";
 
 export const EVENT_TYPES = {
   TASK: "task",
@@ -11,6 +12,21 @@ export const EVENT_TYPES = {
 } as const;
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES];
+
+// Database UUIDs for task_type
+export const TASK_TYPE_IDS = {
+  REMINDER: "24f21ec7-bf59-4c35-9c54-36cb24afafbb",
+  APPOINTMENT: "2a431b4e-4089-422f-a343-a2fd8f3e2a2a",
+  APPOINTMENT_SLOT_WINDOW: "0d035079-2fb0-4e5f-8efc-a927fd55d843",
+} as const;
+
+// Database UUIDs for task_status
+export const TASK_STATUS_IDS = {
+  IN_PROGRESS: "6fe35772-6214-468c-ae26-1b2f2f067740",
+  CANCELLED: "8e5cebbe-28a9-4623-9e7c-e127eb39ed4f",
+  NOT_STARTED: "c2c4fceb-1a22-4b66-bb25-b37faa712c3a",
+  COMPLETED: "dbbdc7fa-aba7-43ab-8252-4766c1fbcfc1",
+} as const;
 
 type FormState = {
   eventType: EventType;
@@ -31,6 +47,10 @@ type FormState = {
   endDate: string;
   note: string;
 
+  // Slot window date/time (kept separate to avoid overwriting)
+  slotDate: string;
+  repeatUntil: string;
+
   // UI state
   repeatDays: number[];
   slotWindow: string;
@@ -47,13 +67,14 @@ const DEFAULT_FORM_STATE: FormState = {
   endDate: "",
   note: "",
   alarm: true,
-  userId: "",
+  userId: "2a3c19b8-d352-4b30-a2ac-1cdf993d310c",
   repeatDays: [],
   totalSlots: 1,
   location: "",
   slotWindow: "",
   slotNo: "",
-
+  slotDate: "",
+  repeatUntil: "",
   attachToSlot: false,
   isRecurring: false,
 };
@@ -64,7 +85,7 @@ const DEFAULT_APPOINTMENT_SLOT_STATE: FormState = {
   endDate: "",
   note: "",
   location: "",
-  userId: "",
+  userId: "2a3c19b8-d352-4b30-a2ac-1cdf993d310c",
   totalSlots: 1,
   repeatDays: [],
   taskTitle: "",
@@ -72,9 +93,42 @@ const DEFAULT_APPOINTMENT_SLOT_STATE: FormState = {
   alarm: false,
   slotWindow: "",
   slotNo: "",
-
+  slotDate: "",
+  repeatUntil: "",
   attachToSlot: false,
   isRecurring: false,
+};
+
+const DEFAULT_APPOINTMENT_STATE: FormState = {
+  eventType: EVENT_TYPES.APPOINTMENT,
+  taskTitle: "",
+  client: "",
+  startDate: "",
+  endDate: "",
+  note: "",
+  location: "",
+  userId: "2a3c19b8-d352-4b30-a2ac-1cdf993d310c",
+  totalSlots: 1,
+  repeatDays: [],
+  alarm: false,
+  slotWindow: "",
+  slotNo: "",
+  slotDate: "",
+  repeatUntil: "",
+  attachToSlot: false,
+  isRecurring: false,
+};
+
+/**
+ * Merge the date portion from `dateSource` with the time portion from `timeSource`.
+ * e.g. dateSource = "2025-11-15T00:00" + timeSource = "2025-01-01T08:30" → "2025-11-15T08:30"
+ */
+const mergeDateAndTime = (dateSource: string, timeSource: string): string => {
+  const d = new Date(dateSource);
+  const t = new Date(timeSource);
+  d.setHours(t.getHours(), t.getMinutes(), 0, 0);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 };
 
 export const useTaskHandler = (onClose: () => void) => {
@@ -92,11 +146,38 @@ export const useTaskHandler = (onClose: () => void) => {
     },
   });
 
+  // Also used for Appointment creation (appointments are tasks with APPOINTMENT type)
+  const { mutate: createAppointment, isPending: isAppointmentPending } =
+    useCreateTask({
+      onSuccess: () => {
+        Alert.alert("Success", "Appointment created successfully");
+        setFormState(DEFAULT_APPOINTMENT_STATE);
+        onClose();
+      },
+      onError: (message) => {
+        Alert.alert("Error", message);
+        console.error(message);
+      },
+    });
+
   const { mutate: createAppointmentSlot, isPending: isAppointmentSlotPending } =
     useCreateAppointmentSlot({
       onSuccess: () => {
         Alert.alert("Success", "Appointment slot created successfully");
         setFormState(DEFAULT_APPOINTMENT_SLOT_STATE);
+        onClose();
+      },
+      onError: (message) => {
+        Alert.alert("Error", message);
+        console.error(message);
+      },
+    });
+
+  const { mutate: reserveAppointment, isPending: isReservePending } =
+    useReserveAppointment({
+      onSuccess: () => {
+        Alert.alert("Success", "Appointment reserved successfully");
+        setFormState(DEFAULT_APPOINTMENT_STATE);
         onClose();
       },
       onError: (message) => {
@@ -115,18 +196,95 @@ export const useTaskHandler = (onClose: () => void) => {
     );
   };
 
+  const resetForm = () => {
+    setFormState(DEFAULT_FORM_STATE);
+  };
+
+  const switchEventType = (newType: EventType) => {
+    setFormState((prev) => {
+      const base: FormState = {
+        ...DEFAULT_FORM_STATE,
+        userId: prev.userId,
+        note: prev.note,
+        eventType: newType,
+      };
+
+      // Carry over client/title between Appointment ↔ Task
+      if (newType === EVENT_TYPES.APPOINTMENT || newType === EVENT_TYPES.TASK) {
+        base.taskTitle = prev.taskTitle;
+        base.client = prev.client;
+      }
+
+      // Carry over location between Appointment ↔ Slot Window
+      if (
+        newType === EVENT_TYPES.APPOINTMENT ||
+        newType === EVENT_TYPES.APPOINTMENT_SLOT_WINDOW
+      ) {
+        base.location = prev.location;
+      }
+
+      return base;
+    });
+  };
+
+  const toggleAttachToSlot = (attached: boolean) => {
+    setFormState((prev) => {
+      if (attached) {
+        // Attaching → clear standalone fields
+        return {
+          ...prev,
+          attachToSlot: true,
+          location: "",
+          startDate: "",
+          endDate: "",
+        };
+      }
+      // Detaching → clear slot fields
+      return {
+        ...prev,
+        attachToSlot: false,
+        slotWindow: "",
+        slotNo: "",
+      };
+    });
+  };
+
+  const toggleRecurring = (recurring: boolean) => {
+    setFormState((prev) => {
+      if (recurring) {
+        // Turning on → clear non-recurring date
+        return { ...prev, isRecurring: true, slotDate: "" };
+      }
+      // Turning off → clear recurring fields
+      return {
+        ...prev,
+        isRecurring: false,
+        repeatUntil: "",
+        repeatDays: [],
+      };
+    });
+  };
+
   const handleSave = () => {
-    if (isTaskPending || isAppointmentSlotPending) return;
+    if (
+      isTaskPending ||
+      isAppointmentPending ||
+      isAppointmentSlotPending ||
+      isReservePending
+    )
+      return;
 
     if (formState.eventType === EVENT_TYPES.TASK) {
       createTask({
         task_title: formState.taskTitle,
-        client: formState.client,
-        start_date: formState.startDate,
-        end_date: formState.endDate,
-        note: formState.note,
-        alarm: formState.alarm,
         user_id: formState.userId,
+        end_date: formState.endDate,
+        start_date: formState.startDate,
+        client_id: formState.client || undefined,
+        note: formState.note,
+        set_alarm: formState.alarm,
+        task_type_id: TASK_TYPE_IDS.REMINDER,
+        task_status_id: TASK_STATUS_IDS.NOT_STARTED,
       });
     }
 
@@ -148,34 +306,62 @@ export const useTaskHandler = (onClose: () => void) => {
           (d) => DAYS[d] as unknown as DayOfWeek
         );
 
+        // Recurring: merge repeatUntil date with start/end times
+        const baseDate = formState.repeatUntil || new Date().toISOString();
         createAppointmentSlot({
           is_recurring: true,
           user_id: formState.userId,
           location: formState.location,
           total_slots: formState.totalSlots,
-          start_time: formState.startDate,
-          end_time: formState.endDate,
-          repeat_until: formState.endDate,
+          start_time: mergeDateAndTime(baseDate, formState.startDate),
+          end_time: mergeDateAndTime(baseDate, formState.endDate),
+          repeat_until: formState.repeatUntil,
           day_of_week,
           note: formState.note,
         });
       } else {
+        // Non-recurring: merge slotDate with start/end times
         createAppointmentSlot({
           is_recurring: false,
           user_id: formState.userId,
           location: formState.location,
           total_slots: formState.totalSlots,
-          date: formState.startDate,
-          start_time: formState.startDate,
-          end_time: formState.endDate,
+          date: formState.slotDate,
+          start_time: mergeDateAndTime(formState.slotDate, formState.startDate),
+          end_time: mergeDateAndTime(formState.slotDate, formState.endDate),
           note: formState.note,
         });
       }
     }
 
     if (formState.eventType === EVENT_TYPES.APPOINTMENT) {
-      console.log("Appointment");
-      Alert.alert("Info", "Appointment not implemented yet");
+      if (formState.attachToSlot) {
+        // Reserve a slot in an existing slot window
+        if (!formState.slotWindow || !formState.client) {
+          Alert.alert(
+            "Missing Info",
+            "Please select a slot window and a client."
+          );
+          return;
+        }
+        reserveAppointment({
+          slot_window_id: formState.slotWindow,
+          client_id: formState.client,
+        });
+      } else {
+        // Standalone appointment
+        createAppointment({
+          task_title: formState.taskTitle,
+          user_id: formState.userId,
+          end_date: formState.endDate,
+          start_date: formState.startDate,
+          client_id: formState.client || undefined,
+          note: formState.note,
+          task_type_id: TASK_TYPE_IDS.APPOINTMENT,
+          task_status_id: TASK_STATUS_IDS.NOT_STARTED,
+          created_by: "PRACTITIONER",
+        });
+      }
     }
   };
 
@@ -183,6 +369,14 @@ export const useTaskHandler = (onClose: () => void) => {
     formState,
     setField,
     handleSave,
-    isPending: isTaskPending || isAppointmentSlotPending,
+    resetForm,
+    switchEventType,
+    toggleAttachToSlot,
+    toggleRecurring,
+    isPending:
+      isTaskPending ||
+      isAppointmentPending ||
+      isAppointmentSlotPending ||
+      isReservePending,
   };
 };
