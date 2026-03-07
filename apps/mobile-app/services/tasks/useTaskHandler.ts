@@ -131,6 +131,16 @@ const mergeDateAndTime = (dateSource: string, timeSource: string): string => {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 };
 
+/**
+ * Extract time portion from a date string as HH:MM:SS.
+ * e.g. "2025-01-01T08:30" → "08:30:00"
+ */
+const extractTime = (dateStr: string): string => {
+  const d = new Date(dateStr);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+};
+
 export const useTaskHandler = (onClose: () => void) => {
   const [formState, setFormState] = useState<FormState>(DEFAULT_FORM_STATE);
 
@@ -307,15 +317,14 @@ export const useTaskHandler = (onClose: () => void) => {
           (d) => DAYS[d] as unknown as DayOfWeek
         );
 
-        // Recurring: merge repeatUntil date with start/end times
-        const baseDate = formState.repeatUntil || new Date().toISOString();
+        // Recurring: send time-only values (HH:MM:SS) for the template
         createAppointmentSlot({
           is_recurring: true,
           user_id: formState.userId,
           location: formState.location,
           total_slots: formState.totalSlots,
-          start_time: mergeDateAndTime(baseDate, formState.startDate),
-          end_time: mergeDateAndTime(baseDate, formState.endDate),
+          start_time: extractTime(formState.startDate),
+          end_time: extractTime(formState.endDate),
           repeat_until: formState.repeatUntil,
           day_of_week,
           note: formState.note,
