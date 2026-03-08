@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export enum FormType {
   REQUEST_FORM = "REQUEST_FORM",
+  APPOINTMENT_RECORD = "APPOINTMENT_RECORD",
 }
 
 export interface Form {
@@ -10,7 +11,7 @@ export interface Form {
   description: string | null;
   version: number;
   is_active: boolean;
-  form_configuration: Record<string, unknown>[]; // JSONB array
+  form_configuration: Record<string, unknown>[];
   user_id: string;
   form_type: string;
   created_date: string;
@@ -26,6 +27,8 @@ export const formFieldSchema = z.object({
   description: z.string(),
   display_label: z.string(),
   options: z.array(z.string()).optional(),
+  required: z.boolean(),
+  shareable: z.boolean(),
 });
 
 export const createFormSchema = z.object({
