@@ -1,0 +1,27 @@
+import { z } from "zod";
+
+export interface AppointmentRecord {
+  appointment_record_id: string;
+  user_id: string;
+  client_id: string;
+  appointment_id: string;
+  form_id: string;
+  appointment_data: Record<string, unknown> | null;
+  note: string | null;
+  created_date: string;
+  updated_date: string;
+  deleted: boolean;
+}
+
+export const createAppointmentRecordSchema = z.object({
+  user_id: z.string().uuid(),
+  client_id: z.string().uuid(),
+  appointment_id: z.string().uuid(),
+  form_id: z.string().uuid(),
+  appointment_data: z.record(z.string(), z.unknown()).optional().nullable(),
+  note: z.string().optional().nullable(),
+});
+
+export type CreateAppointmentRecordInput = z.infer<
+  typeof createAppointmentRecordSchema
+>;

@@ -1,4 +1,5 @@
 export * from "./ai";
+export * from "./appointment-records";
 export * from "./client-reports";
 export * from "./clients";
 export * from "./controller";
