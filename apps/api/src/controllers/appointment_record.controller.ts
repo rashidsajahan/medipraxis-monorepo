@@ -1,6 +1,6 @@
-import type { CreateAppointmentRecordInput } from "@repo/models";
 import { getAppointmentRecordService } from "../lib";
 import type { APIContext } from "../types/api-context";
+import type { CreateAppointmentRecordInput, GetAppointmentRecordQuery } from "@repo/models";
 
 export class AppointmentRecordController {
   static async create(c: APIContext<{ json: CreateAppointmentRecordInput }>) {
@@ -17,6 +17,38 @@ export class AppointmentRecordController {
           ? error.message
           : "Failed to create appointment record";
       return c.json({ error: message }, 400);
+    }
+  }
+
+  static async getByClientId(
+    c: APIContext<{ query: GetAppointmentRecordQuery }>
+  ) {
+    try {
+      const service = getAppointmentRecordService(c);
+      const clientId = c.req.query("client_id") as string;
+      const appointmentId = c.req.query("appointment_id");
+
+      if (appointmentId) {
+        const record = await service.getByClientIdAndAppointmentId(
+          clientId,
+          appointmentId
+        );
+        return c.json({ record });
+      }
+
+      const records = await service.getByClientId(clientId);
+      return c.json({ records, count: records.length });
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to get appointment record";
+      const status =
+        error instanceof Error &&
+        error.message === "Appointment record not found"
+          ? 404
+          : 500;
+      return c.json({ error: message }, status);
     }
   }
 }

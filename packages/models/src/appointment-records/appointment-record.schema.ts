@@ -22,6 +22,10 @@ export const createAppointmentRecordSchema = z.object({
   note: z.string().optional().nullable(),
 });
 
-export type CreateAppointmentRecordInput = z.infer<
-  typeof createAppointmentRecordSchema
->;
+export const getAppointmentRecordQuerySchema = z.object({
+  client_id: z.string().uuid(),
+  appointment_id: z.string().uuid().optional(),
+});
+
+export type CreateAppointmentRecordInput = z.infer<typeof createAppointmentRecordSchema>;
+export type GetAppointmentRecordQuery = z.infer<typeof getAppointmentRecordQuerySchema>;

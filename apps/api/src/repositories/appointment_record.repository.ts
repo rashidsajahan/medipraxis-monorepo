@@ -33,4 +33,32 @@ export class AppointmentRecordRepository {
 
     return data as AppointmentRecord;
   }
+
+  async findByClientId(clientId: string): Promise<AppointmentRecord[]> {
+    const { data, error } = await this.db
+      .from("appointment_record")
+      .select("*")
+      .eq("client_id", clientId)
+      .eq("deleted", false)
+      .order("created_date", { ascending: false });
+
+    if (error || !data) return [];
+    return data as AppointmentRecord[];
+  }
+
+  async findByClientIdAndAppointmentId(
+    clientId: string,
+    appointmentId: string
+  ): Promise<AppointmentRecord | null> {
+    const { data, error } = await this.db
+      .from("appointment_record")
+      .select("*")
+      .eq("client_id", clientId)
+      .eq("appointment_id", appointmentId)
+      .eq("deleted", false)
+      .single();
+
+    if (error || !data) return null;
+    return data as AppointmentRecord;
+  }
 }

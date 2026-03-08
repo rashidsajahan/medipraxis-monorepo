@@ -16,4 +16,21 @@ export class AppointmentRecordService {
   ): Promise<AppointmentRecord> {
     return await this.appointmentRecordRepository.create(input);
   }
+
+  async getByClientId(clientId: string): Promise<AppointmentRecord[]> {
+    return await this.appointmentRecordRepository.findByClientId(clientId);
+  }
+
+  async getByClientIdAndAppointmentId(
+    clientId: string,
+    appointmentId: string
+  ): Promise<AppointmentRecord> {
+    const record =
+      await this.appointmentRecordRepository.findByClientIdAndAppointmentId(
+        clientId,
+        appointmentId
+      );
+    if (!record) throw new Error("Appointment record not found");
+    return record;
+  }
 }
