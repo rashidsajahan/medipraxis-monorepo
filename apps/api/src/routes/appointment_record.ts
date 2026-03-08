@@ -24,6 +24,11 @@ const appointmentRecords = new Hono()
     zValidator("param", getAppointmentRecordParamSchema),
     zValidator("json", updateAppointmentRecordSchema),
     AppointmentRecordController.update
+  )
+  .delete(
+    "/:id",
+    zValidator("param", getAppointmentRecordParamSchema),
+    AppointmentRecordController.delete
   );
 
 export default appointmentRecords;

@@ -87,4 +87,19 @@ export class AppointmentRecordRepository {
 
     return data as AppointmentRecord;
   }
+
+  async delete(recordId: string): Promise<void> {
+    const { error } = await this.db
+      .from("appointment_record")
+      .update({
+        deleted: true,
+        updated_date: new Date().toISOString(),
+      })
+      .eq("appointment_record_id", recordId)
+      .eq("deleted", false);
+
+    if (error) {
+      throw new Error(error?.message || "Failed to delete appointment record");
+    }
+  }
 }

@@ -78,4 +78,23 @@ export class AppointmentRecordController {
       return c.json({ error: message }, 400);
     }
   }
+
+  static async delete(
+    c: APIContext<{ param: GetAppointmentRecordParam }, "/:id">
+  ) {
+    try {
+      const service = getAppointmentRecordService(c);
+      const recordId = c.req.param("id");
+
+      await service.deleteRecord(recordId);
+
+      return c.json({ success: true });
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to delete appointment record";
+      return c.json({ error: message }, 400);
+    }
+  }
 }

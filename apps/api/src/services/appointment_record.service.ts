@@ -41,4 +41,8 @@ export class AppointmentRecordService {
   ): Promise<AppointmentRecord> {
     return await this.appointmentRecordRepository.update(recordId, input);
   }
+
+  async deleteRecord(recordId: string): Promise<void> {
+    await this.appointmentRecordRepository.delete(recordId);
+  }
 }
