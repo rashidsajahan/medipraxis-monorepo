@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button, StyleSheet } from "react-native";
 
 import TaskForm from "@/components/advanced/taskPanel/TaskForm";
-import { FormSetupCenter } from "./settings/formSetupCenter";
+import { FormSetupCenter } from "./settings/components/form-setup-center";
 
 export default function TabOneScreen() {
   const [showForm, setShowForm] = useState(false);
