@@ -602,8 +602,8 @@ export class SlotWindowService {
     return slotWindow;
   }
 
-  async getAllSlotWindowsByUserId(userId: string): Promise<SlotWindow[]> {
-    return await this.slotWindowRepository.findAllSlotWindowsByUserId(userId);
+  async getAllSlotWindowsByUserId(userId: string, date?: string): Promise<SlotWindow[]> {
+    return await this.slotWindowRepository.findAllSlotWindowsByUserId(userId, date);
   }
 
   async getAllSlotWindowTemplatesByUserId(

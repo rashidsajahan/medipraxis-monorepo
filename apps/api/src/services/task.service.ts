@@ -19,7 +19,8 @@ export class TaskService {
     userId: string,
     taskType?: keyof typeof TaskType,
     taskStatus?: keyof typeof TaskStatus,
-    slotWindowId?: string
+    slotWindowId?: string,
+    date?: string
   ): Promise<TaskDetails[]> {
     // Get task type ID if task type name is provided
     let taskTypeId: string | undefined;
@@ -49,6 +50,7 @@ export class TaskService {
       taskTypeId,
       taskStatusId,
       slotWindowId,
+      date,
     });
   }
 

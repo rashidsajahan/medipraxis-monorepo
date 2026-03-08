@@ -445,12 +445,19 @@ export class SlotWindowRepository {
     return data as SlotWindow[];
   }
 
-  async findAllSlotWindowsByUserId(userId: string): Promise<SlotWindow[]> {
-    const { data, error } = await this.db
+  async findAllSlotWindowsByUserId(userId: string, date?: string): Promise<SlotWindow[]> {
+    let query = this.db
       .from(SLOT_WINDOW_QUERIES.SLOT_WINDOW_TABLE)
       .select(SLOT_WINDOW_QUERIES.SLOT_WINDOW_BASE)
-      .eq("user_id", userId)
-      .order("start_date", { ascending: true });
+      .eq("user_id", userId);
+
+    if (date) {
+      const startOfDay = `${date}T00:00:00`;
+      const endOfDay = `${date}T23:59:59`;
+      query = query.gte("start_date", startOfDay).lte("start_date", endOfDay);
+    }
+
+    const { data, error } = await query.order("start_date", { ascending: true });
 
     if (error || !data) {
       return [];

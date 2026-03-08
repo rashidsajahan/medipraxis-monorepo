@@ -249,6 +249,7 @@ export class TaskRepository {
       taskTypeId?: string;
       taskStatusId?: string;
       slotWindowId?: string;
+      date?: string;
     }
   ): Promise<TaskDetails[]> {
     let query = this.db
@@ -267,6 +268,12 @@ export class TaskRepository {
 
     if (options?.slotWindowId) {
       query = query.eq("slot_window_id", options.slotWindowId);
+    }
+
+    if (options?.date) {
+      const startOfDay = `${options.date}T00:00:00`;
+      const endOfDay = `${options.date}T23:59:59`;
+      query = query.gte("start_date", startOfDay).lte("start_date", endOfDay);
     }
 
     const { data, error } = await query.order("start_date", {

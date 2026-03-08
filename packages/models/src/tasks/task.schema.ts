@@ -50,6 +50,7 @@ export const getAllTasksQuerySchema = z.object({
   task_type: TaskTypeEnum.optional(),
   task_status: TaskStatusEnum.optional(),
   slot_window_id: z.string().optional(),
+  date: z.string().optional(), // YYYY-MM-DD to filter tasks for a specific day
 });
 
 export const getAppointmentsByClientQuerySchema = z.object({
