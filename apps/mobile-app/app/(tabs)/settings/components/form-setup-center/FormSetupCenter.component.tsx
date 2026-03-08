@@ -49,10 +49,12 @@ export function FormSetupCenter({ visible, onClose }: FormSetupCenterProps) {
       {/* Back Button - only show in modal mode */}
       {onClose && (
         <View className="px-5 pt-4 pb-2">
-          <ButtonComponent.BackButton
-            size={ButtonSize.Small}
-            onPress={onClose}
-          />
+          <View style={{ alignSelf: "flex-start" }}>
+            <ButtonComponent.BackButton
+              size={ButtonSize.Small}
+              onPress={onClose}
+            />
+          </View>
         </View>
       )}
 

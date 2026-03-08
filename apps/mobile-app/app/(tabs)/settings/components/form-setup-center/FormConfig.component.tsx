@@ -264,11 +264,13 @@ export function FormConfig({
       >
         <View className="flex-1 bg-white">
           {/* Header with Back Button */}
-          <View className="px-5 pt-4 pb-2 flex-row items-center">
-            <ButtonComponent.BackButton
-              size={ButtonSize.Small}
-              onPress={onClose}
-            />
+          <View className="px-5 pt-4 pb-2">
+            <View style={{ alignSelf: "flex-start" }}>
+              <ButtonComponent.BackButton
+                size={ButtonSize.Small}
+                onPress={onClose}
+              />
+            </View>
           </View>
 
           <ScrollView
