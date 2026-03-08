@@ -30,10 +30,8 @@ export function FieldItem({
   });
   const dragStartY = useRef<number>(0);
   const isDraggingRef = useRef<boolean>(false);
-
-  // Animation values
   const scaleXAnim = useRef(new Animated.Value(1)).current;
-  const elevationAnim = useRef(new Animated.Value(0)).current;
+  const shadowOpacityAnim = useRef(new Animated.Value(0)).current;
 
   // Animate when dragging state changes
   useEffect(() => {
@@ -45,10 +43,10 @@ export function FieldItem({
           friction: 8,
           tension: 40,
         }),
-        Animated.timing(elevationAnim, {
-          toValue: 1,
+        Animated.timing(shadowOpacityAnim, {
+          toValue: 0.3,
           duration: 200,
-          useNativeDriver: false,
+          useNativeDriver: true,
         }),
       ]).start();
     } else {
@@ -59,14 +57,14 @@ export function FieldItem({
           friction: 8,
           tension: 40,
         }),
-        Animated.timing(elevationAnim, {
+        Animated.timing(shadowOpacityAnim, {
           toValue: 0,
           duration: 200,
-          useNativeDriver: false,
+          useNativeDriver: true,
         }),
       ]).start();
     }
-  }, [isDragging, scaleXAnim, elevationAnim]);
+  }, [isDragging, scaleXAnim, shadowOpacityAnim]);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -102,17 +100,6 @@ export function FieldItem({
   }
 
   const FieldIcon = field.icon;
-
-  // Interpolate elevation
-  const elevationValue = elevationAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 8],
-  });
-
-  const shadowOpacity = elevationAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 0.3],
-  });
 
   // Web-compatible drag handlers
   const handleMouseDown = (e: any) => {
@@ -152,8 +139,8 @@ export function FieldItem({
         borderColor: Color.LightGrey,
         marginBottom: 24,
         transform: [{ scaleX: scaleXAnim }],
-        elevation: elevationValue,
-        shadowOpacity: shadowOpacity,
+        elevation: isDragging ? 8 : 2,
+        shadowOpacity: shadowOpacityAnim,
         shadowColor: Color.Black,
         shadowOffset: { width: 0, height: 2 },
         shadowRadius: 4,
