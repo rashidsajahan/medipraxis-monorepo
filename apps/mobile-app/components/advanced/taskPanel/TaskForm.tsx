@@ -493,7 +493,7 @@ export default function TaskForm({ visible, onClose }: Props) {
             <View style={{ flex: 1, marginRight: 8 }}>
               <ButtonComponent
                 size={ButtonSize.Large}
-                buttonColor={Color.LightGrey}
+                buttonColor={Color.LightCream}
                 textColor={Color.Grey}
                 onPress={() => {
                   resetForm();
