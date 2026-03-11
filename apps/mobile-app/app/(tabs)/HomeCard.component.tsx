@@ -1,6 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Color } from "@repo/config";
-import { ImageBackground, Text, TouchableOpacity, View } from "react-native";
+import { Color, TextSize, TextVariant, textStyles } from "@repo/config";
+import {
+  Image,
+  ImageBackground,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import {
   Defs,
   LinearGradient,
@@ -32,9 +38,30 @@ function getGreeting(): string {
   return "Good Evening,";
 }
 
+function applyTextStyle(variant: TextVariant, size: TextSize) {
+  const style =
+    textStyles[variant][size as keyof (typeof textStyles)[typeof variant]];
+
+  const fontFamilyMap: Record<string, string> = {
+    lato: "Lato",
+    dm_sans: "DMSans",
+  };
+
+  return {
+    fontFamily: fontFamilyMap[style.fontFamily] ?? undefined,
+    fontSize: style.fontSize,
+    fontWeight: String(style.fontWeight) as any,
+    fontStyle: style.fontStyle as any,
+    ...(style.lineHeight && { lineHeight: style.lineHeight }),
+    ...(style.letterSpacing && { letterSpacing: style.letterSpacing }),
+  };
+}
+
 interface HomeCardProps {
   name?: string;
   notificationCount?: number;
+  appointmentCount?: number;
+  taskCount?: number;
   onNotificationPress?: () => void;
   onSettingsPress?: () => void;
 }
@@ -42,26 +69,25 @@ interface HomeCardProps {
 export default function HomeCard({
   name = "Katherine",
   notificationCount = 8,
+  appointmentCount = 15,
+  taskCount = 7,
   onNotificationPress,
   onSettingsPress,
 }: HomeCardProps) {
   return (
     <ImageBackground
       source={require("@/assets/images/home/card-background.png")}
-      style={{ width: "100%", height: 240 }}
+      style={{ width: "100%", height: 300 }}
       imageStyle={{ borderBottomLeftRadius: 24, borderBottomRightRadius: 24 }}
       resizeMode="cover"
     >
       {/* Date + Icons Row */}
       <View className="flex-row justify-between items-center px-5 pt-5">
-        {/* Date */}
         <Text style={{ color: Color.Black, fontSize: 14, fontWeight: "500" }}>
           {getFormattedDate()}
         </Text>
 
-        {/* Icons */}
         <View className="flex-row items-center gap-3">
-          {/* Notification Bell */}
           <TouchableOpacity onPress={onNotificationPress} className="relative">
             <Ionicons
               name="notifications-outline"
@@ -82,7 +108,6 @@ export default function HomeCard({
             )}
           </TouchableOpacity>
 
-          {/* Settings */}
           <TouchableOpacity onPress={onSettingsPress}>
             <Ionicons name="settings-outline" size={22} color={Color.Black} />
           </TouchableOpacity>
@@ -90,7 +115,7 @@ export default function HomeCard({
       </View>
 
       {/* Greeting + Name */}
-      <View className="px-5 pt-6">
+      <View className="px-5 pt-3">
         <Text style={{ color: Color.Black, fontSize: 32, fontWeight: "700" }}>
           {getGreeting()}
         </Text>
@@ -114,6 +139,85 @@ export default function HomeCard({
             {name}
           </SvgText>
         </Svg>
+      </View>
+
+      {/* Stats Cards Row */}
+      <View className="flex-row px-5 gap-3 mt-5">
+        {/* Appointments Card */}
+        <View
+          className="flex-1 rounded-2xl overflow-hidden justify-center items-center py-4"
+          style={{ backgroundColor: Color.LightCream, minHeight: 120 }}
+        >
+          <Image
+            source={require("@/assets/images/home/appointment.png")}
+            style={{
+              position: "absolute",
+              left: -8,
+              bottom: -8,
+              width: 110,
+              height: 110,
+              opacity: 1,
+            }}
+            resizeMode="contain"
+          />
+          <Text
+            style={{
+              ...applyTextStyle(TextVariant.Title, TextSize.Small),
+              color: Color.Black,
+              textAlign: "center",
+            }}
+          >
+            APPOINTMENTS
+          </Text>
+          <Text
+            style={{
+              ...applyTextStyle(TextVariant.Title, TextSize.Large),
+              color: Color.Black,
+              textAlign: "center",
+              lineHeight: 36,
+            }}
+          >
+            {String(appointmentCount).padStart(2, "0")}
+          </Text>
+        </View>
+
+        {/* Tasks Card */}
+        <View
+          className="flex-1 rounded-2xl overflow-hidden justify-center items-center py-4"
+          style={{ backgroundColor: Color.LightCream, minHeight: 120 }}
+        >
+          <Image
+            source={require("@/assets/images/home/tasks.png")}
+            style={{
+              position: "absolute",
+              right: -8,
+              top: -8,
+              width: 110,
+              height: 110,
+              opacity: 1,
+            }}
+            resizeMode="contain"
+          />
+          <Text
+            style={{
+              ...applyTextStyle(TextVariant.Title, TextSize.Small),
+              color: Color.Black,
+              textAlign: "center",
+            }}
+          >
+            TASKS
+          </Text>
+          <Text
+            style={{
+              ...applyTextStyle(TextVariant.Title, TextSize.Large),
+              color: Color.Black,
+              textAlign: "center",
+              lineHeight: 36,
+            }}
+          >
+            {String(taskCount).padStart(2, "0")}
+          </Text>
+        </View>
       </View>
     </ImageBackground>
   );
