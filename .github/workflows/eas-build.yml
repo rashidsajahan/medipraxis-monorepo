@@ -32,4 +32,6 @@ jobs:
       - name: Build APK on EAS
         # We cd into the app directory because you are in a monorepo
         working-directory: ./apps/mobile-app
+        env:
+          EAS_BUILD_NO_EXPO_GO_WARNING: "true"
         run: eas build --platform android --profile production --non-interactive
