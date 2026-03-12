@@ -3,6 +3,7 @@ import { View } from "@/components/Themed";
 import { Input, InputField, InputSlot } from "@/components/ui/input";
 import { Icons } from "@/config";
 import {
+  fetchClientsByContactNumber,
   groupClientsByLetter,
   useCreateClient,
   useFetchClients,
@@ -10,7 +11,7 @@ import {
 } from "@/services/clients";
 import { Color, Font, TextSize, TextVariant, textStyles } from "@repo/config";
 import { useRouter } from "expo-router";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Platform,
@@ -51,17 +52,62 @@ export default function ClientsScreen({
   const router = useRouter();
 
   // Fetch clients using React Query
-  const { data: clients = [], isLoading } = useFetchClients(userId);
+  const { data: clients, isLoading } = useFetchClients(userId);
 
   // Create client mutation
   const createClientMutation = useCreateClient(userId);
 
   // Filter clients based on search
-  const filteredClients = clients.filter((client) =>
-    client.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const groupedClients = useMemo(() => {
+    const filteredClients = (clients ?? []).filter((client) =>
+      client.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
-  const groupedClients = groupClientsByLetter(filteredClients);
+    const groupClient = groupClientsByLetter(filteredClients);
+    return groupClient;
+  }, [clients, searchQuery]);
+
+  const { mutateAsync: checkPhone } = fetchClientsByContactNumber();
+
+  const [familyMembersMap, setFamilyMembersMap] = useState<
+    Record<string, any[]>
+  >({});
+
+  // TODO: add useDEBounce for the sort fn
+  useEffect(() => {
+    let globalIndex = 0;
+
+    const fetchFirstThree = async () => {
+      const letters = Object.keys(groupedClients).sort();
+      const members: Record<string, any[]> = {};
+      for (const letter of letters) {
+        const clientGroup = groupedClients[letter];
+        if (!clientGroup) continue;
+
+        for (const client of clientGroup) {
+          const currentIndex = globalIndex++;
+          if (currentIndex >= 3) return;
+          if (familyMembersMap[client.id]) continue;
+
+          try {
+            const res = await checkPhone({
+              countryCode: "+94",
+              contactNumber: "771245786",
+            });
+
+            members[client.id] = res.clients ?? [];
+          } catch (err) {
+            console.log("Family fetch failed", err);
+          }
+        }
+        setFamilyMembersMap(members);
+      }
+    };
+
+    if (Object.keys(groupedClients).length > 0 && searchQuery) {
+      fetchFirstThree();
+    }
+  }, [groupedClients, searchQuery]);
 
   const handleClientPress = (clientId: string) => {
     router.push(`/clients/${clientId}` as any);
@@ -139,7 +185,7 @@ export default function ClientsScreen({
   }
 
   // Empty state - no clients loaded
-  if (clients.length === 0) {
+  if (clients?.length === 0) {
     return (
       <View className="flex-1 pt-5">
         {/* Header */}
@@ -233,6 +279,8 @@ export default function ClientsScreen({
     );
   }
 
+  let globalIndex = 0;
+
   return (
     <View className="flex-1 pt-5">
       {/* Header */}
@@ -323,16 +371,21 @@ export default function ClientsScreen({
                   >
                     {letter}
                   </TextComponent>
-                  {clientGroup.map((client) => (
-                    <ClientCardComponent
-                      key={client.id}
-                      id={client.id}
-                      name={client.name}
-                      color={client.color}
-                      icon={client.icon}
-                      onPress={() => handleClientPress(client.id)}
-                    />
-                  ))}
+                  {clientGroup.map((client) => {
+                    const currentIndex = globalIndex++;
+                    return (
+                      <ClientCardComponent
+                        key={client.id}
+                        id={client.id}
+                        name={client.name}
+                        color={client.color}
+                        icon={client.icon}
+                        onPress={() => handleClientPress(client.id)}
+                        index={currentIndex}
+                        familyMembers={familyMembersMap[client.id] || []}
+                      />
+                    );
+                  })}
                 </View>
               );
             })}

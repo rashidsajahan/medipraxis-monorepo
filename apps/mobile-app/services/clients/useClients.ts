@@ -15,7 +15,7 @@ export interface ClientDisplay {
 }
 
 // Helper function to get random color
-const getRandomColor = (): string => {
+export const getRandomColor = (): string => {
   const colors = [
     "#F4D03F",
     "#85C1E9",
@@ -32,7 +32,7 @@ const getRandomColor = (): string => {
 };
 
 // Helper function to get random icon
-const getRandomIcon = (): IconName => {
+export const getRandomIcon = (): IconName => {
   const icons: IconName[] = ["Heart", "Star", "Check", "Plus"];
   return icons[Math.floor(Math.random() * icons.length)] || "Heart";
 };
@@ -42,6 +42,7 @@ const mapClientToDisplay = (client: Client): ClientDisplay => {
   const fullName = `${client.first_name} ${client.last_name || ""}`.trim();
 
   return {
+    ...client,
     id: client.client_id,
     name: fullName,
     initial: client.first_name.charAt(0).toUpperCase(),
@@ -220,8 +221,8 @@ export const useFetchClientById = (clientId: string) => {
   });
 };
 
-// Check phone exists hook
-export const useCheckPhoneExists = () => {
+// fetch clients by contact number(country code + phone number)
+export const fetchClientsByContactNumber = () => {
   return useMutation({
     mutationFn: async ({
       countryCode,
@@ -246,4 +247,5 @@ export const useCheckPhoneExists = () => {
       return data;
     },
   });
+  //TODO: cache by contact number.
 };
