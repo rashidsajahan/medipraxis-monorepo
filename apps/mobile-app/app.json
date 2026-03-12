@@ -4,7 +4,7 @@
     "slug": "medipraxis",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/brand-logo.png",
+    "icon": "./assets/images/app-brand-logo.png",
     "scheme": "medipraxis",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -19,7 +19,7 @@
     "android": {
       "package": "com.medipraxis.app",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/brand-logo.png",
+        "foregroundImage": "./assets/images/app-brand-logo.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
@@ -28,7 +28,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/brand-logo.png"
+      "favicon": "./assets/images/app-brand-logo.png"
     },
     "plugins": ["expo-router"],
     "experiments": {
@@ -37,8 +37,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "5609fe88-5fe6-4fb3-8815-88552a09c3e4"
+        "projectId": "154f9738-64fd-4fb1-91d6-b856b19cdeb0"
       }
-    }
+    },
+    "owner": "rashidsajahan22"
   }
 }
