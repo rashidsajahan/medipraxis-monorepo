@@ -32,7 +32,9 @@ export const useCreateTask = (options?: UseCreateTaskOptions) => {
 
       if (!res.ok) {
         const errorData = (await res.json().catch(() => ({}))) as any;
-        throw new Error(errorData?.error ?? errorData?.message ?? "Failed to create task");
+        throw new Error(
+          errorData?.error ?? errorData?.message ?? "Failed to create task"
+        );
       }
 
       return res.json();

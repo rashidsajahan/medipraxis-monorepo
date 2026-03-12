@@ -52,7 +52,9 @@ export const useCreateAppointmentSlot = (
         if (!res.ok) {
           const errorData = (await res.json().catch(() => ({}))) as any;
           throw new Error(
-            errorData?.error ?? errorData?.message ?? "Failed to create appointment template"
+            errorData?.error ??
+              errorData?.message ??
+              "Failed to create appointment template"
           );
         }
         return res.json();
@@ -70,7 +72,9 @@ export const useCreateAppointmentSlot = (
         if (!res.ok) {
           const errorData = (await res.json().catch(() => ({}))) as any;
           throw new Error(
-            errorData?.error ?? errorData?.message ?? "Failed to create appointment slot"
+            errorData?.error ??
+              errorData?.message ??
+              "Failed to create appointment slot"
           );
         }
         return res.json();
