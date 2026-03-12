@@ -4,7 +4,6 @@
   },
   "build": {
     "production": {
-      "node": "20.18.0",
       "env": {
         "EAS_BUILD_NO_EXPO_GO_WARNING": "true"
       },
