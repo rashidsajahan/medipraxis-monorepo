@@ -133,6 +133,16 @@ export default function TaskForm({ visible, onClose }: Props) {
     });
   }, [selectedSlotWindow]);
 
+  const averageMinutesPerSlot = useMemo(() => {
+    if (!startDate || !endDate || !totalSlots || totalSlots <= 0) return null;
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffMs = end.getTime() - start.getTime();
+    if (diffMs <= 0) return null;
+    const diffMins = diffMs / (1000 * 60);
+    return Math.round(diffMins / totalSlots);
+  }, [startDate, endDate, totalSlots]);
+
   const toggleDay = (dayIndex: number) => {
     const updatedDays = repeatDays.includes(dayIndex)
       ? repeatDays.filter((d: number) => d !== dayIndex)
@@ -199,7 +209,11 @@ export default function TaskForm({ visible, onClose }: Props) {
                   placeholder: "10",
                 }}
                 inputType={TextInputType.Number}
-                helperText="average 15mins per slot"
+                helperText={
+                  averageMinutesPerSlot
+                    ? `Average ${averageMinutesPerSlot}mins per slot`
+                    : "Average 15mins per slot"
+                }
               />
 
               {!isRecurring && (
