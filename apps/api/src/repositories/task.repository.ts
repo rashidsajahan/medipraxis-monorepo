@@ -114,10 +114,7 @@ export class TaskRepository {
     return task as Task;
   }
 
-  async update(
-    taskId: string,
-    taskData: UpdateTaskData
-  ): Promise<Task | null> {
+  async update(taskId: string, taskData: UpdateTaskData): Promise<Task | null> {
     const updateData: UpdateTaskData & { modified_date: string } = {
       ...taskData,
       modified_date: new Date().toISOString(),
@@ -136,6 +133,25 @@ export class TaskRepository {
     }
 
     return data as Task;
+  }
+
+  // Only for debugging don't use this in production, this might cause side effects if the slot windows are linked to appointments
+  async deleteByIds(taskIds: string[]): Promise<string[]> {
+    if (taskIds.length === 0) {
+      return [];
+    }
+
+    const { data, error } = await this.db
+      .from("task")
+      .delete()
+      .in("task_id", taskIds)
+      .select("task_id");
+
+    if (error) {
+      throw new Error(`Failed to delete tasks: ${error.message}`);
+    }
+
+    return (data ?? []).map((task) => task.task_id as string);
   }
 
   async getAppointmentCountForDate(

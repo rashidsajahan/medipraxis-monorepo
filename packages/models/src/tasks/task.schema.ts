@@ -116,7 +116,10 @@ export type GetAppointmentsByClientQuery = z.infer<
 export type CreateTaskInput = z.infer<typeof createTaskSchema>;
 // TODO: UpdateTaskInput & UpdateTaskData can be merged if we introduce enums to the tasks db table
 export type UpdateTaskInput = z.infer<typeof updateTaskSchema>;
-export type UpdateTaskData = Omit<UpdateTaskInput, "task_type" | "task_status"> & {
+export type UpdateTaskData = Omit<
+  UpdateTaskInput,
+  "task_type" | "task_status"
+> & {
   task_type_id?: string;
   task_status_id?: string;
 };

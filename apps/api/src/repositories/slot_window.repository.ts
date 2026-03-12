@@ -370,6 +370,27 @@ export class SlotWindowRepository {
     return data as SlotWindow;
   }
 
+  // Only for debugging don't use this in production, this might cause side effects if the slot windows are linked to appointments
+  async deleteByIds(slotWindowIds: string[]): Promise<string[]> {
+    if (slotWindowIds.length === 0) {
+      return [];
+    }
+
+    const { data, error } = await this.db
+      .from(SLOT_WINDOW_QUERIES.SLOT_WINDOW_TABLE)
+      .delete()
+      .in("slot_window_id", slotWindowIds)
+      .select("slot_window_id");
+
+    if (error) {
+      throw new Error(`Failed to delete slot windows: ${error.message}`);
+    }
+
+    return (data ?? []).map(
+      (slotWindow) => slotWindow.slot_window_id as string
+    );
+  }
+
   // find all slot windows for clients
   async findSlotWindowsByUserId(
     query: FindAvailableSlotWindowsQuery
@@ -445,7 +466,10 @@ export class SlotWindowRepository {
     return data as SlotWindow[];
   }
 
-  async findAllSlotWindowsByUserId(userId: string, date?: string): Promise<SlotWindow[]> {
+  async findAllSlotWindowsByUserId(
+    userId: string,
+    date?: string
+  ): Promise<SlotWindow[]> {
     let query = this.db
       .from(SLOT_WINDOW_QUERIES.SLOT_WINDOW_TABLE)
       .select(SLOT_WINDOW_QUERIES.SLOT_WINDOW_BASE)
@@ -457,7 +481,9 @@ export class SlotWindowRepository {
       query = query.gte("start_date", startOfDay).lte("start_date", endOfDay);
     }
 
-    const { data, error } = await query.order("start_date", { ascending: true });
+    const { data, error } = await query.order("start_date", {
+      ascending: true,
+    });
 
     if (error || !data) {
       return [];

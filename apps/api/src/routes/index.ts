@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import ai from "./ai";
 import clientReports from "./client_reports";
 import clients from "./clients";
+import debug from "./debug";
 import forms from "./forms";
 import otp from "./otp";
 import requestReports from "./request_reports";
@@ -20,6 +21,7 @@ const routes = new Hono()
   .route("/shareable-calendar-links", shareableCalendarLinks)
   .route("/otp", otp)
   .route("/forms", forms)
-  .route("/request-reports", requestReports);
+  .route("/request-reports", requestReports)
+  .route("/debug", debug);
 
 export default routes;

@@ -98,6 +98,28 @@ export class TaskService {
     return task;
   }
 
+  // Only for debugging don't use this in production, this might cause side effects if the slot windows are linked to appointments
+  async debugCreateCustomAppointment(
+    input: Omit<CreateTaskInput, "task_type_id">
+  ): Promise<Task> {
+    const appointmentTypeId = await this.taskRepository.getTaskTypeByName(
+      TaskType.APPOINTMENT
+    );
+
+    if (!appointmentTypeId) {
+      throw new Error('Default task type "APPOINTMENT" not found in database');
+    }
+
+    return await this.createTask({
+      ...input,
+      task_type_id: appointmentTypeId,
+    });
+  }
+
+  async debugDeleteTasksByIds(taskIds: string[]): Promise<string[]> {
+    return await this.taskRepository.deleteByIds(taskIds);
+  }
+
   async createTask(input: CreateTaskInput): Promise<Task> {
     if (!input.start_date) {
       input.start_date = new Date().toISOString();

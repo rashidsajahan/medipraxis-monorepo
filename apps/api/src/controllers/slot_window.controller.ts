@@ -13,7 +13,9 @@ type SlotWindowParam = { id: string };
 
 export class SlotWindowController {
   // Get all slot windows for a user
-  static async getAllSlotWindows(c: APIContext<{ query: GetAllSlotWindowsQuery }>) {
+  static async getAllSlotWindows(
+    c: APIContext<{ query: GetAllSlotWindowsQuery }>
+  ) {
     try {
       const slotWindowService = getSlotWindowService(c);
       const userId = c.req.query("user_id");
@@ -24,8 +26,10 @@ export class SlotWindowController {
 
       const date = c.req.query("date");
 
-      const slotWindows =
-        await slotWindowService.getAllSlotWindowsByUserId(userId, date);
+      const slotWindows = await slotWindowService.getAllSlotWindowsByUserId(
+        userId,
+        date
+      );
 
       return c.json({ slotWindows, count: slotWindows.length });
     } catch (error) {

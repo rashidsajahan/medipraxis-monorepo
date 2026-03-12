@@ -6,4 +6,5 @@ export interface Env {
   TEXT_LK_API_KEY: string;
   TEXT_LK_API_URL: string;
   MEDIPRAXIS_WEB_URL: string;
+  IS_DEV?: string;
 }
