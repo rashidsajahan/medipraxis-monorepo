@@ -33,6 +33,7 @@ export const useGetReminders = (userId: string, date: string) => {
       content: { id: task.task_id, title: task.task_title },
       startTime: formatISOToTime(task.start_date),
       ...(task.end_date && { endTime: formatISOToTime(task.end_date) }),
+      isCompleted: task.task_status_name === "COMPLETED",
     }));
   }, [query.data]);
 

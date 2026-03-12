@@ -9,7 +9,7 @@ import { Icons } from "@/config";
 import { useUpdateTask } from "@/services/tasks";
 import { formatISOToSimple } from "@/utils/timeUtils";
 import { type TaskDetails } from "@repo/models";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Alert,
   Modal,
@@ -52,6 +52,10 @@ export const ViewReminderModal = ({
       : data?.task_status_name == "COMPLETED"
   );
 
+  useEffect(() => {
+    setIsChecked(data?.task_status_name === "COMPLETED");
+  }, [data?.task_status_name]);
+
   const handleEdit = () => {
     onEdit?.();
   };
@@ -64,7 +68,7 @@ export const ViewReminderModal = ({
     updateTask({
       task_id: data.task_id,
       data: {
-        task_status: isChecked ? "COMPLETED" : "IN_PROGRESS",
+        task_status: isChecked ? "IN_PROGRESS" : "COMPLETED",
       },
     });
   };
