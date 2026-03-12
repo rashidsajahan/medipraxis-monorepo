@@ -21,8 +21,10 @@ export const useReserveAppointment = (
       });
 
       if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error?.error ?? "Failed to reserve appointment");
+        const errorData = (await res.json().catch(() => ({}))) as any;
+        throw new Error(
+          errorData?.error ?? errorData?.message ?? "Failed to reserve appointment"
+        );
       }
 
       return res.json();
