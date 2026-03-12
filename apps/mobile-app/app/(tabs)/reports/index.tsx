@@ -3,6 +3,7 @@ import { Input, InputField, InputSlot } from "@/components/ui/input";
 import { Icons } from "@/config";
 import { useFetchGroupedReports } from "@/services/reports";
 import { Color, Font, TextSize, TextVariant, textStyles } from "@repo/config";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -24,6 +25,7 @@ const TEMP_USER_ID = "2a3c19b8-d352-4b30-a2ac-1cdf993d310c";
 export default function ReportsScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<TabType>("completed");
+  const router = useRouter();
 
   // Fetch reports based on active tab
   const { data: groupedReports = [], isLoading } = useFetchGroupedReports(
@@ -33,8 +35,7 @@ export default function ReportsScreen() {
 
   // Handle view client navigation
   const handleViewClient = (clientId: string) => {
-    // TODO: Navigate to client detail screen
-    console.log("View client:", clientId);
+    router.push(`/clients/${clientId}` as any);
   };
 
   // Handle report click for completed reports with files
