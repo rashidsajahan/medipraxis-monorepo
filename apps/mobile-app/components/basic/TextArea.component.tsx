@@ -17,6 +17,7 @@ interface TextAreaProps {
   label?: string;
   validationSchema?: z.ZodString;
   helperText?: string;
+  errorText?: string;
   hideHelperText?: boolean;
   validateOnChange?: boolean;
 }
@@ -31,6 +32,7 @@ export const TextAreaComponent: React.FC<TextAreaProps> = ({
   label,
   validationSchema,
   helperText,
+  errorText,
   hideHelperText = false,
   validateOnChange = true,
 }) => {
@@ -82,7 +84,7 @@ export const TextAreaComponent: React.FC<TextAreaProps> = ({
 
   // Determine border color based on validation
   const getBorderColor = () => {
-    if (isInvalid || validationError) return Color.Danger;
+    if (isInvalid || validationError || errorText) return Color.Danger;
     if (isValid && value !== "") return Color.Success;
     return Color.LightGrey;
   };
@@ -90,6 +92,7 @@ export const TextAreaComponent: React.FC<TextAreaProps> = ({
   // Determine message to display
   const getMessage = () => {
     if (hideHelperText) return null;
+    if (errorText) return errorText;
     if (validationError) return validationError;
     if (isValid) return helperText || null;
     if (helperText && !validationError && !isValid) return helperText;
@@ -98,7 +101,7 @@ export const TextAreaComponent: React.FC<TextAreaProps> = ({
 
   // Determine message color
   const getMessageColor = () => {
-    if (validationError) return Color.Danger;
+    if (errorText || validationError) return Color.Danger;
     if (isValid) return Color.Success;
     return Color.Grey;
   };
@@ -129,7 +132,7 @@ export const TextAreaComponent: React.FC<TextAreaProps> = ({
       <Textarea
         size="md"
         isDisabled={isDisabled}
-        isInvalid={isInvalid || !!validationError}
+        isInvalid={isInvalid || !!validationError || !!errorText}
         {...restInputWrapper}
         style={{
           borderColor: getBorderColor(),

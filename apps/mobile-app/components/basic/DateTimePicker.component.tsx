@@ -22,6 +22,7 @@ interface DateTimePickerProps {
   isInvalid?: boolean;
   isDisabled?: boolean;
   helperText?: string;
+  errorText?: string;
   hideHelperText?: boolean;
   className?: string;
 }
@@ -69,6 +70,7 @@ export const DateTimePickerComponent: React.FC<DateTimePickerProps> = ({
   isInvalid = false,
   isDisabled = false,
   helperText,
+  errorText,
   hideHelperText = false,
   className,
 }) => {
@@ -212,9 +214,9 @@ export const DateTimePickerComponent: React.FC<DateTimePickerProps> = ({
           variant="outline"
           size="md"
           isDisabled={isDisabled}
-          isInvalid={isInvalid}
+          isInvalid={isInvalid || !!errorText}
           style={{
-            borderColor: isInvalid ? Color.Danger : Color.LightGrey,
+            borderColor: errorText || isInvalid ? Color.Danger : Color.LightGrey,
             borderWidth: 1,
             borderRadius: 8,
             height: 50,
@@ -240,11 +242,11 @@ export const DateTimePickerComponent: React.FC<DateTimePickerProps> = ({
         </Input>
       </TouchableOpacity>
 
-      {!hideHelperText && helperText && (
+      {!hideHelperText && (errorText || helperText) && (
         <Text
           className="mt-1 ml-1"
           style={{
-            color: Color.Grey,
+            color: errorText ? Color.Danger : Color.Grey,
             fontFamily:
               textSmallStyle.fontFamily === Font.DMsans
                 ? "DMSans_400Regular"
@@ -255,7 +257,7 @@ export const DateTimePickerComponent: React.FC<DateTimePickerProps> = ({
             ) as RNTextStyle["fontWeight"],
           }}
         >
-          {helperText}
+          {errorText || helperText}
         </Text>
       )}
 
