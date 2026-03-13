@@ -115,14 +115,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     _title?: string
   ) => {
     try {
-      const user = await authService.register(
-        phoneNumber,
-        countryCode,
-        password,
-        username
-      );
-      await authStorage.setUser(user);
-      setUser(user);
+      await authService.register(phoneNumber, countryCode, password, username);
+      // Registration successful, but we don't log them in automatically.
+      // The user will be redirected manually from the Register screen.
     } catch (e) {
       throw e;
     }
