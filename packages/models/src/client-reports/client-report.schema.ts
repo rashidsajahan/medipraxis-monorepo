@@ -49,3 +49,11 @@ export interface GroupedClientReport {
     file_type: string | null;
   }>;
 }
+
+export interface ReportFileUrlResponse {
+  fileUrl: string;
+  reportTitle: string | null;
+  clientName: string;
+  uploadedOn: string;
+  expiresIn: string | null;
+}
