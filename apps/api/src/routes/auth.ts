@@ -29,7 +29,10 @@ const auth = new Hono<{ Bindings: Env }>()
         return c.json(result, 201);
       } catch (e: any) {
         console.error("Registration error:", e);
-        if (e.message === "User already exists") {
+        if (
+          e.message === "Username already exists" ||
+          e.message === "Mobile number already exists"
+        ) {
           return c.json({ error: e.message }, 409);
         }
         return c.json({ error: e.message }, 400);
@@ -70,9 +73,9 @@ const auth = new Hono<{ Bindings: Env }>()
 
       if (refreshToken) {
         // We can extract the user ID from the refresh token to call logout safely
-        const { verifyRefreshToken } = await import("../lib/jwt");
         try {
-          const payload = await verifyRefreshToken(refreshToken);
+          const payload =
+            await authService.jwtService.verifyRefreshToken(refreshToken);
           if (payload && payload.sub) {
             await authService.logout(payload.sub as string, refreshToken);
             return c.json({ message: "Logged out from this device" });

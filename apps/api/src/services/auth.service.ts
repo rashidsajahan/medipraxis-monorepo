@@ -23,8 +23,14 @@ export class AuthService {
       mobileNumber,
       countryCode
     );
-    if (existingUser) {
-      throw new Error("User already exists");
+    if (existingMobile) {
+      throw new Error("Mobile number already exists");
+    }
+
+    const existingUsername =
+      await this.userRepository.findUserByUsername(username);
+    if (existingUsername) {
+      throw new Error("Username already exists");
     }
 
     const passwordHash = await hashPassword(password);

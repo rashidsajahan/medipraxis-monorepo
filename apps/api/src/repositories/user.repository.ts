@@ -46,6 +46,20 @@ export class UserRepository {
     return data || null;
   }
 
+  async findUserByUsername(username: string) {
+    const { data, error } = await this.db
+      .from(USER_QUERIES.USER_TABLE)
+      .select(USER_QUERIES.USER_BASE)
+      .ilike("username", username)
+      .single();
+
+    if (error && error.code !== "PGRST116") {
+      throw new Error(`Failed to find user by username: ${error.message}`);
+    }
+
+    return data || null;
+  }
+
   async findUserByEmail(email: string) {
     const { data, error } = await this.db
       .from(USER_QUERIES.USER_TABLE)
