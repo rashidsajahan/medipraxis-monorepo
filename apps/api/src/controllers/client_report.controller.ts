@@ -92,12 +92,12 @@ export class ClientReportController {
       const reportId = c.req.param("id");
       const userId = c.req.param("user_id");
 
-      const fileUrl = await clientReportService.getReportFileUrl(
+      const reportFileData = await clientReportService.getReportFileUrl(
         reportId,
         userId
       );
 
-      return c.json({ fileUrl });
+      return c.json(reportFileData);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Failed to get file URL";

@@ -2,6 +2,7 @@ import type {
   ClientReport,
   CreateClientReportInput,
   PendingReport,
+  ReportFileUrlResponse,
 } from "@repo/models";
 import { ClientReportRepository, UserRepository } from "../repositories";
 import type { ClientRepository } from "../repositories/client.repository";
@@ -140,7 +141,10 @@ export class ClientReportService {
     return reportsWithStatus;
   }
 
-  async getReportFileUrl(reportId: string, userId: string): Promise<string> {
+  async getReportFileUrl(
+    reportId: string,
+    userId: string
+  ): Promise<ReportFileUrlResponse> {
     const report = await this.clientReportRepository.findById(reportId);
 
     if (!report) {
@@ -155,7 +159,26 @@ export class ClientReportService {
       throw new Error("Report has no associated file");
     }
 
-    return await this.clientReportRepository.getFileUrl(report.file_path, 300);
+    const fileUrl = await this.clientReportRepository.getFileUrl(
+      report.file_path,
+      300
+    );
+
+    const client = report.client_id
+      ? await this.clientRepository.findById(report.client_id)
+      : null;
+
+    const clientName = client
+      ? `${client.first_name} ${client.last_name}`.trim()
+      : "Unknown Client";
+
+    return {
+      fileUrl,
+      reportTitle: report.report_title,
+      clientName,
+      uploadedOn: report.created_date,
+      expiresIn: report.expiry_date,
+    };
   }
 
   async deleteReport(reportId: string): Promise<boolean> {
