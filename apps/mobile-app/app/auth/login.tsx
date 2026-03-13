@@ -1,10 +1,9 @@
 import { Icons } from "@/config";
 import { Color, TextSize, TextVariant } from "@repo/config";
 import { LinearGradient } from "expo-linear-gradient";
-import { Link } from "expo-router";
-import React, { useState } from "react";
+import { useLocalSearchParams, Link } from "expo-router";
+import React from "react";
 import { Alert, Image, TouchableOpacity, View } from "react-native";
-import { useAuth } from "../../auth/AuthContext";
 import {
   ButtonComponent,
   ButtonSize,
@@ -18,35 +17,30 @@ import {
   CheckboxIndicator,
   CheckboxLabel,
 } from "../../components/ui/checkbox";
+import { useAuthHandler } from "../../services/auth";
+import { Controller } from "react-hook-form";
 
 export default function LoginScreen() {
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [countryCode, setCountryCode] = useState("+94");
-  const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
-  const { signIn, isLoading } = useAuth();
+  const params = useLocalSearchParams<{
+    phoneNumber?: string;
+    countryCode?: string;
+  }>();
+
+  const { login, isLoading } = useAuthHandler({
+    phoneNumber: params.phoneNumber,
+    countryCode: params.countryCode,
+  });
+  const {
+    control,
+    formState: { errors },
+  } = login.form;
 
   const handleLogin = async () => {
-    if (!phoneNumber.trim()) {
-      Alert.alert("Error", "Phone number is required");
-      return;
-    }
-    if (!countryCode.trim()) {
-      Alert.alert("Error", "Country code is required");
-      return;
-    }
-    if (!password) {
-      Alert.alert("Error", "Password is required");
-      return;
-    }
     try {
-      await signIn(phoneNumber, countryCode, password);
+      await login.submit();
     } catch (e: any) {
       console.error("Login Error:", e);
-      Alert.alert(
-        "Login Failed",
-        typeof e.message === "string" ? e.message : JSON.stringify(e)
-      );
+      Alert.alert("Login Failed", e.message);
     }
   };
 
@@ -121,58 +115,85 @@ export default function LoginScreen() {
 
             <View className="flex-row items-center mb-4 gap-2">
               <View style={{ flex: 0.3 }}>
-                <TextInputComponent
-                  inputField={{
-                    placeholder: "Code",
-                    value: countryCode,
-                    onChangeText: setCountryCode,
-                  }}
+                <Controller
+                  control={control}
+                  name="countryCode"
+                  render={({ field: { onChange, value } }) => (
+                    <TextInputComponent
+                      inputField={{
+                        placeholder: "Code",
+                        value: value,
+                        onChangeText: onChange,
+                      }}
+                      errorText={errors.countryCode?.message}
+                    />
+                  )}
                 />
               </View>
               <View style={{ flex: 0.7 }}>
-                <TextInputComponent
-                  inputType={TextInputType.Phone}
-                  inputField={{
-                    placeholder: "Mobile Number",
-                    value: phoneNumber,
-                    onChangeText: setPhoneNumber,
-                  }}
+                <Controller
+                  control={control}
+                  name="phoneNumber"
+                  render={({ field: { onChange, value } }) => (
+                    <TextInputComponent
+                      inputType={TextInputType.Phone}
+                      inputField={{
+                        placeholder: "Mobile Number",
+                        value: value,
+                        onChangeText: onChange,
+                      }}
+                      errorText={errors.phoneNumber?.message}
+                    />
+                  )}
                 />
               </View>
             </View>
 
             <View className="mb-4">
-              <TextInputComponent
-                inputType={TextInputType.Password}
-                inputField={{
-                  placeholder: "Password",
-                  value: password,
-                  onChangeText: setPassword,
-                }}
+              <Controller
+                control={control}
+                name="password"
+                render={({ field: { onChange, value } }) => (
+                  <TextInputComponent
+                    inputType={TextInputType.Password}
+                    inputField={{
+                      placeholder: "Password",
+                      value: value,
+                      onChangeText: onChange,
+                    }}
+                    errorText={errors.password?.message}
+                  />
+                )}
               />
             </View>
 
             <View className="flex-row justify-between items-center mb-6">
-              <Checkbox
-                size="md"
-                value="remember"
-                isChecked={rememberMe}
-                onChange={(isChecked: boolean) => setRememberMe(isChecked)}
-                aria-label="Remember Me"
-              >
-                <CheckboxIndicator className="mr-2">
-                  <CheckboxIcon as={Icons.Check} />
-                </CheckboxIndicator>
-                <CheckboxLabel>
-                  <TextComponent
-                    variant={TextVariant.Body}
-                    size={TextSize.Small}
-                    color={Color.Grey}
+              <Controller
+                control={control}
+                name="rememberMe"
+                render={({ field: { onChange, value } }) => (
+                  <Checkbox
+                    size="md"
+                    value="remember"
+                    isChecked={value}
+                    onChange={onChange}
+                    aria-label="Remember Me"
                   >
-                    Remember Me
-                  </TextComponent>
-                </CheckboxLabel>
-              </Checkbox>
+                    <CheckboxIndicator className="mr-2">
+                      <CheckboxIcon as={Icons.Check} />
+                    </CheckboxIndicator>
+                    <CheckboxLabel>
+                      <TextComponent
+                        variant={TextVariant.Body}
+                        size={TextSize.Small}
+                        color={Color.Grey}
+                      >
+                        Remember Me
+                      </TextComponent>
+                    </CheckboxLabel>
+                  </Checkbox>
+                )}
+              />
 
               <TouchableOpacity>
                 <TextComponent
