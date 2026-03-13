@@ -174,7 +174,7 @@ export default function ReportsScreen() {
           <View className="gap-4">
             {groupedReports.map((group) => (
               <ReportTile
-                key={group.client_id}
+                key={group.group_id}
                 clientId={group.client_id}
                 clientFirstName={group.client_first_name}
                 clientLastName={group.client_last_name}

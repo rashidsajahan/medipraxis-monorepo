@@ -261,6 +261,7 @@ export class ClientReportService {
       const groupedMap = new Map<
         string,
         {
+          group_id: string;
           client_id: string;
           client_first_name: string;
           client_last_name: string;
@@ -280,10 +281,12 @@ export class ClientReportService {
         if (!client) continue;
 
         const reportDate = requestReport.created_date.split("T")[0];
+        const groupId = `${requestReport.request_report_id}_${reportDate}`;
         const key = `${requestReport.client_id}_${reportDate}_${requestReport.request_report_id}`;
 
         if (!groupedMap.has(key)) {
           groupedMap.set(key, {
+            group_id: groupId,
             client_id: requestReport.client_id,
             client_first_name: client.first_name,
             client_last_name: client.last_name,
@@ -303,7 +306,7 @@ export class ClientReportService {
           for (let i = 0; i < requestedReports.length; i++) {
             const report = requestedReports[i];
             group.reports.push({
-              report_id: `${requestReport.request_report_id}_${i}`,
+              report_id: `${requestReport.request_report_id}_report_${i}`,
               report_title: report.display_label || "Report",
               file_path: null,
               file_type: null,
@@ -324,6 +327,7 @@ export class ClientReportService {
     const groupedMap = new Map<
       string,
       {
+        group_id: string;
         client_id: string;
         client_first_name: string;
         client_last_name: string;
@@ -344,10 +348,12 @@ export class ClientReportService {
 
       const reportDate = report.created_date.split("T")[0];
       const requestReportId = report.request_report_id || "no_request";
+      const groupId = `${requestReportId}_${reportDate}_${report.client_id}`;
       const key = `${report.client_id}_${reportDate}_${requestReportId}`;
 
       if (!groupedMap.has(key)) {
         groupedMap.set(key, {
+          group_id: groupId,
           client_id: report.client_id,
           client_first_name: client.first_name,
           client_last_name: client.last_name,

@@ -45,6 +45,7 @@ export const reportItemSchema = z.object({
 });
 
 export const groupedPendingReportSchema = z.object({
+  group_id: z.string(),
   client_id: z.string(),
   client_first_name: z.string(),
   client_last_name: z.string(),
@@ -54,6 +55,7 @@ export const groupedPendingReportSchema = z.object({
 });
 
 export const groupedCompletedReportSchema = z.object({
+  group_id: z.string(),
   client_id: z.string(),
   client_first_name: z.string(),
   client_last_name: z.string(),
@@ -67,10 +69,12 @@ export type GroupedPendingReport = z.infer<typeof groupedPendingReportSchema>;
 export type GroupedCompletedReport = z.infer<typeof groupedCompletedReportSchema>;
 
 export interface GroupedClientReport {
+  group_id: string;
   client_id: string;
   client_first_name: string;
   client_last_name: string;
   report_date: string;
+  request_report_id: string | null;
   reports: Array<{
     report_id: string;
     report_title: string | null;
