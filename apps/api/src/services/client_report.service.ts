@@ -2,6 +2,8 @@ import type {
   ClientReport,
   CreateClientReportInput,
   PendingReport,
+  GroupedPendingReport,
+  GroupedCompletedReport,
 } from "@repo/models";
 import { ClientReportRepository, UserRepository } from "../repositories";
 import type { ClientRepository } from "../repositories/client.repository";
@@ -249,7 +251,7 @@ export class ClientReportService {
   async getGroupedReportsByUserId(
     userId: string,
     completed?: boolean
-  ): Promise<any[]> {
+  ): Promise<GroupedPendingReport[] | GroupedCompletedReport[]> {
     // Fetch either completed or pending reports based on the flag
     if (completed === false) {
       // Get pending reports (from request_report table)
@@ -263,6 +265,7 @@ export class ClientReportService {
           client_first_name: string;
           client_last_name: string;
           report_date: string;
+          request_report_id: string;
           reports: Array<{
             report_id: string;
             report_title: string | null;
@@ -277,7 +280,7 @@ export class ClientReportService {
         if (!client) continue;
 
         const reportDate = requestReport.created_date.split("T")[0];
-        const key = `${requestReport.client_id}_${reportDate}`;
+        const key = `${requestReport.client_id}_${reportDate}_${requestReport.request_report_id}`;
 
         if (!groupedMap.has(key)) {
           groupedMap.set(key, {
@@ -285,6 +288,7 @@ export class ClientReportService {
             client_first_name: client.first_name,
             client_last_name: client.last_name,
             report_date: reportDate,
+            request_report_id: requestReport.request_report_id,
             reports: [],
           });
         }
@@ -294,11 +298,12 @@ export class ClientReportService {
         // For pending reports, extract display_label from requested_reports array
         const requestedReports = requestReport.requested_reports || [];
 
-        // Add each requested report as a separate entry
+        // Add each requested report as a separate entry with unique ID
         if (Array.isArray(requestedReports) && requestedReports.length > 0) {
-          for (const report of requestedReports) {
+          for (let i = 0; i < requestedReports.length; i++) {
+            const report = requestedReports[i];
             group.reports.push({
-              report_id: requestReport.request_report_id,
+              report_id: `${requestReport.request_report_id}_${i}`,
               report_title: report.display_label || "Report",
               file_path: null,
               file_type: null,
@@ -323,6 +328,7 @@ export class ClientReportService {
         client_first_name: string;
         client_last_name: string;
         report_date: string;
+        request_report_id: string | null;
         reports: Array<{
           report_id: string;
           report_title: string | null;
@@ -337,7 +343,8 @@ export class ClientReportService {
       if (!client) continue;
 
       const reportDate = report.created_date.split("T")[0];
-      const key = `${report.client_id}_${reportDate}`;
+      const requestReportId = report.request_report_id || "no_request";
+      const key = `${report.client_id}_${reportDate}_${requestReportId}`;
 
       if (!groupedMap.has(key)) {
         groupedMap.set(key, {
@@ -345,6 +352,7 @@ export class ClientReportService {
           client_first_name: client.first_name,
           client_last_name: client.last_name,
           report_date: reportDate,
+          request_report_id: report.request_report_id,
           reports: [],
         });
       }
