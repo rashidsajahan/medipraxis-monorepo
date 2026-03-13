@@ -1,7 +1,7 @@
 import { ButtonComponent, ButtonSize, TextComponent } from "@/components/basic";
 import { useFetchReportFile } from "@/services/reports";
 import { Color, TextSize, TextVariant } from "@repo/config";
-import * as WebBrowser from "expo-web-browser";
+import { ExpoPdfReaderView } from "@june24/expo-pdf-reader";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   CalendarBlankIcon,
@@ -9,16 +9,32 @@ import {
   FileTextIcon,
   UserIcon,
 } from "phosphor-react-native";
-import React from "react";
-import { ActivityIndicator, ScrollView, View } from "react-native";
+import React, { useState } from "react";
+import { ActivityIndicator, Dimensions, Image, ScrollView, View } from "react-native";
 
 const TEMP_USER_ID = "2a3c19b8-d352-4b30-a2ac-1cdf993d310c";
+
+const isPDF = (fileType: string | null) => {
+  return (
+    fileType?.toLowerCase() === "pdf" ||
+    fileType?.toLowerCase() === "application/pdf"
+  );
+};
+
+const isImage = (fileType: string | null) => {
+  return (
+    fileType?.toLowerCase().includes("image") ||
+    ["jpg", "jpeg", "png"].includes(fileType?.toLowerCase() || "")
+  );
+};
 
 export default function ReportViewerScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const [documentLoading, setDocumentLoading] = useState(true);
+  const [documentError, setDocumentError] = useState(false);
 
-  const { data: reportData, isLoading, error } = useFetchReportFile(
+  const { data: reportData, isLoading, error, refetch } = useFetchReportFile(
     TEMP_USER_ID,
     id || ""
   );
@@ -41,16 +57,6 @@ export default function ReportViewerScreen() {
       hour: "2-digit",
       minute: "2-digit",
     });
-  };
-
-  const handleViewReport = async () => {
-    if (reportData?.fileUrl) {
-      await WebBrowser.openBrowserAsync(reportData.fileUrl, {
-        presentationStyle:
-          WebBrowser.WebBrowserPresentationStyle.FULL_SCREEN,
-        controlsColor: Color.Green,
-      });
-    }
   };
 
   if (isLoading) {
@@ -218,15 +224,124 @@ export default function ReportViewerScreen() {
           )}
         </View>
 
-        {/* View Report Button */}
-        <ButtonComponent
-          size={ButtonSize.Large}
-          buttonColor={Color.Green}
-          textColor={Color.Black}
-          onPress={handleViewReport}
-        >
-          View Report
-        </ButtonComponent>
+        {/* Document Viewer */}
+        <View className="mt-4">
+          {documentError ? (
+            <View className="p-6 bg-red-50 rounded-lg items-center">
+              <TextComponent
+                variant={TextVariant.Body}
+                size={TextSize.Medium}
+                color={Color.Danger}
+                style={{ marginBottom: 16, textAlign: "center" }}
+              >
+                Failed to load document. The link may have expired.
+              </TextComponent>
+              <ButtonComponent
+                size={ButtonSize.Medium}
+                buttonColor={Color.Black}
+                textColor={Color.White}
+                onPress={() => {
+                  setDocumentError(false);
+                  setDocumentLoading(true);
+                  refetch();
+                }}
+              >
+                Retry
+              </ButtonComponent>
+            </View>
+          ) : reportData.fileType && isPDF(reportData.fileType) ? (
+            <View
+              style={{
+                height: Dimensions.get("window").height * 0.6,
+                borderRadius: 12,
+                overflow: "hidden",
+                backgroundColor: Color.LightGrey,
+                position: "relative",
+              }}
+            >
+              <ExpoPdfReaderView
+                style={{ flex: 1, width: "100%" }}
+                url={reportData.fileUrl}
+              />
+              {documentLoading && (
+                <View
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "rgba(255,255,255,0.8)",
+                  }}
+                >
+                  <ActivityIndicator size="large" color={Color.Green} />
+                  <TextComponent
+                    variant={TextVariant.Body}
+                    size={TextSize.Small}
+                    color={Color.Grey}
+                    style={{ marginTop: 8 }}
+                  >
+                    Loading PDF...
+                  </TextComponent>
+                </View>
+              )}
+            </View>
+          ) : reportData.fileType && isImage(reportData.fileType) ? (
+            <View style={{ position: "relative" }}>
+              <Image
+                source={{ uri: reportData.fileUrl }}
+                style={{
+                  width: "100%",
+                  height: Dimensions.get("window").height * 0.5,
+                  borderRadius: 12,
+                }}
+                resizeMode="contain"
+                onLoadStart={() => setDocumentLoading(true)}
+                onLoadEnd={() => setDocumentLoading(false)}
+                onError={() => {
+                  setDocumentError(true);
+                  setDocumentLoading(false);
+                }}
+              />
+              {documentLoading && (
+                <View
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "rgba(255,255,255,0.8)",
+                  }}
+                >
+                  <ActivityIndicator size="large" color={Color.Green} />
+                  <TextComponent
+                    variant={TextVariant.Body}
+                    size={TextSize.Small}
+                    color={Color.Grey}
+                    style={{ marginTop: 8 }}
+                  >
+                    Loading image...
+                  </TextComponent>
+                </View>
+              )}
+            </View>
+          ) : (
+            <View className="p-4 bg-gray-100 rounded-lg">
+              <TextComponent
+                variant={TextVariant.Body}
+                size={TextSize.Small}
+                color={Color.Grey}
+              >
+                Unable to display this file type
+              </TextComponent>
+            </View>
+          )}
+        </View>
       </View>
     </ScrollView>
   );

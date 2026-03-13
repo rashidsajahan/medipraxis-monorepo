@@ -2930,6 +2930,13 @@
   resolved "https://registry.yarnpkg.com/@jsep-plugin/regex/-/regex-1.0.4.tgz#cb2fc423220fa71c609323b9ba7f7d344a755fcc"
   integrity sha512-q7qL4Mgjs1vByCaTnDFcBnV9HS7GVPJX5vyVoCgZHNSC9rjwIlmbXG5sUuorR5ndfHAIlJ8pVStxvjXHbNvtUg==
 
+"@june24/expo-pdf-reader@^0.1.23":
+  version "0.1.23"
+  resolved "https://registry.yarnpkg.com/@june24/expo-pdf-reader/-/expo-pdf-reader-0.1.23.tgz#c491899b8729b20562cfc036f46684fd1a3057a9"
+  integrity sha512-/cqrVLvJYpdL/+vjysFipI6sJRTowHTMSaZ7N9+Y3PzZhiQa7LfNO/hwMA5T6b2Nli7d/pZG4Lvqx8lc6OHIJA==
+  dependencies:
+    expo-modules-core "^3.0.29"
+
 "@legendapp/motion@^2.5.3":
   version "2.5.3"
   resolved "https://registry.yarnpkg.com/@legendapp/motion/-/motion-2.5.3.tgz#f9a4c07c76eee757c5ca206085440d14cc28001b"
@@ -9123,6 +9130,13 @@ expo-modules-core@3.0.28:
   version "3.0.28"
   resolved "https://registry.yarnpkg.com/expo-modules-core/-/expo-modules-core-3.0.28.tgz#77eca5ecd6bc6d59c4b8edf4256380f46ac4c71c"
   integrity sha512-8EDpksNxnN4HXWE+yhYUYAZAWTEDRzK2VpZjPSp+UBF2LtWZicXKLOCODCvsjCkTCVVA2JKKcWtGxWiteV3ueA==
+  dependencies:
+    invariant "^2.2.4"
+
+expo-modules-core@^3.0.29:
+  version "3.0.29"
+  resolved "https://registry.yarnpkg.com/expo-modules-core/-/expo-modules-core-3.0.29.tgz#99287eba52f21784bcb2e4f4edd4fc4c21b5b265"
+  integrity sha512-LzipcjGqk8gvkrOUf7O2mejNWugPkf3lmd9GkqL9WuNyeN2fRwU0Dn77e3ZUKI3k6sI+DNwjkq4Nu9fNN9WS7Q==
   dependencies:
     invariant "^2.2.4"
 

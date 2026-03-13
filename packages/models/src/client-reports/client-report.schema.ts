@@ -56,4 +56,5 @@ export interface ReportFileUrlResponse {
   clientName: string;
   uploadedOn: string;
   expiresIn: string | null;
+  fileType: string | null;
 }
