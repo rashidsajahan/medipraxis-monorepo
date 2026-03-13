@@ -274,4 +274,34 @@ export class TaskController {
       return c.json({ error: message }, 500);
     }
   }
+
+static async getUpcomingTasksByUserId(
+  c: APIContext<{ query: GetTaskSummaryQuery }>
+) {
+  try {
+    const taskService = getTaskService(c);
+    const userId = c.req.query("user_id") as string;
+    const dateParam = c.req.query("date");
+    const date: string =
+      dateParam !== undefined
+        ? dateParam
+        : (new Date().toISOString().split("T")[0] as string);
+ 
+    const tasks = await taskService.getUpcomingTasksForToday(userId, date);
+ 
+    return c.json({
+      success: true,
+      date,
+      tasks,
+      count: tasks.length,
+    });
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Failed to get upcoming tasks";
+    return c.json({ error: message }, 500);
+  }
+}
+ 
 }
