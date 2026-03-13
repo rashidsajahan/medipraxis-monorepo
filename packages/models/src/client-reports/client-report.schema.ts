@@ -37,6 +37,35 @@ export const createClientReportSchema = z
 export type ClientReport = z.infer<typeof clientReportSchema>;
 export type CreateClientReportInput = z.infer<typeof createClientReportSchema>;
 
+export const reportItemSchema = z.object({
+  report_id: z.string(),
+  report_title: z.string().nullable(),
+  file_path: z.string().nullable(),
+  file_type: z.string().nullable(),
+});
+
+export const groupedPendingReportSchema = z.object({
+  client_id: z.string(),
+  client_first_name: z.string(),
+  client_last_name: z.string(),
+  report_date: z.string(),
+  request_report_id: z.string(),
+  reports: z.array(reportItemSchema),
+});
+
+export const groupedCompletedReportSchema = z.object({
+  client_id: z.string(),
+  client_first_name: z.string(),
+  client_last_name: z.string(),
+  report_date: z.string(),
+  request_report_id: z.string().nullable(),
+  reports: z.array(reportItemSchema),
+});
+
+export type ReportItem = z.infer<typeof reportItemSchema>;
+export type GroupedPendingReport = z.infer<typeof groupedPendingReportSchema>;
+export type GroupedCompletedReport = z.infer<typeof groupedCompletedReportSchema>;
+
 export interface GroupedClientReport {
   client_id: string;
   client_first_name: string;
