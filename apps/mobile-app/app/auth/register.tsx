@@ -1,8 +1,8 @@
 import { Icons } from "@/config";
 import { Color, TextSize, TextVariant } from "@repo/config";
 import { LinearGradient } from "expo-linear-gradient";
-import { Link } from "expo-router";
-import React, { useState } from "react";
+import { useRouter, Link } from "expo-router";
+import React from "react";
 import {
   Alert,
   Image,
@@ -12,7 +12,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useAuth } from "../../auth/AuthContext";
+import { useAuthHandler } from "../../services/auth";
+import { Controller } from "react-hook-form";
 import {
   ButtonComponent,
   ButtonSize,
@@ -28,48 +29,36 @@ import {
 } from "../../components/ui/checkbox";
 
 export default function RegisterScreen() {
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [countryCode, setCountryCode] = useState("+94");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [username, setUsername] = useState("");
-  const [agreed, setAgreed] = useState(false);
-
-  const { signUp, isLoading } = useAuth();
+  const { register, isLoading } = useAuthHandler();
+  const {
+    control,
+    formState: { errors },
+  } = register.form;
+  const router = useRouter();
 
   const handleRegister = async () => {
-    if (!username.trim()) {
-      Alert.alert("Error", "Username is required");
-      return;
-    }
-    if (!phoneNumber.trim()) {
-      Alert.alert("Error", "Phone number is required");
-      return;
-    }
-    if (!countryCode.trim()) {
-      Alert.alert("Error", "Country code is required");
-      return;
-    }
-    if (!password) {
-      Alert.alert("Error", "Password is required");
-      return;
-    }
-    if (password !== confirmPassword) {
-      Alert.alert("Error", "Passwords do not match");
-      return;
-    }
-    if (!agreed) {
-      Alert.alert("Error", "Please agree to the terms and policy");
-      return;
-    }
     try {
-      await signUp(phoneNumber, countryCode, password, username);
+      const success = await register.submit();
+      if (success) {
+        const { phoneNumber, countryCode } = register.form.getValues();
+        Alert.alert(
+          "Registration Successful",
+          "Your account has been created. Please log in to continue.",
+          [
+            {
+              text: "OK",
+              onPress: () =>
+                router.replace({
+                  pathname: "/auth/login",
+                  params: { phoneNumber, countryCode },
+                }),
+            },
+          ]
+        );
+      }
     } catch (e: any) {
       console.error("Register Error:", e);
-      Alert.alert(
-        "Registration Failed",
-        typeof e.message === "string" ? e.message : JSON.stringify(e)
-      );
+      Alert.alert("Registration Failed", e.message);
     }
   };
 
@@ -151,81 +140,134 @@ export default function RegisterScreen() {
             </TextComponent>
 
             <View className="mb-4">
-              <TextInputComponent
-                inputField={{
-                  placeholder: "Username",
-                  value: username,
-                  onChangeText: setUsername,
-                }}
+              <Controller
+                control={control}
+                name="username"
+                render={({ field: { onChange, value } }) => (
+                  <TextInputComponent
+                    inputField={{
+                      placeholder: "Username",
+                      value: value,
+                      onChangeText: onChange,
+                    }}
+                    errorText={errors.username?.message}
+                  />
+                )}
               />
             </View>
 
             <View className="flex-row items-center mb-4 gap-2">
               <View style={{ flex: 0.3 }}>
-                <TextInputComponent
-                  inputField={{
-                    placeholder: "Code",
-                    value: countryCode,
-                    onChangeText: setCountryCode,
-                  }}
+                <Controller
+                  control={control}
+                  name="countryCode"
+                  render={({ field: { onChange, value } }) => (
+                    <TextInputComponent
+                      inputField={{
+                        placeholder: "Code",
+                        value: value,
+                        onChangeText: onChange,
+                      }}
+                      errorText={errors.countryCode?.message}
+                    />
+                  )}
                 />
               </View>
               <View style={{ flex: 0.7 }}>
-                <TextInputComponent
-                  inputType={TextInputType.Phone}
-                  inputField={{
-                    placeholder: "Mobile Number",
-                    value: phoneNumber,
-                    onChangeText: setPhoneNumber,
-                  }}
+                <Controller
+                  control={control}
+                  name="phoneNumber"
+                  render={({ field: { onChange, value } }) => (
+                    <TextInputComponent
+                      inputType={TextInputType.Phone}
+                      inputField={{
+                        placeholder: "Mobile Number",
+                        value: value,
+                        onChangeText: onChange,
+                      }}
+                      errorText={errors.phoneNumber?.message}
+                    />
+                  )}
                 />
               </View>
             </View>
 
             <View className="mb-4">
-              <TextInputComponent
-                inputType={TextInputType.Password}
-                inputField={{
-                  placeholder: "Password",
-                  value: password,
-                  onChangeText: setPassword,
-                }}
+              <Controller
+                control={control}
+                name="password"
+                render={({ field: { onChange, value } }) => (
+                  <TextInputComponent
+                    inputType={TextInputType.Password}
+                    inputField={{
+                      placeholder: "Password",
+                      value: value,
+                      onChangeText: onChange,
+                    }}
+                    errorText={errors.password?.message}
+                  />
+                )}
               />
             </View>
 
             <View className="mb-4">
-              <TextInputComponent
-                inputType={TextInputType.Password}
-                inputField={{
-                  placeholder: "Confirm Password",
-                  value: confirmPassword,
-                  onChangeText: setConfirmPassword,
-                }}
+              <Controller
+                control={control}
+                name="confirmPassword"
+                render={({ field: { onChange, value } }) => (
+                  <TextInputComponent
+                    inputType={TextInputType.Password}
+                    inputField={{
+                      placeholder: "Confirm Password",
+                      value: value,
+                      onChangeText: onChange,
+                    }}
+                    errorText={errors.confirmPassword?.message}
+                  />
+                )}
               />
             </View>
 
             <View className="flex-row items-start mb-6 pr-6">
-              <Checkbox
-                size="md"
-                value="agree"
-                isChecked={agreed}
-                onChange={(isChecked: boolean) => setAgreed(isChecked)}
-                aria-label="I agree"
-                className="flex-1"
-              >
-                <CheckboxIndicator className="mr-2 mt-1">
-                  <CheckboxIcon as={Icons.Check} />
-                </CheckboxIndicator>
-                <CheckboxLabel className="flex-1">
-                  <TextComponent
-                    variant={TextVariant.Body}
-                    size={TextSize.Small}
-                    color={Color.Grey}
+              <Controller
+                control={control}
+                name="agreed"
+                render={({ field: { onChange, value } }) => (
+                  <Checkbox
+                    size="md"
+                    value="agree"
+                    isChecked={value}
+                    onChange={onChange}
+                    aria-label="I agree"
+                    className="flex-1"
                   >
-                    I agree with MediPraxis Public Agreement, Terms & Policy
-                  </TextComponent>
-                </CheckboxLabel>
-              </Checkbox>
+                    <CheckboxIndicator className="mr-2 mt-1">
+                      <CheckboxIcon as={Icons.Check} />
+                    </CheckboxIndicator>
+                    <CheckboxLabel className="flex-1">
+                      <View>
+                        <TextComponent
+                          variant={TextVariant.Body}
+                          size={TextSize.Small}
+                          color={Color.Grey}
+                        >
+                          I agree with MediPraxis Public Agreement, Terms &
+                          Policy
+                        </TextComponent>
+                        {errors.agreed && (
+                          <TextComponent
+                            variant={TextVariant.Body}
+                            size={TextSize.Small}
+                            color={Color.Danger}
+                          >
+                            {errors.agreed.message}
+                          </TextComponent>
+                        )}
+                      </View>
+                    </CheckboxLabel>
+                  </Checkbox>
+                )}
+              />
             </View>
 
             <View className="mb-4">
