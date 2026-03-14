@@ -204,7 +204,7 @@ export default function TaskForm({ visible, onClose }: Props) {
                 helperText={
                   averageMinutesPerSlot
                     ? `Average ${averageMinutesPerSlot}mins per slot`
-                    : "Average 15mins per slot"
+                    : ""
                 }
               />
 
