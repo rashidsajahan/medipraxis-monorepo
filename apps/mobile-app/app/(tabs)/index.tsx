@@ -3,13 +3,13 @@ import { Color, TextSize, TextVariant, textStyles } from "@repo/config";
 import { useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
-import { FormSetupCenter } from "@/components/advanced/formSetupCenter";
 import TaskForm from "@/components/advanced/taskPanel/TaskForm";
 import { HomeCard } from "./home/HomeCard.component";
 import { UpcomingEventCard } from "./home/UpcomingEventCard.Component";
 
 const PlusIcon = Icons.Plus;
 const FileTextIcon = Icons.FileText;
+import { FormSetupCenter } from "./settings/components/form-setup-center";
 
 export default function TabOneScreen() {
   const [showForm, setShowForm] = useState(false);
