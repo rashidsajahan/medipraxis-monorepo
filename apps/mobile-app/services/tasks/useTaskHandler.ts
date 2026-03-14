@@ -183,15 +183,15 @@ export const useTaskHandler = (onClose: () => void) => {
   const { mutate: createAppointment, isPending: isAppointmentPending } =
     useCreateTask({
       onSuccess: () => {
-      Alert.alert("Success", "Appointment created successfully");
-      setFormState(DEFAULT_APPOINTMENT_STATE);
-      setError(null);
-      onClose();
-    },
-    onError: (message) => {
-      setError(message);
-    },
-  });
+        Alert.alert("Success", "Appointment created successfully");
+        setFormState(DEFAULT_APPOINTMENT_STATE);
+        setError(null);
+        onClose();
+      },
+      onError: (message) => {
+        setError(message);
+      },
+    });
 
   const { mutate: createAppointmentSlot, isPending: isAppointmentSlotPending } =
     useCreateAppointmentSlot({
@@ -301,7 +301,7 @@ export const useTaskHandler = (onClose: () => void) => {
     });
   };
 
-    const handleSave = () => {
+  const handleSave = () => {
     if (
       isTaskPending ||
       isAppointmentPending ||
