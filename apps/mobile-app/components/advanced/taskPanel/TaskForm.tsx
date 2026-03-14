@@ -327,7 +327,7 @@ export default function TaskForm({ visible, onClose }: Props) {
                     value={client || ""}
                     onValueChange={(v) => setField("client", v)}
                     options={clientOptions}
-                    placeholder="Jennifer ( 012 3456789 )"
+                    placeholder="Select Client"
                   />
 
                   <DateTimePickerComponent
@@ -353,7 +353,7 @@ export default function TaskForm({ visible, onClose }: Props) {
                     value={slotWindow || ""}
                     onValueChange={(v) => setField("slotWindow", v)}
                     options={slotWindowOptions}
-                    placeholder="Sat 9-11PM"
+                    placeholder="Select Slot Window"
                     helperText="First available slot number will be reserved"
                   />
                   <TouchableOpacity
@@ -375,7 +375,7 @@ export default function TaskForm({ visible, onClose }: Props) {
                     value={client || ""}
                     onValueChange={(v) => setField("client", v)}
                     options={clientOptions}
-                    placeholder="Jennifer ( 012 3456789 )"
+                    placeholder="Select Client"
                   />
                 </>
               )}
@@ -400,7 +400,7 @@ export default function TaskForm({ visible, onClose }: Props) {
                 value={client || ""}
                 onValueChange={(v) => setField("client", v)}
                 options={clientOptions}
-                placeholder="Jennifer ( 012 3456789 )"
+                placeholder="Select Client"
               />
 
               <DateTimePickerComponent
