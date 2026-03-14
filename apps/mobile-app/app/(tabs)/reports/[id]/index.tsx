@@ -8,8 +8,12 @@ import {
   FileTextIcon,
   UserIcon,
 } from "phosphor-react-native";
-import { usePreventScreenCapture } from "expo-screen-capture";
-import React, { useRef, useState } from "react";
+import {
+  allowScreenCaptureAsync,
+  preventScreenCaptureAsync,
+} from "expo-screen-capture";
+import { useFocusEffect } from "expo-router";
+import React, { useCallback, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -63,7 +67,14 @@ const isImage = (fileType: string | null) => {
 };
 
 export default function ReportViewerScreen() {
-  usePreventScreenCapture();
+  useFocusEffect(
+    useCallback(() => {
+      preventScreenCaptureAsync();
+      return () => {
+        allowScreenCaptureAsync();
+      };
+    }, []),
+  );
 
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
