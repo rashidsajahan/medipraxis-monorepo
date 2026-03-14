@@ -20,6 +20,7 @@ import {
   type NativeSyntheticEvent,
   type TextStyle as RNTextStyle,
 } from "react-native";
+import { AppointmentsList } from "./AppointmentList.component";
 
 enum ClientDetailTab {
   Appointments = "Appointments",
@@ -43,10 +44,6 @@ const textButtonMediumStyle = textStyles[TextVariant.Button][TextSize.Medium];
 
 export default function ClientDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-
-  // useRouter gives us programmatic navigation (push, back, replace etc.)
-  // We need this because the back button triggers navigation in code,
-  // not via a static <Link> element
   const router = useRouter();
 
   const { data: client, isLoading } = useFetchClientById(id ?? "");
@@ -55,7 +52,6 @@ export default function ClientDetailScreen() {
     ClientDetailTab.Appointments
   );
   const [searchQuery, setSearchQuery] = useState("");
-  const [loading] = useState(false);
   const [showLeftShadow, setShowLeftShadow] = useState(false);
   const [showRightShadow, setShowRightShadow] = useState(true);
   const [showOptionsMenu, setShowOptionsMenu] = useState(false);
@@ -252,7 +248,7 @@ export default function ClientDetailScreen() {
               </View>
             </View>
 
-            {/* Action Buttons */}
+            {/* Action Buttons — horizontal scroll */}
             <View className="-ml-5">
               <ScrollView
                 horizontal
@@ -341,7 +337,10 @@ export default function ClientDetailScreen() {
                         ? Color.Green
                         : "transparent",
                   }}
-                  onPress={() => setActiveTab(ClientDetailTab.Appointments)}
+                  onPress={() => {
+                    setActiveTab(ClientDetailTab.Appointments);
+                    setSearchQuery("");
+                  }}
                   activeOpacity={0.7}
                 >
                   <TextComponent
@@ -361,7 +360,10 @@ export default function ClientDetailScreen() {
                         ? Color.Green
                         : "transparent",
                   }}
-                  onPress={() => setActiveTab(ClientDetailTab.Reports)}
+                  onPress={() => {
+                    setActiveTab(ClientDetailTab.Reports);
+                    setSearchQuery("");
+                  }}
                   activeOpacity={0.7}
                 >
                   <TextComponent
@@ -489,24 +491,19 @@ export default function ClientDetailScreen() {
             }}
             showsVerticalScrollIndicator={false}
           >
-            {loading ? (
-              <View className="flex-1 justify-center items-center py-20">
-                <ActivityIndicator size="large" color={Color.Green} />
-              </View>
+            {activeTab === ClientDetailTab.Appointments ? (
+              // Hardcoded AppointmentsList — shows dummy data for Ms Aone Test
+              <AppointmentsList
+                searchQuery={searchQuery}
+                onViewAppointment={(appointmentId) =>
+                  console.log("View appointment:", appointmentId)
+                }
+                onAddRecord={(appointmentId) =>
+                  console.log("Add record:", appointmentId)
+                }
+              />
             ) : (
-              <View className="flex-1">
-                {activeTab === ClientDetailTab.Appointments ? (
-                  <EmptyState
-                    icon={Icons.CalendarBlank}
-                    message="No appointments found"
-                  />
-                ) : (
-                  <EmptyState
-                    icon={Icons.FileText}
-                    message="No reports found"
-                  />
-                )}
-              </View>
+              <EmptyState icon={Icons.FileText} message="No reports found" />
             )}
           </ScrollView>
         </View>
