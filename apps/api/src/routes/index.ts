@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import ai from "./ai";
+import appointmentRecords from "./appointment_record";
 import clientReports from "./client_reports";
 import clients from "./clients";
 import forms from "./forms";
@@ -20,6 +21,7 @@ const routes = new Hono()
   .route("/shareable-calendar-links", shareableCalendarLinks)
   .route("/otp", otp)
   .route("/forms", forms)
+  .route("/appointment-records", appointmentRecords)
   .route("/request-reports", requestReports);
 
 export default routes;
