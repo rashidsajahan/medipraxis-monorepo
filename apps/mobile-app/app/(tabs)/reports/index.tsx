@@ -39,7 +39,7 @@ export default function ReportsScreen() {
   };
 
   // Handle report click for completed reports with files
-  const handleReportClick = (reportId: string, filePath: string) => {
+  const handleReportClick = (reportId: string) => {
     router.push(`/reports/${reportId}` as any);
   };
 
