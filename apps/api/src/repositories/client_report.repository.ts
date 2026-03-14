@@ -236,12 +236,10 @@ export class ClientReportRepository {
    * Find completed reports by user ID, grouped by client ID and date
    * Filters out expired reports (expiry_date <= today)
    */
-  async findCompletedReportsGroupedByUserIdAndDate(
-    userId: string
-  ): Promise<any[]> {
+  async findCompletedReportsGroupedByUserIdAndDate(userId: string) {
     const today = new Date().toISOString().split("T")[0];
 
-    let query = this.db
+    const { data, error } = await this.db
       .from(CLIENT_REPORT_QUERIES.CLIENT_REPORT_TABLE)
       .select(
         `
@@ -251,7 +249,8 @@ export class ClientReportRepository {
         ${CLIENT_REPORT_QUERIES.FILE_TYPE},
         ${CLIENT_REPORT_QUERIES.CLIENT_ID},
         ${CLIENT_REPORT_QUERIES.CREATED_DATE},
-        client:client_id (
+        ${CLIENT_REPORT_QUERIES.REQUEST_REPORT_ID},
+        client:client_id!inner (
           client_id,
           first_name,
           last_name
@@ -261,7 +260,6 @@ export class ClientReportRepository {
       .eq(CLIENT_REPORT_QUERIES.USER_ID, userId)
       .gt("expiry_date", today)
       .order(CLIENT_REPORT_QUERIES.CREATED_DATE, { ascending: false });
-    const { data, error } = await query;
 
     if (error) {
       throw new Error(`Failed to fetch grouped reports: ${error.message}`);
@@ -270,11 +268,7 @@ export class ClientReportRepository {
     return data || [];
   }
 
-  /**
-   * Find pending reports by user ID
-   * Pending reports are request_reports that don't have corresponding client_reports yet
-   */
-  async findPendingReportsByUserId(userId: string): Promise<any[]> {
+  async findPendingReportsByUserId(userId: string) {
     const { data, error } = await this.db
       .from(REQUEST_REPORT_QUERIES.REQUEST_REPORT_TABLE)
       .select(
@@ -283,7 +277,7 @@ export class ClientReportRepository {
         ${REQUEST_REPORT_QUERIES.CREATED_DATE},
         ${REQUEST_REPORT_QUERIES.CLIENT_ID},
         ${REQUEST_REPORT_QUERIES.REQUESTED_REPORTS},
-        client:${REQUEST_REPORT_QUERIES.CLIENT_ID} (
+        client:${REQUEST_REPORT_QUERIES.CLIENT_ID}!inner (
           client_id,
           first_name,
           last_name

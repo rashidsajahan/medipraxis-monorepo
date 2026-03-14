@@ -277,7 +277,9 @@ export class ClientReportService {
       >();
 
       for (const requestReport of rawReports) {
-        const client = requestReport.client;
+        const client = Array.isArray(requestReport.client) 
+          ? requestReport.client[0] 
+          : requestReport.client;
         if (!client) continue;
 
         const reportDate = requestReport.created_date.split("T")[0];
@@ -343,7 +345,9 @@ export class ClientReportService {
     >();
 
     for (const report of rawReports) {
-      const client = report.client;
+      const client = Array.isArray(report.client) 
+        ? report.client[0] 
+        : report.client;
       if (!client) continue;
 
       const reportDate = report.created_date.split("T")[0];
