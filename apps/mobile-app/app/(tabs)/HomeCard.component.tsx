@@ -1,4 +1,6 @@
 import { Icons } from "@/config";
+import { useFetchTaskSummary } from "@/services/tasks/useTaskSummary";
+import { useFetchUser } from "@/services/user";
 import {
   Color,
   Font,
@@ -8,8 +10,6 @@ import {
   TextVariant,
   textStyles,
 } from "@repo/config";
-import type { User } from "@repo/models";
-import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -27,7 +27,6 @@ import {
 } from "react-native-svg";
 
 const HARDCODED_USER_ID = "2a3c19b8-d352-4b30-a2ac-1cdf993d310c";
-const BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
 
 const fontFamilyMap: { [key in Font]: string } = {
   [Font.Lato]: "Lato",
@@ -94,18 +93,6 @@ function getLocalDateString(): string {
   return `${year}-${month}-${day}`;
 }
 
-type UserResponse = {
-  success: boolean;
-  user: User;
-};
-
-type TaskSummaryResponse = {
-  success: boolean;
-  date: string;
-  appointment_count: number;
-  reminder_count: number;
-};
-
 interface HomeCardProps {
   onNotificationPress?: () => void;
   onSettingsPress?: () => void;
@@ -120,40 +107,18 @@ export default function HomeCard({
   onSettingsPress,
   notificationCount = 8,
 }: HomeCardProps) {
-  const [user, setUser] = useState<User | null>(null);
-  const [appointmentCount, setAppointmentCount] = useState<number>(0);
-  const [taskCount, setTaskCount] = useState<number>(0);
-  const [loading, setLoading] = useState(true);
+  const today = getLocalDateString();
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const today = getLocalDateString();
+  const { data: user, isLoading: userLoading } =
+    useFetchUser(HARDCODED_USER_ID);
+  const { data: taskSummary, isLoading: summaryLoading } = useFetchTaskSummary(
+    HARDCODED_USER_ID,
+    today
+  );
 
-        const [userRes, summaryRes] = await Promise.all([
-          fetch(`${BASE_URL}/api/users/${HARDCODED_USER_ID}`),
-          fetch(
-            `${BASE_URL}/api/tasks/summary?user_id=${HARDCODED_USER_ID}&date=${today}`
-          ),
-        ]);
-
-        const userData = (await userRes.json()) as UserResponse;
-        const summaryData = (await summaryRes.json()) as TaskSummaryResponse;
-
-        if (userData.success) setUser(userData.user);
-        if (summaryData.success) {
-          setAppointmentCount(summaryData.appointment_count);
-          setTaskCount(summaryData.reminder_count);
-        }
-      } catch (error) {
-        console.error("HomeCard fetch error:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    void fetchData();
-  }, []);
+  const loading = userLoading || summaryLoading;
+  const appointmentCount = taskSummary?.appointment_count ?? 0;
+  const taskCount = taskSummary?.reminder_count ?? 0;
 
   return (
     <ImageBackground
