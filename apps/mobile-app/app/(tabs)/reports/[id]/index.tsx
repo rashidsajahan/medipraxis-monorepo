@@ -2,6 +2,12 @@ import { ButtonComponent, ButtonSize, TextComponent } from "@/components/basic";
 import { useFetchReportFile } from "@/services/reports";
 import { Color, TextSize, TextVariant } from "@repo/config";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import {
+  CalendarBlankIcon,
+  ClockIcon,
+  FileTextIcon,
+  UserIcon,
+} from "phosphor-react-native";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -125,20 +131,20 @@ export default function ReportViewerScreen() {
           </View>
 
           {/* Report Metadata */}
-          <View className="gap-3">
+          <View className="gap-2">
             {/* Client Name */}
-            <View>
+            <View className="flex-row items-center gap-2">
+              <UserIcon size={18} color={Color.Black} weight="regular" />
               <TextComponent
                 variant={TextVariant.Body}
                 size={TextSize.Small}
-                color={Color.Grey}
-                className="mb-1"
+                color={Color.Black}
               >
-                Client Name
+                Client Name:{" "}
               </TextComponent>
               <TextComponent
                 variant={TextVariant.Body}
-                size={TextSize.Medium}
+                size={TextSize.Small}
                 color={Color.Black}
               >
                 {reportData.clientName}
@@ -146,18 +152,18 @@ export default function ReportViewerScreen() {
             </View>
 
             {/* Report Title */}
-            <View>
+            <View className="flex-row items-center gap-2">
+              <FileTextIcon size={18} color={Color.Black} weight="regular" />
               <TextComponent
                 variant={TextVariant.Body}
                 size={TextSize.Small}
-                color={Color.Grey}
-                className="mb-1"
+                color={Color.Black}
               >
-                Report Title
+                Report Title:{" "}
               </TextComponent>
               <TextComponent
                 variant={TextVariant.Body}
-                size={TextSize.Medium}
+                size={TextSize.Small}
                 color={Color.Black}
               >
                 {reportData.reportTitle || "Untitled Report"}
@@ -165,18 +171,22 @@ export default function ReportViewerScreen() {
             </View>
 
             {/* Uploaded On */}
-            <View>
+            <View className="flex-row items-center gap-2">
+              <CalendarBlankIcon
+                size={18}
+                color={Color.Black}
+                weight="regular"
+              />
               <TextComponent
                 variant={TextVariant.Body}
                 size={TextSize.Small}
-                color={Color.Grey}
-                className="mb-1"
+                color={Color.Black}
               >
-                Uploaded On
+                Uploaded On:{" "}
               </TextComponent>
               <TextComponent
                 variant={TextVariant.Body}
-                size={TextSize.Medium}
+                size={TextSize.Small}
                 color={Color.Black}
               >
                 {formatDateTime(reportData.uploadedOn)}
@@ -185,19 +195,19 @@ export default function ReportViewerScreen() {
 
             {/* Expires On */}
             {reportData.expiresIn && (
-              <View>
+              <View className="flex-row items-center gap-2">
+                <ClockIcon size={18} color={Color.Danger} weight="regular" />
                 <TextComponent
                   variant={TextVariant.Body}
                   size={TextSize.Small}
-                  color={Color.Grey}
-                  className="mb-1"
+                  color={Color.Danger}
                 >
-                  Expires On
+                  Expires On:{" "}
                 </TextComponent>
                 <TextComponent
                   variant={TextVariant.Body}
-                  size={TextSize.Medium}
-                  color={Color.Black}
+                  size={TextSize.Small}
+                  color={Color.Danger}
                 >
                   {formatDate(reportData.expiresIn)}
                 </TextComponent>
