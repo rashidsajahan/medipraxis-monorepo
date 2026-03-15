@@ -8,6 +8,7 @@ import {
 import { Icons, type Icon } from "@/config";
 import { useFetchClients } from "@/services/clients";
 import { useFetchRequestForm, type FormField } from "@/services/forms";
+import { useCreateRequestReport } from "@/services/reports";
 import { Color, Font, TextSize, TextVariant, textStyles } from "@repo/config";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -20,6 +21,7 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Modal,
   Pressable,
   SafeAreaView,
@@ -52,6 +54,7 @@ export default function RequestReportScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: clients = [] } = useFetchClients(TEMP_USER_ID);
   const { data: requestForm, isLoading: isFormLoading } = useFetchRequestForm(TEMP_USER_ID);
+  const createRequestReportMutation = useCreateRequestReport();
   const [formFields, setFormFields] = useState<FormField[]>([]);
   const [selectedSendThrough, setSelectedSendThrough] = useState<
     SendThroughOption[]
@@ -118,11 +121,32 @@ export default function RequestReportScreen() {
     );
   };
 
-  const handleRequest = () => {
+  const handleRequest = async () => {
+    if (!selectedClientId) {
+      Alert.alert("Error", "Please select a client");
+      return;
+    }
+
+    if (!requestForm?.form_id) {
+      Alert.alert("Error", "Form configuration not loaded");
+      return;
+    }
+
+    const hasSelectedReports = formFields.some((field) => field.active);
+    if (!hasSelectedReports) {
+      Alert.alert("Error", "Please select at least one report");
+      return;
+    }
+
+    if (selectedSendThrough.length === 0) {
+      Alert.alert("Error", "Please select at least one notification method");
+      return;
+    }
+
     const requestPayload = {
       user_id: TEMP_USER_ID,
       client_id: selectedClientId,
-      form_id: requestForm?.form_id || "",
+      form_id: requestForm.form_id,
       note: additionalNotes,
       notification_type: {
         whatsapp: selectedSendThrough.includes("whatsapp"),
@@ -132,10 +156,12 @@ export default function RequestReportScreen() {
       requested_reports: formFields,
     };
 
-    console.log(
-      "Request report payload:",
-      JSON.stringify(requestPayload, null, 2)
-    );
+    try {
+      await createRequestReportMutation.mutateAsync(requestPayload);
+      router.back();
+    } catch (error) {
+      console.error("Failed to create request report:", error);
+    }
   };
 
   if (isFormLoading) {
