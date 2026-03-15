@@ -68,6 +68,18 @@ export default function ReportsScreen() {
     router.push(`/reports/${reportId}` as any);
   };
 
+  const handleRequestReport = () => {
+    const firstGroup = filteredReports[0];
+    const clientId = firstGroup?.client_id || "unknown-client";
+    const clientName = firstGroup
+      ? `${firstGroup.client_first_name} ${firstGroup.client_last_name}`.trim()
+      : "Unknown Client";
+
+    router.push(
+      `/reports/request-report/${clientId}?clientName=${encodeURIComponent(clientName)}` as any
+    );
+  };
+
   return (
     <View className="flex-1 bg-white px-5 pt-5">
       {/* Header with Title and Button */}
@@ -84,10 +96,7 @@ export default function ReportsScreen() {
           size={ButtonSize.Small}
           buttonColor={Color.Black}
           textColor={Color.White}
-          onPress={() => {
-            // TODO: Implement request report functionality
-            console.log("Request Report pressed");
-          }}
+          onPress={handleRequestReport}
         >
           + Request Report
         </ButtonComponent>
