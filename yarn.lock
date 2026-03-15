@@ -9070,6 +9070,11 @@ expo-asset@~12.0.11:
     "@expo/image-utils" "^0.8.8"
     expo-constants "~18.0.11"
 
+expo-clipboard@^55.0.8:
+  version "55.0.8"
+  resolved "https://registry.yarnpkg.com/expo-clipboard/-/expo-clipboard-55.0.8.tgz#9e7a0a16c9fc41caa91e216e7aa5457567558e55"
+  integrity sha512-s0Hkop+dc6m09LwzUAWweNI0gzLAaX5CgEGR8TMdOdSPKTPc2rCl8h8Ji/cUNM1wYoJQ4Wysa15E8If/Vlu7WA==
+
 expo-constants@~18.0.11:
   version "18.0.11"
   resolved "https://registry.yarnpkg.com/expo-constants/-/expo-constants-18.0.11.tgz#522680c14f0a54cfd968d581961848c6397d44ae"
@@ -9077,6 +9082,13 @@ expo-constants@~18.0.11:
   dependencies:
     "@expo/config" "~12.0.11"
     "@expo/env" "~2.0.8"
+
+expo-crypto@~15.0.8:
+  version "15.0.8"
+  resolved "https://registry.yarnpkg.com/expo-crypto/-/expo-crypto-15.0.8.tgz#339198aae149b3ccc0b44f7150d7261a3a1f5287"
+  integrity sha512-aF7A914TB66WIlTJvl5J6/itejfY78O7dq3ibvFltL9vnTALJ/7LYHvLT4fwmx9yUNS6ekLBtDGWivFWnj2Fcw==
+  dependencies:
+    base64-js "^1.3.0"
 
 expo-file-system@~19.0.20:
   version "19.0.20"

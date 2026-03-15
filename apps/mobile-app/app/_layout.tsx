@@ -76,6 +76,10 @@ function RootLayoutNav() {
                 name="auth/register"
                 options={{ headerShown: false }}
               />
+              <Stack.Screen
+                name="auth/key-reveal"
+                options={{ headerShown: false, gestureEnabled: false }}
+              />
             </Stack>
           </QueryClientProvider>
         </ThemeProvider>

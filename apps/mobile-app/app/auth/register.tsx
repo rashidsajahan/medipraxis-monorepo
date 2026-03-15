@@ -41,20 +41,10 @@ export default function RegisterScreen() {
       const success = await register.submit();
       if (success) {
         const { phoneNumber, countryCode } = register.form.getValues();
-        Alert.alert(
-          "Registration Successful",
-          "Your account has been created. Please log in to continue.",
-          [
-            {
-              text: "OK",
-              onPress: () =>
-                router.replace({
-                  pathname: "/auth/login",
-                  params: { phoneNumber, countryCode },
-                }),
-            },
-          ]
-        );
+        router.replace({
+          pathname: "/auth/key-reveal",
+          params: { phoneNumber, countryCode },
+        });
       }
     } catch (e: any) {
       console.error("Register Error:", e);
@@ -302,6 +292,21 @@ export default function RegisterScreen() {
                 </TouchableOpacity>
               </Link>
             </View>
+
+            {/* DEV: quick nav to key-reveal screen */}
+            <TouchableOpacity
+              onPress={() => router.replace("/auth/key-reveal" as any)}
+              className="mt-3"
+            >
+              <TextComponent
+                variant={TextVariant.Body}
+                size={TextSize.Small}
+                color={Color.Grey}
+                className="text-center underline"
+              >
+                [DEV] Preview key-reveal screen
+              </TextComponent>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
