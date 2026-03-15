@@ -476,9 +476,12 @@ export class SlotWindowRepository {
       .eq("user_id", userId);
 
     if (date) {
-      const startOfDay = `${date}T00:00:00`;
-      const endOfDay = `${date}T23:59:59`;
-      query = query.gte("start_date", startOfDay).lte("start_date", endOfDay);
+      const startOfDayUtc = new Date(`${date}T00:00:00Z`);
+      const nextDayUtc = new Date(startOfDayUtc);
+      nextDayUtc.setUTCDate(nextDayUtc.getUTCDate() + 1);
+      const nextDayDatePart = nextDayUtc.toISOString().slice(0, 10);
+      const nextDayStart = `${nextDayDatePart}T00:00:00Z`;
+      query = query.gte("start_date", startOfDayUtc.toISOString()).lt("start_date", nextDayStart);
     }
 
     const { data, error } = await query.order("start_date", {

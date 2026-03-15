@@ -27,9 +27,13 @@ const USER_ID = "2a3c19b8-d352-4b30-a2ac-1cdf993d310c";
 
 export default function ScheduleScreen() {
   const queryClient = useQueryClient();
-  const [selectedDate, setSelectedDate] = useState(
-    () => new Date().toISOString().split("T")[0]!
-  );
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
+    const dd = String(now.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  });
   const [selectedReminderId, setSelectedReminderId] = useState<string | null>(
     null
   );

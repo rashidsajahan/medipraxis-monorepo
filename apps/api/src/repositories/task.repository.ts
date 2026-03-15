@@ -287,9 +287,11 @@ export class TaskRepository {
     }
 
     if (options?.date) {
-      const startOfDay = `${options.date}T00:00:00`;
-      const endOfDay = `${options.date}T23:59:59`;
-      query = query.gte("start_date", startOfDay).lte("start_date", endOfDay);
+      const startOfDay = `${options.date}T00:00:00Z`;
+      const dateObj = new Date(startOfDay);
+      dateObj.setUTCDate(dateObj.getUTCDate() + 1);
+      const nextDayStart = dateObj.toISOString().slice(0, 10) + "T00:00:00Z";
+      query = query.gte("start_date", startOfDay).lt("start_date", nextDayStart);
     }
 
     const { data, error } = await query.order("start_date", {
