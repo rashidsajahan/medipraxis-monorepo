@@ -1,5 +1,6 @@
 export * from "./ai";
 export * from "./appointment-records";
+export * from "./auth";
 export * from "./client-reports";
 export * from "./clients";
 export * from "./controller";
@@ -10,4 +11,3 @@ export * from "./shareable-calendar-links";
 export * from "./shareable-user-links";
 export * from "./slot-windows";
 export * from "./tasks";
-export * from "./user";

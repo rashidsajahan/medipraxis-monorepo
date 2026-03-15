@@ -87,6 +87,7 @@ export default function TabOneScreen() {
         <UpcomingEventCard />
       </ScrollView>
 
+      {/* Task Form modal */}
       <TaskForm visible={showForm} onClose={() => setShowForm(false)} />
       <FormSetupCenter
         visible={showFormSetup}
