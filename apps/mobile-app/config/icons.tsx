@@ -1,30 +1,34 @@
 import {
   ArrowRightIcon,
+  BellIcon,
+  CalendarIcon,
   CalendarBlankIcon,
+  CalendarDotsIcon,
   CaretDownIcon,
   CaretLeftIcon,
+  CaretRightIcon,
+  CaretUpIcon,
   CheckIcon,
   DotsThreeVerticalIcon,
   EyeIcon,
   EyeSlashIcon,
   FileTextIcon,
+  GearIcon,
   HeartIcon,
   InfoIcon,
   MagnifyingGlassIcon,
+  PencilSimpleIcon,
   PhoneIcon,
   PlusIcon,
   ShareNetworkIcon,
   ShoppingCartIcon,
   StarIcon,
-  CalendarDotsIcon,
-  PencilSimpleIcon,
   TrashSimpleIcon,
   UploadIcon,
   UserIcon,
   WarningIcon,
 } from "phosphor-react-native";
 
-// Export the Icon type from phosphor-react-native
 export type { Icon } from "phosphor-react-native";
 
 export const Icons = {
@@ -42,6 +46,9 @@ export const Icons = {
   CalendarDotsIcon: CalendarDotsIcon,
   Pencil: PencilSimpleIcon,
   Trash: TrashSimpleIcon,
+  Calendar: CalendarIcon,
+  CaretRight: CaretRightIcon,
+  CaretUp: CaretUpIcon,
   MagnifyingGlass: MagnifyingGlassIcon,
   Info: InfoIcon,
   User: UserIcon,
@@ -52,6 +59,8 @@ export const Icons = {
   FileText: FileTextIcon,
   Warning: WarningIcon,
   UploadIcon: UploadIcon,
+  Bell: BellIcon,
+  Gear: GearIcon,
 } as const;
 
 export type IconName = keyof typeof Icons;
