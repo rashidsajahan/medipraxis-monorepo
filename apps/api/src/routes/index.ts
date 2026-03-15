@@ -10,6 +10,7 @@ import requestReports from "./request_reports";
 import shareableCalendarLinks from "./shareable-calendar-links";
 import slotWindows from "./slot_windows";
 import tasks from "./tasks";
+import userKeys from "./user-keys";
 import users from "./user";
 
 const routes = new Hono()
@@ -24,6 +25,7 @@ const routes = new Hono()
   .route("/otp", otp)
   .route("/forms", forms)
   .route("/appointment-records", appointmentRecords)
-  .route("/request-reports", requestReports);
+  .route("/request-reports", requestReports)
+  .route("/user-keys", userKeys);
 
 export default routes;

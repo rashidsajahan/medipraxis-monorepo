@@ -11,6 +11,7 @@ import {
   TextComponent,
 } from "../../components/basic";
 import { generateRecoveryKey, generateUserKeys } from "../../utils/userKeys";
+import { useSaveUserKeys } from "../../services/user-keys";
 
 export default function KeyRevealScreen() {
   const router = useRouter();
@@ -22,6 +23,8 @@ export default function KeyRevealScreen() {
   const [recoveryKey, setRecoveryKey] = useState("................");
   const [copied, setCopied] = useState(false);
   const [generatingKeys, setGeneratingKeys] = useState(false);
+
+  const { mutateAsync: saveUserKeys } = useSaveUserKeys();
 
   const handleCopy = async () => {
     await setStringAsync(recoveryKey);
@@ -41,7 +44,11 @@ export default function KeyRevealScreen() {
     // Yield to let the UI re-render the loading state before heavy work starts
     await new Promise((resolve) => setTimeout(resolve, 50));
     const userKeys = await generateUserKeys(recoveryKey);
-    console.log("[DEV] user keys:", userKeys);
+    await saveUserKeys({
+      public_key: userKeys.publicKey,
+      wrapped_private_key: userKeys.wrappedPrivateKey,
+      pbkdf2_salt: userKeys.pbkdf2Salt,
+    });
     setGeneratingKeys(false);
     router.replace({
       pathname: "/auth/login",
