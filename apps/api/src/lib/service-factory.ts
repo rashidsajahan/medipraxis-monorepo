@@ -1,5 +1,6 @@
 import type { Context } from "hono";
 import {
+  AppointmentRecordRepository,
   ClientReportRepository,
   ClientRepository,
   FormRepository,
@@ -14,6 +15,7 @@ import {
 } from "../repositories";
 import {
   AIService,
+  AppointmentRecordService,
   AuthService,
   ClientReportService,
   ClientService,
@@ -134,6 +136,12 @@ export function getFormService(c: Context<{ Bindings: Env }>) {
   const db = createDatabaseClient(c.env);
   const formRepository = new FormRepository(db);
   return new FormService(formRepository);
+}
+
+export function getAppointmentRecordService(c: Context<{ Bindings: Env }>) {
+  const db = createDatabaseClient(c.env);
+  const appointmentRecordRepository = new AppointmentRecordRepository(db);
+  return new AppointmentRecordService(appointmentRecordRepository);
 }
 
 export function getAuthService(c: Context<{ Bindings: Env }>) {

@@ -1,3 +1,4 @@
+export * from "./appointment_record.repository";
 export * from "./client.repository";
 export * from "./client_report.repository";
 export * from "./form.repository";
