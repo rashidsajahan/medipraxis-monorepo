@@ -1,5 +1,8 @@
 import { apiClient } from "@/lib/api-client";
-import type { CreateRequestReportInput, GroupedClientReport } from "@repo/models";
+import type {
+  CreateRequestReportInput,
+  GroupedClientReport,
+} from "@repo/models";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Alert } from "react-native";
 
@@ -46,8 +49,15 @@ export const useCreateRequestReport = () => {
 
       if (!response.ok) {
         try {
-          const errorData = await response.json() as { error?: string; message?: string };
-          throw new Error(errorData.error || errorData.message || "Failed to create request report");
+          const errorData = (await response.json()) as {
+            error?: string;
+            message?: string;
+          };
+          throw new Error(
+            errorData.error ||
+              errorData.message ||
+              "Failed to create request report"
+          );
         } catch {
           throw new Error("Failed to create request report");
         }
@@ -57,11 +67,16 @@ export const useCreateRequestReport = () => {
       return data;
     },
     onSuccess: async (_data, variables) => {
-      await queryClient.invalidateQueries({ queryKey: ["grouped-reports", variables.user_id] });
+      await queryClient.invalidateQueries({
+        queryKey: ["grouped-reports", variables.user_id],
+      });
       Alert.alert("Success", "Report request sent successfully");
     },
     onError: (error: Error) => {
-      Alert.alert("Error", error.message || "Failed to send request report. Please try again.");
+      Alert.alert(
+        "Error",
+        error.message || "Failed to send request report. Please try again."
+      );
     },
   });
 };

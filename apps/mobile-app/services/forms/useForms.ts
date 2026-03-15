@@ -54,7 +54,7 @@ export const useFetchRequestForm = (userId: string) => {
 
       const data = await response.json();
       const forms = data.forms as Form[];
-      
+
       if (forms.length === 0) {
         return null;
       }

@@ -83,7 +83,11 @@ export const InlineDropdownComponent: React.FC<InlineDropdownProps> = ({
         >
           {displayValue}
         </Text>
-        <CaretDownIcon size={CARET_ICON_SIZE} color={Color.Grey} weight="regular" />
+        <CaretDownIcon
+          size={CARET_ICON_SIZE}
+          color={Color.Grey}
+          weight="regular"
+        />
       </Pressable>
 
       <Modal transparent visible={isOpen} animationType="none">

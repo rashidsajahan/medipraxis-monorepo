@@ -14,13 +14,17 @@ import {
 } from "react-native";
 import { ReportTile } from "./ReportTile.component";
 
-// Text styles
-const textLargeStyle = textStyles[TextVariant.Body][TextSize.Large];
+const TEMP_USER_ID = "2a3c19b8-d352-4b30-a2ac-1cdf993d310c";
+
+const SEARCH_ICON_SIZE = 20;
+const INPUT_HEIGHT = 56;
+const INPUT_BORDER_WIDTH = 1.5;
+const INPUT_BORDER_RADIUS = 12;
+const BOTTOM_PADDING = 100;
 
 type TabType = "completed" | "pending";
 
-// Hardcoded user ID for now - TODO: Get from auth context
-const TEMP_USER_ID = "2a3c19b8-d352-4b30-a2ac-1cdf993d310c";
+const textLargeStyle = textStyles[TextVariant.Body][TextSize.Large];
 
 export default function ReportsScreen() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -109,10 +113,10 @@ export default function ReportsScreen() {
           size="md"
           style={{
             borderColor: Color.LightGrey,
-            borderWidth: 1.5,
-            borderRadius: 12,
+            borderWidth: INPUT_BORDER_WIDTH,
+            borderRadius: INPUT_BORDER_RADIUS,
             width: "100%",
-            height: 56,
+            height: INPUT_HEIGHT,
             backgroundColor: Color.White,
           }}
         >
@@ -136,7 +140,11 @@ export default function ReportsScreen() {
             }}
           />
           <InputSlot className="pr-4">
-            <Icons.Search size={20} color={Color.Grey} weight="regular" />
+            <Icons.Search
+              size={SEARCH_ICON_SIZE}
+              color={Color.Grey}
+              weight="regular"
+            />
           </InputSlot>
         </Input>
       </View>
@@ -183,7 +191,7 @@ export default function ReportsScreen() {
         className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          paddingBottom: 100,
+          paddingBottom: BOTTOM_PADDING,
         }}
       >
         {isLoading ? (
