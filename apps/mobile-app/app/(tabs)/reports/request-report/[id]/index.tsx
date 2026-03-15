@@ -120,10 +120,16 @@ export default function RequestReportScreen() {
 
   const handleRequest = () => {
     const requestPayload = {
-      form_configuration: formFields,
-      additional_notes: additionalNotes,
-      send_through: selectedSendThrough,
+      user_id: TEMP_USER_ID,
       client_id: selectedClientId,
+      form_id: requestForm?.form_id || "",
+      note: additionalNotes,
+      notification_type: {
+        whatsapp: selectedSendThrough.includes("whatsapp"),
+        text: selectedSendThrough.includes("message"),
+        email: selectedSendThrough.includes("email"),
+      },
+      requested_reports: formFields,
     };
 
     console.log(
