@@ -7,16 +7,27 @@ import {
 } from "@/components/ui/checkbox";
 import { Icons, type Icon } from "@/config";
 import { useFetchClients } from "@/services/clients";
-import { Color, TextSize, TextVariant } from "@repo/config";
+import { Color, Font, TextSize, TextVariant, textStyles } from "@repo/config";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   AtIcon,
+  CaretDownIcon,
   ChatCircleTextIcon,
   CheckIcon,
   WhatsappLogoIcon,
 } from "phosphor-react-native";
-import React, { useState } from "react";
-import { SafeAreaView, ScrollView, TextInput, TouchableOpacity, View } from "react-native";
+import React, { useRef, useState } from "react";
+import {
+  Modal,
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  type TextStyle as RNTextStyle,
+} from "react-native";
 
 const TEMP_USER_ID = "2a3c19b8-d352-4b30-a2ac-1cdf993d310c";
 
@@ -70,27 +81,54 @@ const SEND_THROUGH_OPTIONS: {
 
 type RequestReportForm = typeof REQUEST_REPORT_FORM;
 
+const textBodyMediumStyle = textStyles[TextVariant.Body][TextSize.Medium];
+
 export default function RequestReportScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { data: clients = [], isLoading: isClientsLoading } =
-    useFetchClients(TEMP_USER_ID);
+  const { data: clients = [] } = useFetchClients(TEMP_USER_ID);
   const [requestReportForm, setRequestReportForm] =
     useState<RequestReportForm>(REQUEST_REPORT_FORM);
   const [selectedSendThrough, setSelectedSendThrough] = useState<
     SendThroughOption[]
   >([]);
   const [additionalNotes, setAdditionalNotes] = useState("");
+  const [selectedClientId, setSelectedClientId] = useState<string>(
+    typeof id === "string" ? id : ""
+  );
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<View>(null);
+  const [dropdownLayout, setDropdownLayout] = useState<{
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | null>(null);
 
   const sortedFormFields = [...requestReportForm.form_structure].sort(
     (a, b) => a.sequence - b.sequence
   );
 
-  const selectedClient =
-    typeof id === "string" ? clients.find((client) => client.id === id) : null;
-  const displayClientName = isClientsLoading
-    ? "Loading client..."
-    : selectedClient?.name || "Unknown Client";
+  const selectedClient = clients.find(
+    (client) => client.id === selectedClientId
+  );
+  const displayClientName = selectedClient?.name || "Select client";
+
+  const handleOpenDropdown = () => {
+    if (dropdownRef.current) {
+      dropdownRef.current.measureInWindow(
+        (x: number, y: number, width: number, height: number) => {
+          setDropdownLayout({ x, y, width, height });
+          setIsDropdownOpen(true);
+        }
+      );
+    }
+  };
+
+  const handleSelectClient = (clientId: string) => {
+    setSelectedClientId(clientId);
+    setIsDropdownOpen(false);
+  };
 
   const toggleReport = (reportType: string) => {
     setRequestReportForm((previous) => ({
@@ -118,12 +156,18 @@ export default function RequestReportScreen() {
       send_through: selectedSendThrough,
     };
 
-    console.log("Request report payload:", JSON.stringify(requestPayload, null, 2));
+    console.log(
+      "Request report payload:",
+      JSON.stringify(requestPayload, null, 2)
+    );
   };
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <ScrollView className="flex-1 bg-white" showsVerticalScrollIndicator={false}>
+      <ScrollView
+        className="flex-1 bg-white"
+        showsVerticalScrollIndicator={false}
+      >
         <View className="px-5 pt-3 pb-6 bg-white">
           <View className="mb-6 self-start">
             <ButtonComponent.BackButton
@@ -141,21 +185,94 @@ export default function RequestReportScreen() {
             Requesting Reports
           </TextComponent>
 
-          <View className="flex-row items-center gap-3">
-            <View className="w-10 h-10 rounded-full bg-[#E8F5A8] justify-center items-center overflow-hidden">
-              <Icons.User size={20} color={Color.Grey} />
-            </View>
+          <View className="flex-row items-center gap-2 mb-6">
             <TextComponent
               variant={TextVariant.Body}
               size={TextSize.Medium}
               color={Color.Black}
             >
-              from {displayClientName}
+              from
             </TextComponent>
+            <View className="w-6 h-6 rounded-full bg-[#E8F5A8] justify-center items-center overflow-hidden">
+              <Icons.User size={14} color={Color.Grey} />
+            </View>
+            <Pressable
+              ref={dropdownRef}
+              onPress={handleOpenDropdown}
+              className="flex-row items-center gap-1"
+            >
+              <Text
+                style={{
+                  color: selectedClientId ? Color.Black : Color.Grey,
+                  fontFamily:
+                    textBodyMediumStyle.fontFamily === Font.DMsans
+                      ? "DMSans_600SemiBold"
+                      : "Lato_600SemiBold",
+                  fontSize: textBodyMediumStyle.fontSize,
+                  fontWeight: "600" as RNTextStyle["fontWeight"],
+                }}
+              >
+                {displayClientName}
+              </Text>
+              <CaretDownIcon size={16} color={Color.Grey} weight="regular" />
+            </Pressable>
           </View>
+
+          <Modal transparent visible={isDropdownOpen} animationType="none">
+            <Pressable
+              className="flex-1"
+              onPress={() => setIsDropdownOpen(false)}
+            />
+            {dropdownLayout && (
+              <View
+                className="absolute bg-white rounded-xl shadow-lg border border-[#D4D4D4] max-h-[200px] overflow-hidden"
+                style={{
+                  top: dropdownLayout.y + dropdownLayout.height + 4,
+                  left: dropdownLayout.x,
+                  minWidth: 200,
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 4,
+                  elevation: 5,
+                }}
+              >
+                <ScrollView showsVerticalScrollIndicator={false}>
+                  {[...clients]
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((client) => (
+                      <Pressable
+                        key={client.id}
+                        onPress={() => handleSelectClient(client.id)}
+                        className={`py-3 px-4 border-b border-[#F5F5F5] ${
+                          selectedClientId === client.id ? "bg-[#F5F5F5]" : ""
+                        }`}
+                      >
+                        <Text
+                          style={{
+                            color: Color.Black,
+                            fontFamily:
+                              textBodyMediumStyle.fontFamily === Font.DMsans
+                                ? "DMSans_400Regular"
+                                : "Lato_400Regular",
+                            fontSize: textBodyMediumStyle.fontSize,
+                            fontWeight:
+                              selectedClientId === client.id
+                                ? ("600" as RNTextStyle["fontWeight"])
+                                : ("400" as RNTextStyle["fontWeight"]),
+                          }}
+                        >
+                          {client.name}
+                        </Text>
+                      </Pressable>
+                    ))}
+                </ScrollView>
+              </View>
+            )}
+          </Modal>
         </View>
 
-        <View className="px-5 pt-2">
+        <View className="px-5">
           <TextComponent
             variant={TextVariant.Title}
             size={TextSize.Medium}
@@ -175,8 +292,12 @@ export default function RequestReportScreen() {
                 onChange={() => toggleReport(field.display_label)}
                 className="items-center"
               >
-                <CheckboxIndicator className="mr-3 border-[#D4D4D4] data-[checked=true]:bg-[#84CC16] data-[checked=true]:border-[#84CC16]">
-                  <CheckboxIcon as={CheckIcon} />
+                <CheckboxIndicator className="mr-3 border-[#D4D4D4] data-[checked=true]:bg-[#90C67C] data-[checked=true]:border-[#90C67C]">
+                  <CheckboxIcon
+                    as={CheckIcon}
+                    className="!text-white"
+                    color="#FFFFFF"
+                  />
                 </CheckboxIndicator>
                 <CheckboxLabel className="text-[#111827]">
                   {field.display_label}
@@ -224,7 +345,7 @@ export default function RequestReportScreen() {
                   key={option.key}
                   onPress={() => toggleSendThrough(option.key)}
                   activeOpacity={0.8}
-                  className={`flex-1 flex-row items-center justify-center gap-2 rounded-xl border px-3 py-3 ${isSelected ? "border-[#84CC16] bg-[#84CC16]" : "border-[#D4D4D4] bg-[#F5F5F5]"}`}
+                  className={`flex-1 flex-row items-center justify-center gap-2 rounded-xl border px-3 py-3 ${isSelected ? "border-[#90C67C] bg-[#90C67C]" : "border-[#D4D4D4] bg-[#F5F5F5]"}`}
                 >
                   <IconComponent
                     size={18}
@@ -244,7 +365,7 @@ export default function RequestReportScreen() {
           </View>
 
           <ButtonComponent
-            size={ButtonSize.Medium}
+            size={ButtonSize.Small}
             buttonColor={Color.Black}
             textColor={Color.White}
             onPress={handleRequest}
