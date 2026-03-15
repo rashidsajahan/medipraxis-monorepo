@@ -1,8 +1,8 @@
-import { Icons } from "@/config";
 import { Color, TextSize, TextVariant } from "@repo/config";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter, Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import React from "react";
+import { Controller } from "react-hook-form";
 import {
   Alert,
   Image,
@@ -12,8 +12,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useAuthHandler } from "../../services/auth";
-import { Controller } from "react-hook-form";
 import {
   ButtonComponent,
   ButtonSize,
@@ -22,6 +20,7 @@ import {
   TextInputComponent,
   TextInputType,
 } from "../../components/basic";
+import { useAuthHandler } from "../../services/auth";
 
 export default function RegisterScreen() {
   const { register, isLoading } = useAuthHandler();
@@ -217,7 +216,6 @@ export default function RegisterScreen() {
                 name="agreed"
                 render={({ field: { onChange, value } }) => (
                   <CheckboxComponent
-                    value="agree"
                     isChecked={value}
                     onChange={onChange}
                     label="I agree with MediPraxis Public Agreement, Terms & Policy"

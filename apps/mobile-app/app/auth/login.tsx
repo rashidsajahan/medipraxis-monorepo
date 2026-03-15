@@ -1,7 +1,6 @@
-import { Icons } from "@/config";
 import { Color, TextSize, TextVariant } from "@repo/config";
 import { LinearGradient } from "expo-linear-gradient";
-import { useLocalSearchParams, Link } from "expo-router";
+import { Link, useLocalSearchParams } from "expo-router";
 import React from "react";
 import {
   Alert,
@@ -21,8 +20,8 @@ import {
   TextInputType,
 } from "../../components/basic";
 
-import { useAuthHandler } from "../../services/auth";
 import { Controller } from "react-hook-form";
+import { useAuthHandler } from "../../services/auth";
 
 export default function LoginScreen() {
   const params = useLocalSearchParams<{
@@ -183,7 +182,6 @@ export default function LoginScreen() {
                   name="rememberMe"
                   render={({ field: { onChange, value } }) => (
                     <CheckboxComponent
-                      value="remember"
                       isChecked={value}
                       onChange={onChange}
                       label="Remember Me"

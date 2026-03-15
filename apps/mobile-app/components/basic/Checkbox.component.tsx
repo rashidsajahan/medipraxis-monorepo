@@ -10,7 +10,6 @@ export enum CheckboxSize {
 }
 
 interface CheckboxComponentProps {
-  value: string;
   label?: string;
   isChecked?: boolean;
   onChange?: (isChecked: boolean) => void;
@@ -25,7 +24,6 @@ interface CheckboxComponentProps {
 }
 
 export const CheckboxComponent: React.FC<CheckboxComponentProps> = ({
-  value: _value,
   label,
   isChecked = false,
   onChange,
