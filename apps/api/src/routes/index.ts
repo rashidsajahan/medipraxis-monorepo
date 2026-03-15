@@ -4,6 +4,7 @@ import appointmentRecords from "./appointment_record";
 import auth from "./auth";
 import clientReports from "./client_reports";
 import clients from "./clients";
+import debug from "./debug";
 import forms from "./forms";
 import otp from "./otp";
 import requestReports from "./request_reports";
@@ -26,6 +27,7 @@ const routes = new Hono()
   .route("/forms", forms)
   .route("/appointment-records", appointmentRecords)
   .route("/request-reports", requestReports)
-  .route("/user-keys", userKeys);
+  .route("/user-keys", userKeys)
+  .route("/debug", debug);
 
 export default routes;

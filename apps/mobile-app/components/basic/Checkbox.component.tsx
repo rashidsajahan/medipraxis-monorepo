@@ -1,34 +1,58 @@
-import { Color } from "@repo/config";
+import { Color, TextSize, TextVariant } from "@repo/config";
 import React from "react";
 import { TouchableOpacity, View } from "react-native";
+import { TextComponent } from "./Text.component";
 
-type CheckboxComponentProps = {
-  checked: boolean;
-  onChange: (value: boolean) => void;
-  label?: React.ReactNode;
-  color?: Color;
-};
+export enum CheckboxSize {
+  Small = "sm",
+  Medium = "md",
+  Large = "lg",
+}
 
-export function CheckboxComponent({
-  checked,
-  onChange,
+interface CheckboxComponentProps {
+  value: string;
+  label?: string;
+  isChecked?: boolean;
+  onChange?: (isChecked: boolean) => void;
+  size?: CheckboxSize;
+  isDisabled?: boolean;
+  isInvalid?: boolean;
+  labelVariant?: TextVariant;
+  labelSize?: Exclude<TextSize, TextSize.ExtraLarge>;
+  labelColor?: Color;
+  className?: string;
+  containerClassName?: string;
+}
+
+export const CheckboxComponent: React.FC<CheckboxComponentProps> = ({
+  value: _value,
   label,
-  color = Color.Black,
-}: CheckboxComponentProps) {
+  isChecked = false,
+  onChange,
+  isDisabled = false,
+  isInvalid = false,
+  labelVariant = TextVariant.Body,
+  labelSize = TextSize.Medium,
+  labelColor = Color.Black,
+  containerClassName,
+}) => {
+  const color = isInvalid ? Color.Danger : Color.Black;
+
   return (
     <TouchableOpacity
-      onPress={() => onChange(!checked)}
-      className="flex-row items-start gap-2.5"
+      onPress={() => !isDisabled && onChange?.(!isChecked)}
+      className={`flex-row items-start gap-2.5 ${containerClassName ?? ""}`}
       activeOpacity={0.7}
+      disabled={isDisabled}
     >
       <View
         className="w-[22px] h-[22px] rounded-md border-2 justify-center items-center mt-0.5"
         style={{
-          borderColor: checked ? color : Color.Grey,
-          backgroundColor: checked ? color : "transparent",
+          borderColor: isChecked ? color : Color.Grey,
+          backgroundColor: isChecked ? color : "transparent",
         }}
       >
-        {checked && (
+        {isChecked && (
           <View
             style={{
               width: 12,
@@ -42,8 +66,16 @@ export function CheckboxComponent({
         )}
       </View>
       {label !== undefined && (
-        <View style={{ flex: 1 }}>{label}</View>
+        <View style={{ flex: 1 }}>
+          <TextComponent
+            variant={labelVariant}
+            size={labelSize}
+            color={labelColor}
+          >
+            {label}
+          </TextComponent>
+        </View>
       )}
     </TouchableOpacity>
   );
-}
+};

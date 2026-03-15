@@ -248,6 +248,13 @@ export default function TabLayout() {
             headerShown: false,
           }}
         />
+        <Tabs.Screen
+          name="reports/[id]"
+          options={{
+            href: null,
+            headerShown: false,
+          }}
+        />
       </Tabs>
 
       <AIAssistantModal

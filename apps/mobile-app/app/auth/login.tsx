@@ -15,16 +15,12 @@ import {
 import {
   ButtonComponent,
   ButtonSize,
+  CheckboxComponent,
   TextComponent,
   TextInputComponent,
   TextInputType,
 } from "../../components/basic";
-import {
-  Checkbox,
-  CheckboxIcon,
-  CheckboxIndicator,
-  CheckboxLabel,
-} from "../../components/ui/checkbox";
+
 import { useAuthHandler } from "../../services/auth";
 import { Controller } from "react-hook-form";
 
@@ -186,26 +182,14 @@ export default function LoginScreen() {
                   control={control}
                   name="rememberMe"
                   render={({ field: { onChange, value } }) => (
-                    <Checkbox
-                      size="md"
+                    <CheckboxComponent
                       value="remember"
                       isChecked={value}
                       onChange={onChange}
-                      aria-label="Remember Me"
-                    >
-                      <CheckboxIndicator className="mr-2">
-                        <CheckboxIcon as={Icons.Check} />
-                      </CheckboxIndicator>
-                      <CheckboxLabel>
-                        <TextComponent
-                          variant={TextVariant.Body}
-                          size={TextSize.Small}
-                          color={Color.Grey}
-                        >
-                          Remember Me
-                        </TextComponent>
-                      </CheckboxLabel>
-                    </Checkbox>
+                      label="Remember Me"
+                      labelSize={TextSize.Small}
+                      labelColor={Color.Grey}
+                    />
                   )}
                 />
 
