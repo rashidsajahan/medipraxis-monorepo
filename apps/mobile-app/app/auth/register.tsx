@@ -1,4 +1,3 @@
-
 import { Color, TextSize, TextVariant } from "@repo/config";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter, Link } from "expo-router";
@@ -22,7 +21,6 @@ import {
   TextInputComponent,
   TextInputType,
 } from "../../components/basic";
-
 
 export default function RegisterScreen() {
   const { register, isLoading } = useAuthHandler();

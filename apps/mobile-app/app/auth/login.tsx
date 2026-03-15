@@ -1,4 +1,3 @@
-
 import { Color, TextSize, TextVariant } from "@repo/config";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, Link } from "expo-router";
