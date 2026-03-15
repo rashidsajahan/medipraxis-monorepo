@@ -1,4 +1,4 @@
-import { Icons } from "@/config";
+
 import { Color, TextSize, TextVariant } from "@repo/config";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter, Link } from "expo-router";
@@ -17,16 +17,12 @@ import { Controller } from "react-hook-form";
 import {
   ButtonComponent,
   ButtonSize,
+  CheckboxComponent,
   TextComponent,
   TextInputComponent,
   TextInputType,
 } from "../../components/basic";
-import {
-  Checkbox,
-  CheckboxIcon,
-  CheckboxIndicator,
-  CheckboxLabel,
-} from "../../components/ui/checkbox";
+
 
 export default function RegisterScreen() {
   const { register, isLoading } = useAuthHandler();
@@ -231,39 +227,16 @@ export default function RegisterScreen() {
                 control={control}
                 name="agreed"
                 render={({ field: { onChange, value } }) => (
-                  <Checkbox
-                    size="md"
+                  <CheckboxComponent
                     value="agree"
                     isChecked={value}
                     onChange={onChange}
-                    aria-label="I agree"
+                    label="I agree with MediPraxis Public Agreement, Terms & Policy"
+                    labelSize={TextSize.Small}
+                    labelColor={Color.Grey}
                     className="flex-1"
-                  >
-                    <CheckboxIndicator className="mr-2 mt-1">
-                      <CheckboxIcon as={Icons.Check} />
-                    </CheckboxIndicator>
-                    <CheckboxLabel className="flex-1">
-                      <View>
-                        <TextComponent
-                          variant={TextVariant.Body}
-                          size={TextSize.Small}
-                          color={Color.Grey}
-                        >
-                          I agree with MediPraxis Public Agreement, Terms &
-                          Policy
-                        </TextComponent>
-                        {errors.agreed && (
-                          <TextComponent
-                            variant={TextVariant.Body}
-                            size={TextSize.Small}
-                            color={Color.Danger}
-                          >
-                            {errors.agreed.message}
-                          </TextComponent>
-                        )}
-                      </View>
-                    </CheckboxLabel>
-                  </Checkbox>
+                    isInvalid={!!errors.agreed}
+                  />
                 )}
               />
             </View>
