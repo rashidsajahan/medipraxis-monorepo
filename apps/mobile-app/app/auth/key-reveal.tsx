@@ -4,13 +4,13 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { setStringAsync } from "expo-clipboard";
 import { CheckIcon, CopySimpleIcon, KeyIcon } from "phosphor-react-native";
 import React, { useEffect, useState } from "react";
-import { Modal, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Modal, TouchableOpacity, View } from "react-native";
 import {
   ButtonComponent,
   ButtonSize,
   TextComponent,
 } from "../../components/basic";
-import { generateRecoveryKey } from "../../utils/crypto";
+import { generateRecoveryKey, generateUserKeys } from "../../utils/userKeys";
 
 export default function KeyRevealScreen() {
   const router = useRouter();
@@ -21,6 +21,7 @@ export default function KeyRevealScreen() {
   const [acknowledged, setAcknowledged] = useState(false);
   const [recoveryKey, setRecoveryKey] = useState("................");
   const [copied, setCopied] = useState(false);
+  const [generatingKeys, setGeneratingKeys] = useState(false);
 
   const handleCopy = async () => {
     await setStringAsync(recoveryKey);
@@ -35,7 +36,13 @@ export default function KeyRevealScreen() {
     })();
   }, []);
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
+    setGeneratingKeys(true);
+    // Yield to let the UI re-render the loading state before heavy work starts
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    const userKeys = await generateUserKeys(recoveryKey);
+    console.log("[DEV] user keys:", userKeys);
+    setGeneratingKeys(false);
     router.replace({
       pathname: "/auth/login",
       params: { phoneNumber, countryCode },
@@ -205,19 +212,23 @@ export default function KeyRevealScreen() {
             </TouchableOpacity>
 
             <ButtonComponent
-              onPress={handleContinue}
-              disabled={!acknowledged}
-              buttonColor={acknowledged ? Color.Green : Color.Grey}
+              onPress={() => { void handleContinue(); }}
+              disabled={!acknowledged || generatingKeys}
+              buttonColor={acknowledged && !generatingKeys ? Color.Green : Color.Grey}
               textColor={Color.White}
               size={ButtonSize.Large}
             >
-              <TextComponent
-                variant={TextVariant.Button}
-                size={TextSize.Medium}
-                color={Color.White}
-              >
-                Continue to Login
-              </TextComponent>
+              {generatingKeys ? (
+                <ActivityIndicator size="small" color={Color.White} />
+              ) : (
+                <TextComponent
+                  variant={TextVariant.Button}
+                  size={TextSize.Medium}
+                  color={Color.White}
+                >
+                  Continue to Login
+                </TextComponent>
+              )}
             </ButtonComponent>
           </View>
         </View>
