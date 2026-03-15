@@ -2,7 +2,7 @@ import { View } from "@/components/Themed";
 import { useState } from "react";
 import { Button, StyleSheet } from "react-native";
 
-import { FormSetupCenter } from "@/components/advanced/formSetupCenter";
+import { FormSetupCenter } from "./settings/components/form-setup-center";
 
 export default function TabOneScreen() {
   const [showFormSetup, setShowFormSetup] = useState(false);
