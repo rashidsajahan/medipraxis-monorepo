@@ -87,8 +87,11 @@ export const AppointmentTile: React.FC<AppointmentTileProps> = ({
   const isActive =
     appointment.status === "ONGOING" || appointment.status === "IN_PROGRESS";
 
-  // NOT_STARTED = future appointment → 2-row layout (no chip row)
-  const isNotStarted = appointment.status === "NOT_STARTED";
+  // Only suppress the status chip for genuinely future NOT_STARTED appointments.
+  // Past appointments that were never actioned remain NOT_STARTED in the DB and must still show the chip.
+  const isFutureNotStarted =
+    appointment.status === "NOT_STARTED" &&
+    new Date(appointment.date) > new Date();
 
   const actionLabel = getActionLabel(appointment.status);
 
@@ -134,7 +137,7 @@ export const AppointmentTile: React.FC<AppointmentTileProps> = ({
 
       <View
         className="flex-row items-center gap-4"
-        style={{ marginBottom: isNotStarted ? 0 : 16 }}
+        style={{ marginBottom: isFutureNotStarted ? 0 : 16 }}
       >
         {/* Date */}
         <View className="flex-row items-center gap-2">
@@ -160,7 +163,7 @@ export const AppointmentTile: React.FC<AppointmentTileProps> = ({
           </TextComponent>
         </View>
 
-        {isNotStarted && appointment.location ? (
+        {isFutureNotStarted && appointment.location ? (
           <View className="flex-row items-center gap-1 flex-1 justify-end">
             <MapPinIcon size={14} color={Color.Grey} weight="regular" />
             <TextComponent
@@ -174,7 +177,7 @@ export const AppointmentTile: React.FC<AppointmentTileProps> = ({
         ) : null}
       </View>
 
-      {!isNotStarted ? (
+      {!isFutureNotStarted ? (
         <>
           {/* Grey divider line */}
           <View className="border-t border-[#E5E5E5] mb-3" />
