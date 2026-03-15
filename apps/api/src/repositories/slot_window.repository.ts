@@ -481,7 +481,9 @@ export class SlotWindowRepository {
       nextDayUtc.setUTCDate(nextDayUtc.getUTCDate() + 1);
       const nextDayDatePart = nextDayUtc.toISOString().slice(0, 10);
       const nextDayStart = `${nextDayDatePart}T00:00:00Z`;
-      query = query.gte("start_date", startOfDayUtc.toISOString()).lt("start_date", nextDayStart);
+      query = query
+        .gte("start_date", startOfDayUtc.toISOString())
+        .lt("start_date", nextDayStart);
     }
 
     const { data, error } = await query.order("start_date", {

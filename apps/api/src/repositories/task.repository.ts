@@ -291,7 +291,9 @@ export class TaskRepository {
       const dateObj = new Date(startOfDay);
       dateObj.setUTCDate(dateObj.getUTCDate() + 1);
       const nextDayStart = dateObj.toISOString().slice(0, 10) + "T00:00:00Z";
-      query = query.gte("start_date", startOfDay).lt("start_date", nextDayStart);
+      query = query
+        .gte("start_date", startOfDay)
+        .lt("start_date", nextDayStart);
     }
 
     const { data, error } = await query.order("start_date", {
