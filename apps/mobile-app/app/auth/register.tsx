@@ -293,20 +293,7 @@ export default function RegisterScreen() {
               </Link>
             </View>
 
-            {/* DEV: quick nav to key-reveal screen */}
-            <TouchableOpacity
-              onPress={() => router.replace("/auth/key-reveal" as any)}
-              className="mt-3"
-            >
-              <TextComponent
-                variant={TextVariant.Body}
-                size={TextSize.Small}
-                color={Color.Grey}
-                className="text-center underline"
-              >
-                [DEV] Preview key-reveal screen
-              </TextComponent>
-            </TouchableOpacity>
+
           </View>
         </View>
       </ScrollView>

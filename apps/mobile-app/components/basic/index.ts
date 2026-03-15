@@ -1,4 +1,5 @@
 export * from "./Button.component";
+export * from "./Checkbox.component";
 export * from "./Dropdown.component";
 export * from "./Text.component";
 export * from "./TextInput.component";

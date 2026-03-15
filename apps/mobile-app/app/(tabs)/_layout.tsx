@@ -6,10 +6,13 @@ import {
   CalendarIcon,
   FoldersIcon,
   HouseLineIcon,
+  KeyIcon,
   UsersIcon,
 } from "phosphor-react-native";
 import React, { useState } from "react";
 import { Pressable, View } from "react-native";
+
+import { KeyRevealModal } from "../auth/KeyRevealModal";
 
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
 import { useColorScheme } from "@/components/useColorScheme";
@@ -139,6 +142,7 @@ function CustomTabBar({
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const [isAIAssistantVisible, setIsAIAssistantVisible] = useState(false);
+  const [isKeyModalVisible, setIsKeyModalVisible] = useState(false);
   const { signOut } = useAuth();
 
   return (
@@ -166,6 +170,18 @@ export default function TabLayout() {
             ),
             headerRight: () => (
               <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Pressable
+                  onPress={() => setIsKeyModalVisible(true)}
+                  className="mr-[15px]"
+                >
+                  {({ pressed }) => (
+                    <KeyIcon
+                      size={25}
+                      color={Colors[colorScheme ?? "light"].text}
+                      style={{ opacity: pressed ? 0.5 : 1 }}
+                    />
+                  )}
+                </Pressable>
                 <Link href="/modal" asChild>
                   <Pressable className="mr-[15px]">
                     {({ pressed }) => (
@@ -237,6 +253,13 @@ export default function TabLayout() {
       <AIAssistantModal
         visible={isAIAssistantVisible}
         onClose={() => setIsAIAssistantVisible(false)}
+      />
+
+      <KeyRevealModal
+        visible={isKeyModalVisible}
+        mode="revoke"
+        onSuccess={() => setIsKeyModalVisible(false)}
+        onClose={() => setIsKeyModalVisible(false)}
       />
     </View>
   );
