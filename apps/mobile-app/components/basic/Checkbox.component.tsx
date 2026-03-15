@@ -21,6 +21,7 @@ interface CheckboxComponentProps {
   labelColor?: Color;
   className?: string;
   containerClassName?: string;
+  shrinkLabel?: boolean;
 }
 
 export const CheckboxComponent: React.FC<CheckboxComponentProps> = ({
@@ -33,18 +34,19 @@ export const CheckboxComponent: React.FC<CheckboxComponentProps> = ({
   labelSize = TextSize.Medium,
   labelColor = Color.Black,
   containerClassName,
+  shrinkLabel = true,
 }) => {
   const color = isInvalid ? Color.Danger : Color.Black;
 
   return (
     <TouchableOpacity
       onPress={() => !isDisabled && onChange?.(!isChecked)}
-      className={`flex-row items-start gap-2.5 ${containerClassName ?? ""}`}
+      className={`flex-row ${shrinkLabel ? "items-center" : "items-start"} gap-2.5 ${!shrinkLabel ? "w-full" : ""} ${containerClassName ?? ""}`}
       activeOpacity={0.7}
       disabled={isDisabled}
     >
       <View
-        className="w-[22px] h-[22px] rounded-md border-2 justify-center items-center mt-0.5"
+        className="w-[22px] h-[22px] rounded-md border-2 justify-center items-center"
         style={{
           borderColor: isChecked ? color : Color.Grey,
           backgroundColor: isChecked ? color : "transparent",
@@ -64,7 +66,7 @@ export const CheckboxComponent: React.FC<CheckboxComponentProps> = ({
         )}
       </View>
       {label !== undefined && (
-        <View style={{ flex: 1 }}>
+        <View style={shrinkLabel ? undefined : { flex: 1 }}>
           <TextComponent
             variant={labelVariant}
             size={labelSize}

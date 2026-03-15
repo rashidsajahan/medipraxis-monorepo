@@ -210,7 +210,7 @@ export default function RegisterScreen() {
               />
             </View>
 
-            <View className="flex-row items-start mb-6 pr-6">
+            <View className="mb-6">
               <Controller
                 control={control}
                 name="agreed"
@@ -221,7 +221,7 @@ export default function RegisterScreen() {
                     label="I agree with MediPraxis Public Agreement, Terms & Policy"
                     labelSize={TextSize.Small}
                     labelColor={Color.Grey}
-                    containerClassName="flex-1"
+                    shrinkLabel={false}
                     isInvalid={!!errors.agreed}
                   />
                 )}

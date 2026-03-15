@@ -16,6 +16,7 @@ import {
   TextComponent,
 } from "../../components/basic";
 import { useSaveUserKeys } from "../../services/user-keys";
+import { encryptionKeyStorage } from "../../utils/storage";
 import { generateRecoveryKey, generateUserKeys } from "../../utils/userKeys";
 
 type KeyRevealModalProps = {
@@ -69,6 +70,7 @@ export function KeyRevealModal({
       wrapped_private_key: userKeys.wrappedPrivateKey,
       pbkdf2_salt: userKeys.pbkdf2Salt,
     });
+    await encryptionKeyStorage.set(recoveryKey);
     setGeneratingKeys(false);
     onSuccess();
   };
@@ -239,20 +241,15 @@ export function KeyRevealModal({
               {/* Acknowledge checkbox row */}
               <View className="mb-5">
               <CheckboxComponent
-                checked={acknowledged}
+                isChecked={acknowledged}
                 onChange={setAcknowledged}
-                color={isRevoke ? Color.Danger : Color.Green}
+                isInvalid={isRevoke}
                 label={
-                  <TextComponent
-                    variant={TextVariant.Body}
-                    size={TextSize.Medium}
-                    color={Color.Grey}
-                  >
-                    {isRevoke
-                      ? "I understand that revoking my key will make older records inaccessible"
-                      : "I understand and have saved my key safely"}
-                  </TextComponent>
+                  isRevoke
+                    ? "I understand that revoking my key will make older records inaccessible"
+                    : "I understand and have saved my key safely"
                 }
+                labelColor={Color.Grey}
               />
               </View>
             </>
