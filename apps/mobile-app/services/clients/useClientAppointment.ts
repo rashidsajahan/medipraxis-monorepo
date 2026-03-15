@@ -25,6 +25,7 @@ export interface AppointmentApiItem {
   task_status_name: string | null;
   client_first_name: string | null;
   client_last_name: string | null;
+  slot_window_location: string | null; // From slot_windows table
 }
 
 // Status
@@ -77,11 +78,10 @@ export const useFetchClientAppointments = (clientId: string) => {
 
       const data = await response.json();
 
-      // Map API shape - Appointment shape used by AppointmentTile
       return data.appointments.map((item: AppointmentApiItem) => ({
         appointment_id: item.task_id,
         date: item.start_date,
-        location: null,
+        location: item.slot_window_location ?? null, 
         status: resolveStatus(item.task_status_name, item.start_date),
       }));
     },

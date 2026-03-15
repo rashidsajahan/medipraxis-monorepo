@@ -9,7 +9,11 @@ import type {
   UpdateTaskInput,
 } from "@repo/models";
 import { TaskStatus } from "@repo/models";
-import { getSlotWindowService, getTaskService } from "../lib";
+import {
+  getSlotWindowService,
+  getTaskService,
+  getTaskServiceWithLocation,
+} from "../lib";
 import type { APIContext } from "../types/api-context";
 
 export class TaskController {
@@ -44,18 +48,19 @@ export class TaskController {
     c: APIContext<{ query: GetAppointmentsByClientQuery }>
   ) {
     try {
-      const taskService = getTaskService(c);
+      const taskService = getTaskServiceWithLocation(c);
       const clientId = c.req.query("client_id") as string;
       const taskStatus = c.req.query("task_status") as
         | keyof typeof TaskStatus
         | undefined;
       const slotWindowId = c.req.query("slot_window_id");
 
-      const appointments = await taskService.getAppointmentsByClientId(
-        clientId,
-        taskStatus,
-        slotWindowId
-      );
+      const appointments =
+        await taskService.getAppointmentsByClientIdWithLocation(
+          clientId,
+          taskStatus,
+          slotWindowId
+        );
 
       return c.json({ appointments, count: appointments.length });
     } catch (error) {
