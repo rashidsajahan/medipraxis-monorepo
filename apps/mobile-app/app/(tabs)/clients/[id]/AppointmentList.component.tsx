@@ -1,20 +1,26 @@
 import { TextComponent } from "@/components/basic";
 import { Icons } from "@/config";
+import { useFetchClientAppointments } from "@/services/clients/useClientAppointment";
 import { Color, TextSize, TextVariant } from "@repo/config";
 import React from "react";
-import { View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 import {
   AppointmentTile,
   type Appointment,
   type AppointmentStatus,
 } from "./AppointmentTile.component";
 
-// ─── Status ID → AppointmentStatus mapping ────────────────────────────────────
+// task_statuses
+// c2c4fceb = NOT_STARTED
+// 6fe35772 = IN_PROGRESS
+// 8e5cebbe = CANCELLED
+// dbbdc7fa = COMPLETED
 
 const STATUS_MAP: Record<string, AppointmentStatus> = {
-  "c2c4fceb-1a22-4b66-bb25-b37faa712c3a": "UPCOMING",
-  "8e5cebbe-28a9-4623-9e7c-e127eb39ed4f": "COMPLETED",
-  "dbbdc7fa-aba7-43ab-8252-4766c1fbcfc1": "CANCELLED",
+  "c2c4fceb-1a22-4b66-bb25-b37faa712c3a": "NOT_STARTED",
+  "6fe35772-6214-468c-ae26-1b2f2f067740": "IN_PROGRESS",
+  "8e5cebbe-28a9-4623-9e7c-e127eb39ed4f": "CANCELLED",
+  "dbbdc7fa-aba7-43ab-8252-4766c1fbcfc1": "COMPLETED",
 };
 
 const resolveStatus = (
@@ -26,6 +32,7 @@ const resolveStatus = (
   const diffMs = now.getTime() - start.getTime();
   const diffHours = diffMs / (1000 * 60 * 60);
 
+  // Auto-detect ONGOING: started within last 2 hours and still NOT_STARTED
   if (
     diffHours >= 0 &&
     diffHours <= 2 &&
@@ -34,80 +41,50 @@ const resolveStatus = (
     return "ONGOING";
   }
 
-  if (!task_status_id) return "UPCOMING";
-  return STATUS_MAP[task_status_id] ?? "UPCOMING";
+  if (!task_status_id) return "NOT_STARTED";
+  return STATUS_MAP[task_status_id] ?? "NOT_STARTED";
 };
 
-// ─── Dummy data — all 4 statuses covered ─────────────────────────────────────
-// Using real appointment IDs from Ms Aone Test + fabricated dates to
-// demonstrate every status variant clearly.
 
 const now = new Date();
 
 const DUMMY_APPOINTMENTS: Appointment[] = [
-  // ONGOING — started 30 mins ago, status UPCOMING → resolves to ONGOING
+  // ONGOING — started 30 mins ago, NOT_STARTED in DB
   {
-    appointment_id: "0bf81928-9ed3-49ca-a5ad-4b63208247c0",
+    appointment_id: "dummy-ongoing",
     date: new Date(now.getTime() - 30 * 60 * 1000).toISOString(),
     location: "MediHelp Clinic",
-    status: resolveStatus(
-      "c2c4fceb-1a22-4b66-bb25-b37faa712c3a",
-      new Date(now.getTime() - 30 * 60 * 1000).toISOString()
-    ),
+    status: "ONGOING",
   },
-  // UPCOMING — tomorrow
+  // IN_PROGRESS
   {
-    appointment_id: "5dadb105-e3f6-432e-a4e2-1bcc02a0b907",
+    appointment_id: "dummy-inprogress",
+    date: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+    location: "Room A",
+    status: "IN_PROGRESS",
+  },
+  // NOT_STARTED — tomorrow (future)
+  {
+    appointment_id: "dummy-notstarted",
     date: new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString(),
     location: "MediHelp Clinic",
-    status: resolveStatus(
-      "c2c4fceb-1a22-4b66-bb25-b37faa712c3a",
-      new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString()
-    ),
-  },
-  // UPCOMING — this week (3 days from now)
-  {
-    appointment_id: "df2441bc-1d6d-40d3-ab7c-9d7177ea1455",
-    date: new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-    location: "MediHelp Clinic",
-    status: resolveStatus(
-      "c2c4fceb-1a22-4b66-bb25-b37faa712c3a",
-      new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString()
-    ),
+    status: "NOT_STARTED",
   },
   // COMPLETED — yesterday
   {
-    appointment_id: "839b8d22-51ba-4004-a96d-89003c95911e",
+    appointment_id: "dummy-completed",
     date: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(),
     location: "MediHelp Clinic",
-    status: resolveStatus(
-      "8e5cebbe-28a9-4623-9e7c-e127eb39ed4f",
-      new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString()
-    ),
+    status: "COMPLETED",
   },
-  // COMPLETED — last week
+  // CANCELLED — last week
   {
-    appointment_id: "746fdec5-56c3-4008-b8bb-53b061b92fa5",
+    appointment_id: "dummy-cancelled",
     date: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString(),
     location: "MediHelp Clinic",
-    status: resolveStatus(
-      "8e5cebbe-28a9-4623-9e7c-e127eb39ed4f",
-      new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
-    ),
-  },
-  // CANCELLED — 2 weeks ago
-  {
-    appointment_id: "874902bc-e64c-46be-9110-65ea175cb91f",
-    date: new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000).toISOString(),
-    location: "MediHelp Clinic",
-    status: resolveStatus(
-      "dbbdc7fa-aba7-43ab-8252-4766c1fbcfc1",
-      new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000).toISOString()
-    ),
+    status: "CANCELLED",
   },
 ];
-
-// ─── Date label helper ────────────────────────────────────────────────────────
 
 export const getDateLabel = (dateString: string): string => {
   const appointmentDate = new Date(dateString);
@@ -134,26 +111,38 @@ export const getDateLabel = (dateString: string): string => {
   });
 };
 
-// ─── AppointmentsList ─────────────────────────────────────────────────────────
 
 interface AppointmentsListProps {
-  appointments?: Appointment[];
+  clientId?: string;
   onViewAppointment?: (appointmentId: string) => void;
   onAddRecord?: (appointmentId: string) => void;
   searchQuery?: string;
 }
 
 export const AppointmentsList: React.FC<AppointmentsListProps> = ({
-  appointments,
+  clientId,
   onViewAppointment,
   onAddRecord,
   searchQuery = "",
 }) => {
-  // Fall back to dummy data if appointments is undefined OR empty
-  const data =
-    !appointments || appointments.length === 0
-      ? DUMMY_APPOINTMENTS
-      : appointments;
+  const { data: apiAppointments, isLoading } = useFetchClientAppointments(
+    clientId ?? ""
+  );
+
+  // Use real API data when available, fall back to dummy data
+  const data: Appointment[] =
+    apiAppointments && apiAppointments.length > 0
+      ? apiAppointments
+      : DUMMY_APPOINTMENTS;
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <View className="flex-1 justify-center items-center py-20">
+        <ActivityIndicator size="large" color={Color.Green} />
+      </View>
+    );
+  }
 
   // Sort: most recent / soonest first
   const sorted = [...data].sort(

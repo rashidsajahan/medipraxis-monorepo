@@ -523,6 +523,7 @@ export const ViewClient: React.FC<ViewClientProps> = ({
                 <View className="flex-1">
                   {activeTab === ClientDetailTab.Appointments ? (
                     <AppointmentsList
+                      clientId={client.client_id}
                       searchQuery={searchQuery}
                       onViewAppointment={onViewAppointment}
                       onAddRecord={onAddRecord}

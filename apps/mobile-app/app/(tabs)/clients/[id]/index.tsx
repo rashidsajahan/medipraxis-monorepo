@@ -492,8 +492,8 @@ export default function ClientDetailScreen() {
             showsVerticalScrollIndicator={false}
           >
             {activeTab === ClientDetailTab.Appointments ? (
-              // Hardcoded AppointmentsList — shows dummy data for Ms Aone Test
               <AppointmentsList
+                clientId={client.client_id}
                 searchQuery={searchQuery}
                 onViewAppointment={(appointmentId) =>
                   console.log("View appointment:", appointmentId)

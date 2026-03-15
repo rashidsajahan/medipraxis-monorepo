@@ -16,12 +16,11 @@ import {
 import React from "react";
 import { View } from "react-native";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 export type AppointmentStatus =
+  | "NOT_STARTED"
   | "ONGOING"
+  | "IN_PROGRESS"
   | "COMPLETED"
-  | "UPCOMING"
   | "CANCELLED";
 
 export interface Appointment {
@@ -37,8 +36,6 @@ export interface AppointmentTileProps {
   onViewAppointment?: (appointmentId: string) => void;
   onAddRecord?: (appointmentId: string) => void;
 }
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const formatDate = (dateString: string): string =>
   new Date(dateString).toLocaleDateString("en-GB", {
@@ -59,26 +56,23 @@ const getChipConfig = (
   switch (status) {
     case "ONGOING":
       return { label: "Ongoing", variant: ChipVariant.Green };
+    case "IN_PROGRESS":
+      return { label: "In Progress", variant: ChipVariant.Green };
     case "COMPLETED":
       return { label: "Completed", variant: ChipVariant.LightGreen };
     case "CANCELLED":
       return { label: "Cancelled", variant: ChipVariant.Danger };
-    case "UPCOMING":
+    case "NOT_STARTED":
     default:
-      return { label: "Upcoming", variant: ChipVariant.LightGreen };
+      return { label: "Not Started", variant: ChipVariant.LightGreen };
   }
 };
 
-const getActionLabel = (
-  dateLabel: string,
-  status: AppointmentStatus
-): string => {
-  if (status === "ONGOING") return "Add Record";
-  if (status === "UPCOMING") return "View Appointment";
+const getActionLabel = (status: AppointmentStatus): string => {
+  if (status === "ONGOING" || status === "IN_PROGRESS") return "Add Record";
+  if (status === "NOT_STARTED") return "View Appointment";
   return "View Record";
 };
-
-// ─── Component ────────────────────────────────────────────────────────────────
 
 export const AppointmentTile: React.FC<AppointmentTileProps> = ({
   appointment,
@@ -90,12 +84,16 @@ export const AppointmentTile: React.FC<AppointmentTileProps> = ({
     appointment.status
   );
 
-  const isOngoing = appointment.status === "ONGOING";
-  const isUpcoming = appointment.status === "UPCOMING";
-  const actionLabel = getActionLabel(dateLabel, appointment.status);
+  const isActive =
+    appointment.status === "ONGOING" || appointment.status === "IN_PROGRESS";
+
+  // NOT_STARTED = future appointment → 2-row layout (no chip row)
+  const isNotStarted = appointment.status === "NOT_STARTED";
+
+  const actionLabel = getActionLabel(appointment.status);
 
   const handleActionPress = () => {
-    if (isOngoing) {
+    if (isActive) {
       onAddRecord?.(appointment.appointment_id);
     } else {
       onViewAppointment?.(appointment.appointment_id);
@@ -113,7 +111,6 @@ export const AppointmentTile: React.FC<AppointmentTileProps> = ({
         elevation: 2,
       }}
     >
-      {/* ── ROW 1: Date Label + Action Button ──────────────────────────── */}
       <View className="flex-row justify-between items-center mb-4">
         <TextComponent
           variant={TextVariant.Title}
@@ -125,7 +122,7 @@ export const AppointmentTile: React.FC<AppointmentTileProps> = ({
 
         <ButtonComponent
           size={ButtonSize.Small}
-          leftIcon={isOngoing ? PlusIcon : EyeIcon}
+          leftIcon={isActive ? PlusIcon : EyeIcon}
           buttonColor={Color.Black}
           textColor={Color.White}
           iconColor={Color.White}
@@ -135,10 +132,9 @@ export const AppointmentTile: React.FC<AppointmentTileProps> = ({
         </ButtonComponent>
       </View>
 
-      {/* ── ROW 2: Date + Time + Location (location only for UPCOMING) ─── */}
       <View
         className="flex-row items-center gap-4"
-        style={{ marginBottom: isUpcoming ? 0 : 16 }}
+        style={{ marginBottom: isNotStarted ? 0 : 16 }}
       >
         {/* Date */}
         <View className="flex-row items-center gap-2">
@@ -164,8 +160,7 @@ export const AppointmentTile: React.FC<AppointmentTileProps> = ({
           </TextComponent>
         </View>
 
-        {/* Location — only shown on row 2 for UPCOMING */}
-        {isUpcoming && appointment.location ? (
+        {isNotStarted && appointment.location ? (
           <View className="flex-row items-center gap-1 flex-1 justify-end">
             <MapPinIcon size={14} color={Color.Grey} weight="regular" />
             <TextComponent
@@ -179,8 +174,7 @@ export const AppointmentTile: React.FC<AppointmentTileProps> = ({
         ) : null}
       </View>
 
-      {/* ── ROW 3: Divider + Chip + Location (NOT for UPCOMING) ────────── */}
-      {!isUpcoming ? (
+      {!isNotStarted ? (
         <>
           {/* Grey divider line */}
           <View className="border-t border-[#E5E5E5] mb-3" />
