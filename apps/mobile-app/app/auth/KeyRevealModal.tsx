@@ -240,17 +240,17 @@ export function KeyRevealModal({
 
               {/* Acknowledge checkbox row */}
               <View className="mb-5">
-              <CheckboxComponent
-                isChecked={acknowledged}
-                onChange={setAcknowledged}
-                isInvalid={isRevoke}
-                label={
-                  isRevoke
-                    ? "I understand that revoking my key will make older records inaccessible"
-                    : "I understand and have saved my key safely"
-                }
-                labelColor={Color.Grey}
-              />
+                <CheckboxComponent
+                  isChecked={acknowledged}
+                  onChange={setAcknowledged}
+                  isInvalid={isRevoke}
+                  label={
+                    isRevoke
+                      ? "I understand that revoking my key will make older records inaccessible"
+                      : "I understand and have saved my key safely"
+                  }
+                  labelColor={Color.Grey}
+                />
               </View>
             </>
           )}

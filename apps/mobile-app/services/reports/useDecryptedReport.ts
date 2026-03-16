@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
-import { ReportFileType } from "@repo/models";
-import { encryptionKeyStorage } from "@/utils/storage";
-import { decryptFile, unwrapPrivateKey } from "@/utils/decryption";
 import { useFetchUserKeys } from "@/services/user-keys";
+import { decryptFile, unwrapPrivateKey } from "@/utils/decryption";
+import { encryptionKeyStorage } from "@/utils/storage";
+import { ReportFileType } from "@repo/models";
+import { useCallback, useEffect, useState } from "react";
 
 type DecryptedReportResult = {
   decryptedBase64: string | null;
@@ -34,15 +34,12 @@ export function useDecryptedReport(
   const [originalType, setOriginalType] = useState<"pdf" | "image" | null>(
     null
   );
-  const [isDecrypting, setIsDecrypting] = useState(false);
+  const [_isDecrypting, setIsDecrypting] = useState(false);
   const [decryptionError, setDecryptionError] = useState<string | null>(null);
 
   const encrypted = isEncryptedType(fileType);
 
-  const {
-    data: userKeys,
-    error: keysError,
-  } = useFetchUserKeys(encrypted);
+  const { data: userKeys, error: keysError } = useFetchUserKeys(encrypted);
 
   const decrypt = useCallback(async () => {
     if (!encrypted || !fileUrl || !userKeys) return;
@@ -82,12 +79,9 @@ export function useDecryptedReport(
       setOriginalType(isPdf ? "pdf" : "image");
       setDecryptedBase64(base64);
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Decryption failed";
+      const message = err instanceof Error ? err.message : "Decryption failed";
       if (message.includes("tag")) {
-        setDecryptionError(
-          "Unable to decrypt. Key may have been revoked."
-        );
+        setDecryptionError("Unable to decrypt. Key may have been revoked.");
       } else {
         setDecryptionError(message);
       }

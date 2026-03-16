@@ -28,7 +28,10 @@ export function encryptFileForDoctor(
   const ephemeralPublicKey = p256.getPublicKey(ephemeralPrivateKey, false);
 
   // 4. ECDH: shared point x-coordinate as shared secret
-  const sharedPoint = p256.getSharedSecret(ephemeralPrivateKey, doctorPublicKeyBytes);
+  const sharedPoint = p256.getSharedSecret(
+    ephemeralPrivateKey,
+    doctorPublicKeyBytes
+  );
   const sharedSecret = sharedPoint.slice(1, 33); // x-coordinate only
 
   // 5. Derive 32-byte AES key via HKDF-SHA256
