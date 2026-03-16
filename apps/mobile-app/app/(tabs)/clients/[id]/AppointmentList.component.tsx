@@ -1,6 +1,9 @@
 import { TextComponent } from "@/components/basic";
 import { Icons } from "@/config";
-import { useFetchClientAppointments } from "@/services/clients/useClientAppointment";
+import {
+  useFetchClientAppointmentRecords,
+  useFetchClientAppointments,
+} from "@/services/clients/useClientAppointment";
 import { Color, TextSize, TextVariant } from "@repo/config";
 import React from "react";
 import { ActivityIndicator, View } from "react-native";
@@ -129,6 +132,10 @@ export const AppointmentsList: React.FC<AppointmentsListProps> = ({
     clientId ?? ""
   );
 
+  // Fetch appointment records to know which appointments already have a record
+  const { data: appointmentIdsWithRecords = new Set<string>() } =
+    useFetchClientAppointmentRecords(clientId ?? "");
+
   // Use real API data when available, fall back to dummy data
   const data: Appointment[] =
     apiAppointments && apiAppointments.length > 0
@@ -187,6 +194,7 @@ export const AppointmentsList: React.FC<AppointmentsListProps> = ({
           key={appt.appointment_id}
           appointment={appt}
           dateLabel={getDateLabel(appt.date)}
+          hasRecord={appointmentIdsWithRecords.has(appt.appointment_id)}
           onViewAppointment={onViewAppointment}
           onAddRecord={onAddRecord}
         />

@@ -1,4 +1,4 @@
-import { apiClient } from "@/lib/api-client";
+import { apiClient, customFetch } from "@/lib/api-client";
 import { useQuery } from "@tanstack/react-query";
 import { Alert } from "react-native";
 import type { AppointmentStatus } from "../../app/(tabs)/clients/[id]/AppointmentTile.component";
@@ -81,9 +81,44 @@ export const useFetchClientAppointments = (clientId: string) => {
       return data.appointments.map((item: AppointmentApiItem) => ({
         appointment_id: item.task_id,
         date: item.start_date,
-        location: item.slot_window_location ?? null, 
+        location: item.slot_window_location ?? null,
         status: resolveStatus(item.task_status_name, item.start_date),
       }));
+    },
+    enabled: !!clientId,
+  });
+};
+
+// Fetch all appointment records for a client and return a Set of appointment_ids that have records
+export const useFetchClientAppointmentRecords = (clientId: string) => {
+  return useQuery({
+    queryKey: ["appointment-records", clientId],
+    queryFn: async () => {
+      const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL;
+
+      // Use customFetch so auth token is injected automatically
+      const response = await customFetch(
+        `${API_BASE_URL}/api/appointment-records?client_id=${clientId}`
+      );
+
+      console.log("[appointment-records] status:", response.status);
+
+      if (!response.ok) {
+        console.log("[appointment-records] failed:", response.status);
+        return new Set<string>();
+      }
+
+      const data = (await response.json()) as {
+        records: { appointment_id: string }[];
+      };
+
+      console.log("[appointment-records] count:", data.records.length);
+      console.log(
+        "[appointment-records] ids:",
+        data.records.map((r) => r.appointment_id)
+      );
+
+      return new Set<string>(data.records.map((r) => r.appointment_id));
     },
     enabled: !!clientId,
   });

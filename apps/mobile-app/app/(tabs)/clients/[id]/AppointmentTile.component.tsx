@@ -33,6 +33,7 @@ export interface Appointment {
 export interface AppointmentTileProps {
   appointment: Appointment;
   dateLabel: string;
+  hasRecord?: boolean; // Whether this appointment already has a record in the DB
   onViewAppointment?: (appointmentId: string) => void;
   onAddRecord?: (appointmentId: string) => void;
 }
@@ -68,15 +69,10 @@ const getChipConfig = (
   }
 };
 
-const getActionLabel = (status: AppointmentStatus): string => {
-  if (status === "ONGOING" || status === "IN_PROGRESS") return "Add Record";
-  if (status === "NOT_STARTED") return "View Appointment";
-  return "View Record";
-};
-
 export const AppointmentTile: React.FC<AppointmentTileProps> = ({
   appointment,
   dateLabel,
+  hasRecord = false,
   onViewAppointment,
   onAddRecord,
 }) => {
@@ -84,19 +80,30 @@ export const AppointmentTile: React.FC<AppointmentTileProps> = ({
     appointment.status
   );
 
-  const isActive =
-    appointment.status === "ONGOING" || appointment.status === "IN_PROGRESS";
-
   // Only suppress the status chip for genuinely future NOT_STARTED appointments.
   // Past appointments that were never actioned remain NOT_STARTED in the DB and must still show the chip.
   const isFutureNotStarted =
     appointment.status === "NOT_STARTED" &&
     new Date(appointment.date) > new Date();
 
-  const actionLabel = getActionLabel(appointment.status);
+  // Button priority:
+  // 1. Has a record (any status) → "View Record"
+  // 2. No record + NOT_STARTED   → "View Appointment"
+  // 3. No record + any other status → "Add Record"
+  let actionLabel: string;
+  let showAddIcon = false;
+
+  if (hasRecord) {
+    actionLabel = "View Record";
+  } else if (appointment.status === "NOT_STARTED") {
+    actionLabel = "View Appointment";
+  } else {
+    actionLabel = "Add Record";
+    showAddIcon = true;
+  }
 
   const handleActionPress = () => {
-    if (isActive) {
+    if (showAddIcon) {
       onAddRecord?.(appointment.appointment_id);
     } else {
       onViewAppointment?.(appointment.appointment_id);
@@ -125,7 +132,7 @@ export const AppointmentTile: React.FC<AppointmentTileProps> = ({
 
         <ButtonComponent
           size={ButtonSize.Small}
-          leftIcon={isActive ? PlusIcon : EyeIcon}
+          leftIcon={showAddIcon ? PlusIcon : EyeIcon}
           buttonColor={Color.Black}
           textColor={Color.White}
           iconColor={Color.White}
