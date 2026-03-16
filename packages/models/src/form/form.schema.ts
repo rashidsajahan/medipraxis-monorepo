@@ -20,7 +20,7 @@ export interface Form {
 }
 
 export const formFieldSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string().uuid().optional(),
   active: z.boolean(),
   sequence: z.number(),
   help_text: z.string(),
