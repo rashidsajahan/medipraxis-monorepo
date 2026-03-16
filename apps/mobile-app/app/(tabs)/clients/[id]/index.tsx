@@ -1,8 +1,10 @@
+import { useAuth } from "@/auth/AuthContext";
 import { ButtonComponent, ButtonSize, TextComponent } from "@/components/basic";
 import { ChipComponent, ChipVariant } from "@/components/basic/Chip.component";
 import { Input, InputField, InputSlot } from "@/components/ui/input";
 import { Icons } from "@/config";
 import { useFetchClientById } from "@/services/clients";
+import { useFetchClientReports } from "@/services/reports";
 import { Color, Font, TextSize, TextVariant, textStyles } from "@repo/config";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
@@ -43,6 +45,7 @@ const textButtonMediumStyle = textStyles[TextVariant.Button][TextSize.Medium];
 
 export default function ClientDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { user } = useAuth();
 
   // useRouter gives us programmatic navigation (push, back, replace etc.)
   // We need this because the back button triggers navigation in code,
@@ -50,16 +53,30 @@ export default function ClientDetailScreen() {
   const router = useRouter();
 
   const { data: client, isLoading } = useFetchClientById(id ?? "");
+  const { mutate: fetchClientReports, isPending: isReportsLoading } =
+    useFetchClientReports();
 
   const [activeTab, setActiveTab] = useState<ClientDetailTab>(
     ClientDetailTab.Appointments
   );
   const [searchQuery, setSearchQuery] = useState("");
-  const [loading] = useState(false);
   const [showLeftShadow, setShowLeftShadow] = useState(false);
   const [showRightShadow, setShowRightShadow] = useState(true);
   const [showOptionsMenu, setShowOptionsMenu] = useState(false);
   const optionsButtonRef = useRef<View>(null);
+
+  const handleReportsTabPress = () => {
+    setActiveTab(ClientDetailTab.Reports);
+
+    if (!user?.user_id || !client?.client_id) {
+      return;
+    }
+
+    fetchClientReports({
+      user_id: user.user_id,
+      client_id: client.client_id,
+    });
+  };
 
   const handleActionScroll = (
     event: NativeSyntheticEvent<NativeScrollEvent>
@@ -361,7 +378,7 @@ export default function ClientDetailScreen() {
                         ? Color.Green
                         : "transparent",
                   }}
-                  onPress={() => setActiveTab(ClientDetailTab.Reports)}
+                  onPress={handleReportsTabPress}
                   activeOpacity={0.7}
                 >
                   <TextComponent
@@ -489,7 +506,7 @@ export default function ClientDetailScreen() {
             }}
             showsVerticalScrollIndicator={false}
           >
-            {loading ? (
+            {isReportsLoading ? (
               <View className="flex-1 justify-center items-center py-20">
                 <ActivityIndicator size="large" color={Color.Green} />
               </View>
