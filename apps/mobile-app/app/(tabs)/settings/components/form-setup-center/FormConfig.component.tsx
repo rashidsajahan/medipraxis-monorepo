@@ -1,5 +1,11 @@
 import { useAuth } from "@/auth/AuthContext";
-import { ButtonComponent, ButtonSize, TextComponent } from "@/components/basic";
+import {
+  ButtonComponent,
+  ButtonSize,
+  MessagePopup,
+  MessageType,
+  TextComponent,
+} from "@/components/basic";
 import { useFetchActiveForm, useSaveForm } from "@/services/forms";
 import {
   DMSans_400Regular,
@@ -41,7 +47,18 @@ export function FormConfig({
   formType,
 }: FormConfigProps) {
   const { user } = useAuth();
-  const { mutate: saveForm, isPending: isSaving } = useSaveForm();
+  const { mutate: saveForm, isPending: isSaving } = useSaveForm({
+    onSuccess: () => {
+      setMessageType(MessageType.Success);
+      setMessageText("Form saved successfully!");
+      setShowMessagePopup(true);
+    },
+    onError: (error: Error) => {
+      setMessageType(MessageType.Error);
+      setMessageText(error.message || "Failed to save the form");
+      setShowMessagePopup(true);
+    },
+  });
 
   // Get the form type enum for API call
   const formTypeEnum = formType ? FORM_TYPE_MAPPING[formType] : undefined;
@@ -70,6 +87,13 @@ export function FormConfig({
   const [draggingFieldSequence, setDraggingFieldSequence] = useState<
     number | null
   >(null);
+
+  // Message popup state
+  const [showMessagePopup, setShowMessagePopup] = useState(false);
+  const [messageType, setMessageType] = useState<MessageType>(
+    MessageType.Success
+  );
+  const [messageText, setMessageText] = useState("");
   const draggingFieldSequenceRef = useRef<number | null>(null);
   const dragStartYRef = useRef<number>(0);
   const descriptionInputRef = useRef<any>(null);
@@ -473,6 +497,14 @@ export function FormConfig({
         onDelete={handleDeleteField}
         editingField={getEditingFieldData()}
         formType={formType}
+      />
+
+      {/* Message Popup */}
+      <MessagePopup
+        visible={showMessagePopup}
+        type={messageType}
+        message={messageText}
+        onClose={() => setShowMessagePopup(false)}
       />
     </>
   );

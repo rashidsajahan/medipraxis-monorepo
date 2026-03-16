@@ -1,7 +1,6 @@
 import { apiClient } from "@/lib/api-client";
 import type { FormType } from "@repo/models";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Alert } from "react-native";
 
 // Save form input type
 export interface SaveFormInput {
@@ -74,7 +73,10 @@ export const useFetchActiveForm = (userId: string, formType: FormType) => {
 };
 
 // Save form hook
-export const useSaveForm = () => {
+export const useSaveForm = (options?: {
+  onSuccess?: () => void;
+  onError?: (error: Error) => void;
+}) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -106,10 +108,10 @@ export const useSaveForm = () => {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["activeForm"] });
       await queryClient.invalidateQueries({ queryKey: ["forms"] });
-      Alert.alert("Success", "Form saved successfully");
+      options?.onSuccess?.();
     },
     onError: (error: Error) => {
-      Alert.alert("Error", error.message || "Failed to save form");
+      options?.onError?.(error);
     },
   });
 };
