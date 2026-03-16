@@ -3,6 +3,7 @@ import { z } from "zod";
 export enum FormType {
   REQUEST_FORM = "REQUEST_FORM",
   APPOINTMENT_RECORD = "APPOINTMENT_RECORD",
+  CLIENT_DETAILS = "CLIENT_DETAILS",
 }
 
 export interface Form {

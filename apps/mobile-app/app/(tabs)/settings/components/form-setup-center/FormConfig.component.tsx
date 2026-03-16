@@ -1,3 +1,4 @@
+import { useAuth } from "@/auth/AuthContext";
 import { ButtonComponent, ButtonSize, TextComponent } from "@/components/basic";
 import {
   DMSans_400Regular,
@@ -6,6 +7,7 @@ import {
 } from "@expo-google-fonts/dm-sans";
 import { Lato_400Regular, Lato_700Bold } from "@expo-google-fonts/lato";
 import { Color, TextSize, TextVariant } from "@repo/config";
+import { FormType } from "@repo/models";
 import { useFonts } from "expo-font";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -23,12 +25,20 @@ import type { Field, FormConfigProps, FormData } from "./formConfig.types";
 
 const formDataStore: Record<string, FormData> = {};
 
+// Map form IDs to FormType enum values
+const FORM_TYPE_MAPPING: Record<string, FormType> = {
+  "1": FormType.CLIENT_DETAILS,
+  "2": FormType.APPOINTMENT_RECORD,
+  "3": FormType.REQUEST_FORM,
+};
+
 export function FormConfig({
   visible,
   onClose,
   formTitle,
   formType,
 }: FormConfigProps) {
+  const { user } = useAuth();
   const [fontsLoaded] = useFonts({
     DMSans_400Regular,
     DMSans_500Medium,
@@ -57,7 +67,7 @@ export function FormConfig({
       const savedFormData = formDataStore[formType];
       if (savedFormData) {
         setFormDescription(savedFormData.description || "");
-        setFields(savedFormData.form_structure || []);
+        setFields(savedFormData.form_configuration || []);
       } else {
         setFormDescription("");
         setFields([]);
@@ -67,12 +77,30 @@ export function FormConfig({
 
   const handleSave = () => {
     // Save form data to the store for this form type
-    if (formType) {
+    if (formType && user?.user_id) {
+      const formTypeEnum = FORM_TYPE_MAPPING[formType];
+
       const formData = {
+        title: formTitle,
         description: formDescription,
-        form_structure: fields,
+        user_id: user.user_id,
+        form_type: formTypeEnum,
+        form_configuration: fields.map((field) => ({
+          field_type: field.field_type,
+          display_label: field.display_label,
+          description: field.description,
+          help_text: field.help_text,
+          active: field.active,
+          required: field.required,
+          shareable: field.shareable,
+          sequence: field.sequence,
+        })),
       };
-      formDataStore[formType] = formData;
+
+      formDataStore[formType] = {
+        description: formDescription,
+        form_configuration: fields,
+      };
 
       //TO DO: API call to save form struct
       console.log("Form Data JSON:", JSON.stringify(formData, null, 2));
