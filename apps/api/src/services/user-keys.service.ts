@@ -24,4 +24,12 @@ export class UserKeysService {
     }
     return keys;
   }
+
+  async getPublicKeyByUserId(userId: string): Promise<string> {
+    const keys = await this.userKeysRepository.findByUserId(userId);
+    if (!keys) {
+      throw new Error("User keys not found");
+    }
+    return keys.public_key;
+  }
 }

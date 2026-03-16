@@ -5,7 +5,27 @@ import { getUserKeysService } from "../lib/service-factory";
 import { authMiddleware } from "../middleware/auth";
 import type { Env } from "../types";
 
-const userKeys = new Hono<{ Bindings: Env }>()
+// Unauthenticated: returns only the public key for a given user
+const userKeysPublic = new Hono<{ Bindings: Env }>().get(
+  "/:userId/public-key",
+  async (c) => {
+    const userId = c.req.param("userId");
+    const userKeysService = getUserKeysService(c);
+
+    try {
+      const publicKey = await userKeysService.getPublicKeyByUserId(userId);
+      return c.json({ public_key: publicKey });
+    } catch (e: any) {
+      if (e.message === "User keys not found") {
+        return c.json({ error: e.message }, 404);
+      }
+      return c.json({ error: e.message }, 500);
+    }
+  }
+);
+
+// Authenticated routes
+const userKeysAuth = new Hono<{ Bindings: Env; Variables: { user: any } }>()
   .use("*", authMiddleware)
   .post(
     "/",
@@ -49,5 +69,9 @@ const userKeys = new Hono<{ Bindings: Env }>()
       return c.json({ error: e.message }, 500);
     }
   });
+
+const userKeys = new Hono<{ Bindings: Env }>()
+  .route("/", userKeysPublic)
+  .route("/", userKeysAuth);
 
 export default userKeys;
