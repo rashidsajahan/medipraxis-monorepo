@@ -5,8 +5,8 @@ import { useMutation } from "@tanstack/react-query";
 export const useFetchClientReports = () => {
   return useMutation({
     mutationFn: async (payload: { user_id: string; client_id: string }) => {
-      const response = await (apiClient.api["client-reports"] as any).$post({
-        form: {
+      const response = await (apiClient.api["client-reports"] as any).$get({
+        query: {
           user_id: payload.user_id,
           client_id: payload.client_id,
         },

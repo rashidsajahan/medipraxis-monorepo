@@ -6,8 +6,9 @@ import { Icons } from "@/config";
 import { useFetchClientById } from "@/services/clients";
 import { useFetchClientReports } from "@/services/reports";
 import { Color, Font, TextSize, TextVariant, textStyles } from "@repo/config";
+import type { ClientReport } from "@repo/models";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -53,8 +54,11 @@ export default function ClientDetailScreen() {
   const router = useRouter();
 
   const { data: client, isLoading } = useFetchClientById(id ?? "");
-  const { mutate: fetchClientReports, isPending: isReportsLoading } =
-    useFetchClientReports();
+  const {
+    mutate: fetchClientReports,
+    data: clientReportsResponse,
+    isPending: isReportsLoading,
+  } = useFetchClientReports();
 
   const [activeTab, setActiveTab] = useState<ClientDetailTab>(
     ClientDetailTab.Appointments
@@ -64,6 +68,74 @@ export default function ClientDetailScreen() {
   const [showRightShadow, setShowRightShadow] = useState(true);
   const [showOptionsMenu, setShowOptionsMenu] = useState(false);
   const optionsButtonRef = useRef<View>(null);
+
+  const getDaySuffix = (day: number): string => {
+    if (day >= 11 && day <= 13) {
+      return "th";
+    }
+
+    switch (day % 10) {
+      case 1:
+        return "st";
+      case 2:
+        return "nd";
+      case 3:
+        return "rd";
+      default:
+        return "th";
+    }
+  };
+
+  const formatReportDate = (createdDate: string): string => {
+    const date = new Date(createdDate);
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+
+    const dateOnly = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    );
+    const todayOnly = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    );
+    const yesterdayOnly = new Date(
+      yesterday.getFullYear(),
+      yesterday.getMonth(),
+      yesterday.getDate()
+    );
+
+    if (dateOnly.getTime() === todayOnly.getTime()) {
+      return "Today";
+    }
+
+    if (dateOnly.getTime() === yesterdayOnly.getTime()) {
+      return "Yesterday";
+    }
+
+    const day = date.getDate();
+    const month = date.toLocaleString("en-US", { month: "short" });
+
+    return `${day}${getDaySuffix(day)} ${month}`;
+  };
+
+  const reports = useMemo(() => {
+    return clientReportsResponse?.reports ?? [];
+  }, [clientReportsResponse?.reports]);
+
+  const filteredReports = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) {
+      return reports;
+    }
+
+    return reports.filter((report) =>
+      (report.report_title ?? "").toLowerCase().includes(query)
+    );
+  }, [reports, searchQuery]);
 
   const handleReportsTabPress = () => {
     setActiveTab(ClientDetailTab.Reports);
@@ -506,7 +578,7 @@ export default function ClientDetailScreen() {
             }}
             showsVerticalScrollIndicator={false}
           >
-            {isReportsLoading ? (
+            {activeTab === ClientDetailTab.Reports && isReportsLoading ? (
               <View className="flex-1 justify-center items-center py-20">
                 <ActivityIndicator size="large" color={Color.Green} />
               </View>
@@ -517,6 +589,54 @@ export default function ClientDetailScreen() {
                     icon={Icons.CalendarBlank}
                     message="No appointments found"
                   />
+                ) : filteredReports.length > 0 ? (
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      flexWrap: "wrap",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    {filteredReports.map((report: ClientReport) => (
+                      <TouchableOpacity
+                        key={report.report_id}
+                        className="w-[31%] bg-white rounded-xl p-3 mb-3 justify-center"
+                        style={{
+                          minHeight: 140,
+                        }}
+                        onPress={() =>
+                          router.push(`/reports/${report.report_id}` as any)
+                        }
+                        activeOpacity={0.7}
+                      >
+                        <View>
+                          <Icons.FileText
+                            size={52}
+                            color={Color.Grey}
+                            weight="light"
+                          />
+                          <TextComponent
+                            variant={TextVariant.Body}
+                            size={TextSize.Medium}
+                            style={{
+                              marginTop: 8,
+                              color: Color.Black,
+                            }}
+                          >
+                            {report.report_title || "Untitled Report"}
+                          </TextComponent>
+                        </View>
+                        <TextComponent
+                          variant={TextVariant.Body}
+                          size={TextSize.Small}
+                          color={Color.Grey}
+                          className="mt-2"
+                        >
+                          {formatReportDate(report.created_date)}
+                        </TextComponent>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
                 ) : (
                   <EmptyState
                     icon={Icons.FileText}
