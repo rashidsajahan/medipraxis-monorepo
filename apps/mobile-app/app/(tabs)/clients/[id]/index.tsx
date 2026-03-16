@@ -600,7 +600,7 @@ export default function ClientDetailScreen() {
                     {filteredReports.map((report: ClientReport) => (
                       <TouchableOpacity
                         key={report.report_id}
-                        className="w-[31%] bg-white rounded-xl p-3 mb-3 justify-center"
+                        className="w-[31%] bg-white rounded-xl p-3 mb-3 justify-between"
                         style={{
                           minHeight: 140,
                         }}
@@ -609,7 +609,7 @@ export default function ClientDetailScreen() {
                         }
                         activeOpacity={0.7}
                       >
-                        <View>
+                        <View className="items-center">
                           <Icons.FileText
                             size={52}
                             color={Color.Grey}
@@ -618,8 +618,8 @@ export default function ClientDetailScreen() {
                           <TextComponent
                             variant={TextVariant.Body}
                             size={TextSize.Medium}
+                            className="mt-2 text-center"
                             style={{
-                              marginTop: 8,
                               color: Color.Black,
                             }}
                           >
@@ -630,7 +630,7 @@ export default function ClientDetailScreen() {
                           variant={TextVariant.Body}
                           size={TextSize.Small}
                           color={Color.Grey}
-                          className="mt-2"
+                          className="text-center"
                         >
                           {formatReportDate(report.created_date)}
                         </TextComponent>
