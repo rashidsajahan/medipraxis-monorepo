@@ -48,7 +48,6 @@ const resolveStatus = (
   return STATUS_MAP[task_status_id] ?? "NOT_STARTED";
 };
 
-
 const now = new Date();
 
 const DUMMY_APPOINTMENTS: Appointment[] = [
@@ -113,7 +112,6 @@ export const getDateLabel = (dateString: string): string => {
     year: "numeric",
   });
 };
-
 
 interface AppointmentsListProps {
   clientId?: string;
