@@ -16,8 +16,7 @@ export interface AppointmentApiItem {
   modified_date: string | null;
   note: string | null;
   set_alarm: boolean;
-  task_status_id: string;
-  deleted: boolean;
+  task_status_id: string | null;
   appointment_number: number | null;
   slot_window_id: string | null;
   created_by: string;
@@ -76,7 +75,9 @@ export const useFetchClientAppointments = (clientId: string) => {
         return [];
       }
 
-      const data = await response.json();
+      const data = (await response.json()) as {
+        appointments: AppointmentApiItem[];
+      };
 
       return data.appointments.map((item: AppointmentApiItem) => ({
         appointment_id: item.task_id,

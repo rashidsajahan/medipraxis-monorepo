@@ -109,7 +109,7 @@ export const AppointmentsList: React.FC<AppointmentsListProps> = ({
   }
 
   return (
-    <View className="pt-1">
+    <View className="pt-1 pb-32">
       {filtered.map((appt) => (
         <AppointmentTile
           key={appt.appointment_id}
