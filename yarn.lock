@@ -9135,6 +9135,11 @@ expo-crypto@~15.0.8:
   dependencies:
     base64-js "^1.3.0"
 
+expo-file-system@^55.0.10:
+  version "55.0.10"
+  resolved "https://registry.yarnpkg.com/expo-file-system/-/expo-file-system-55.0.10.tgz#fae0a424f404a456522193346cf07e9e51e2df26"
+  integrity sha512-ysFdVdUgtfj2ApY0Cn+pBg+yK4xp+SNwcaH8j2B91JJQ4OXJmnyCSmrNZYz7J4mdYVuv2GzxIP+N/IGlHQG3Yw==
+
 expo-file-system@~19.0.20:
   version "19.0.20"
   resolved "https://registry.yarnpkg.com/expo-file-system/-/expo-file-system-19.0.20.tgz#57850ecbca885c50e27eed59917fbb2742fd36c0"

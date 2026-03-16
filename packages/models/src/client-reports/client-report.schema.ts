@@ -5,8 +5,8 @@ import { z } from "zod";
 export enum ReportFileType {
   Pdf = "PDF",
   Image = "IMAGE",
-  EncryptedPdf = "ENCRYPTED_PDF",
-  EncryptedImage = "ENCRYPTED_IMAGE",
+  EncryptedPdf = "EPDF",
+  EncryptedImage = "EIMAGE",
 }
 
 /* ---------------- RESPONSE SCHEMAS ---------------- */
