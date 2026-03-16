@@ -7,86 +7,13 @@ import {
 import { Color, TextSize, TextVariant } from "@repo/config";
 import React from "react";
 import { ActivityIndicator, View } from "react-native";
-import {
-  AppointmentTile,
-  type Appointment,
-  type AppointmentStatus,
-} from "./AppointmentTile.component";
+import { AppointmentTile, type Appointment } from "./AppointmentTile.component";
 
 // task_statuses
 // c2c4fceb = NOT_STARTED
 // 6fe35772 = IN_PROGRESS
 // 8e5cebbe = CANCELLED
 // dbbdc7fa = COMPLETED
-
-const STATUS_MAP: Record<string, AppointmentStatus> = {
-  "c2c4fceb-1a22-4b66-bb25-b37faa712c3a": "NOT_STARTED",
-  "6fe35772-6214-468c-ae26-1b2f2f067740": "IN_PROGRESS",
-  "8e5cebbe-28a9-4623-9e7c-e127eb39ed4f": "CANCELLED",
-  "dbbdc7fa-aba7-43ab-8252-4766c1fbcfc1": "COMPLETED",
-};
-
-const resolveStatus = (
-  task_status_id: string | null,
-  start_date: string
-): AppointmentStatus => {
-  const now = new Date();
-  const start = new Date(start_date);
-  const diffMs = now.getTime() - start.getTime();
-  const diffHours = diffMs / (1000 * 60 * 60);
-
-  // Auto-detect ONGOING: started within last 2 hours and still NOT_STARTED
-  if (
-    diffHours >= 0 &&
-    diffHours <= 2 &&
-    task_status_id === "c2c4fceb-1a22-4b66-bb25-b37faa712c3a"
-  ) {
-    return "ONGOING";
-  }
-
-  if (!task_status_id) return "NOT_STARTED";
-  return STATUS_MAP[task_status_id] ?? "NOT_STARTED";
-};
-
-const now = new Date();
-
-const DUMMY_APPOINTMENTS: Appointment[] = [
-  // ONGOING — started 30 mins ago, NOT_STARTED in DB
-  {
-    appointment_id: "dummy-ongoing",
-    date: new Date(now.getTime() - 30 * 60 * 1000).toISOString(),
-    location: "MediHelp Clinic",
-    status: "ONGOING",
-  },
-  // IN_PROGRESS
-  {
-    appointment_id: "dummy-inprogress",
-    date: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    location: "Room A",
-    status: "IN_PROGRESS",
-  },
-  // NOT_STARTED — tomorrow (future)
-  {
-    appointment_id: "dummy-notstarted",
-    date: new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString(),
-    location: "MediHelp Clinic",
-    status: "NOT_STARTED",
-  },
-  // COMPLETED — yesterday
-  {
-    appointment_id: "dummy-completed",
-    date: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(),
-    location: "MediHelp Clinic",
-    status: "COMPLETED",
-  },
-  // CANCELLED — last week
-  {
-    appointment_id: "dummy-cancelled",
-    date: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    location: "MediHelp Clinic",
-    status: "CANCELLED",
-  },
-];
 
 export const getDateLabel = (dateString: string): string => {
   const appointmentDate = new Date(dateString);
@@ -134,12 +61,6 @@ export const AppointmentsList: React.FC<AppointmentsListProps> = ({
   const { data: appointmentIdsWithRecords = new Set<string>() } =
     useFetchClientAppointmentRecords(clientId ?? "");
 
-  // Use real API data when available, fall back to dummy data
-  const data: Appointment[] =
-    apiAppointments && apiAppointments.length > 0
-      ? apiAppointments
-      : DUMMY_APPOINTMENTS;
-
   // Loading state
   if (isLoading) {
     return (
@@ -148,6 +69,8 @@ export const AppointmentsList: React.FC<AppointmentsListProps> = ({
       </View>
     );
   }
+
+  const data: Appointment[] = apiAppointments ?? [];
 
   // Sort: most recent / soonest first
   const sorted = [...data].sort(

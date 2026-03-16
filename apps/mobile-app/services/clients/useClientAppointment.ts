@@ -16,7 +16,7 @@ export interface AppointmentApiItem {
   modified_date: string | null;
   note: string | null;
   set_alarm: boolean;
-  task_status_id: string | null;
+  task_status_id: string;
   deleted: boolean;
   appointment_number: number | null;
   slot_window_id: string | null;
