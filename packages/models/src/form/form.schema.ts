@@ -35,7 +35,6 @@ export const formFieldSchema = z.object({
 export const createFormSchema = z.object({
   title: z.string().min(1),
   description: z.string().optional().nullable(),
-  is_active: z.boolean().optional().default(true),
   form_configuration: z.array(formFieldSchema),
   user_id: z.string().uuid(),
   form_type: z.nativeEnum(FormType),
