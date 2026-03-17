@@ -9,14 +9,18 @@ import {
   KeyIcon,
   UsersIcon,
 } from "phosphor-react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Pressable, View } from "react-native";
 
+import { KeyEntryModal } from "../auth/KeyEntryModal";
 import { KeyRevealModal } from "../auth/KeyRevealModal";
+
+import { encryptionKeyStorage } from "../../utils/storage";
 
 import { useClientOnlyValue } from "@/components/useClientOnlyValue";
 import { useColorScheme } from "@/components/useColorScheme";
 import Colors from "@/constants/Colors";
+import { useQueryClient } from "@tanstack/react-query";
 import { Color } from "@repo/config";
 import { useAuth } from "../../auth/AuthContext";
 import { AIAssistantButton } from "./ai/AIAssistantButton";
@@ -143,7 +147,19 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
   const [isAIAssistantVisible, setIsAIAssistantVisible] = useState(false);
   const [isKeyModalVisible, setIsKeyModalVisible] = useState(false);
+  const [isKeyEntryVisible, setIsKeyEntryVisible] = useState(false);
   const { signOut } = useAuth();
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const checkEncryptionKey = async () => {
+      const key = await encryptionKeyStorage.get();
+      if (!key) {
+        setIsKeyEntryVisible(true);
+      }
+    };
+    void checkEncryptionKey();
+  }, []);
 
   return (
     <View className="flex-1 h-full">
@@ -262,11 +278,31 @@ export default function TabLayout() {
         onClose={() => setIsAIAssistantVisible(false)}
       />
 
+      <KeyEntryModal
+        visible={isKeyEntryVisible}
+        onSuccess={() => setIsKeyEntryVisible(false)}
+        onForgotKey={() => {
+          setIsKeyEntryVisible(false);
+          setIsKeyModalVisible(true);
+        }}
+      />
+
       <KeyRevealModal
         visible={isKeyModalVisible}
         mode="revoke"
-        onSuccess={() => setIsKeyModalVisible(false)}
-        onClose={() => setIsKeyModalVisible(false)}
+        onSuccess={() => {
+          setIsKeyModalVisible(false);
+          setIsKeyEntryVisible(false);
+          void queryClient.invalidateQueries({ queryKey: ["user-keys"] });
+        }}
+        onClose={() => {
+          setIsKeyModalVisible(false);
+          // Re-check: if key still missing, re-show entry modal
+          void (async () => {
+            const key = await encryptionKeyStorage.get();
+            if (!key) setIsKeyEntryVisible(true);
+          })();
+        }}
       />
     </View>
   );
