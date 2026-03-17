@@ -1,3 +1,4 @@
+import { useAuth } from "@/auth/AuthContext";
 import { ButtonComponent, ButtonSize, TextComponent } from "@/components/basic";
 import { View } from "@/components/Themed";
 import { Input, InputField, InputSlot } from "@/components/ui/input";
@@ -32,13 +33,9 @@ const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const NAV_BAR_HEIGHT = Platform.OS === "ios" ? 83 : 60;
 const CIRCLE_SIZE = 18;
 
-interface ClientsScreenProps {
-  userId?: string; // Will use default if not provided
-}
-
-export default function ClientsScreen({
-  userId = "2a3c19b8-d352-4b30-a2ac-1cdf993d310c", // Default hard coded user ID
-}: ClientsScreenProps) {
+export default function ClientsScreen() {
+  const { user } = useAuth();
+  const userId = user?.user_id ?? "";
   const [searchQuery, setSearchQuery] = useState("");
   const [visibleSection, setVisibleSection] = useState<string>("A");
   const [isAddClientVisible, setIsAddClientVisible] = useState(false);
@@ -200,13 +197,6 @@ export default function ClientsScreen({
 
         {/* Empty state message */}
         <View className="flex-1 justify-center items-center px-5">
-          <TextComponent
-            variant={TextVariant.Title}
-            size={TextSize.Large}
-            style={{ marginTop: 16, color: Color.Grey }}
-          >
-            📋
-          </TextComponent>
           <TextComponent
             variant={TextVariant.Title}
             size={TextSize.Medium}
