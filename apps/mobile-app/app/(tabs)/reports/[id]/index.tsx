@@ -1,3 +1,4 @@
+import { useAuth } from "@/auth/AuthContext";
 import { ButtonComponent, ButtonSize, TextComponent } from "@/components/basic";
 import { useFetchReportFile } from "@/services/reports";
 import { Color, TextSize, TextVariant } from "@repo/config";
@@ -24,8 +25,6 @@ import {
   View,
 } from "react-native";
 import { WebView } from "react-native-webview";
-
-const TEMP_USER_ID = "2a3c19b8-d352-4b30-a2ac-1cdf993d310c";
 
 const HIDE_POPOUT_ICON_JS = `
 (function() {
@@ -67,6 +66,9 @@ const isImage = (fileType: string | null) => {
 };
 
 export default function ReportViewerScreen() {
+  const { user } = useAuth();
+  const userId = user?.user_id ?? "";
+
   useFocusEffect(
     useCallback(() => {
       preventScreenCaptureAsync();
@@ -87,7 +89,7 @@ export default function ReportViewerScreen() {
     isLoading,
     error,
     refetch,
-  } = useFetchReportFile(TEMP_USER_ID, id || "");
+  } = useFetchReportFile(userId, id || "");
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);

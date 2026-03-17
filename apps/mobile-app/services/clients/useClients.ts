@@ -70,6 +70,7 @@ export const groupClientsByLetter = (clients: ClientDisplay[]) => {
 export const useFetchClients = (userId: string) => {
   return useQuery({
     queryKey: ["clients", userId],
+    enabled: !!userId,
     queryFn: async () => {
       const response = await apiClient.api.clients.$get({
         query: {

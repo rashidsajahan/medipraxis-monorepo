@@ -1,3 +1,4 @@
+import { useAuth } from "@/auth/AuthContext";
 import { Icons } from "@/config";
 import { useFetchTaskSummary } from "@/services/tasks/useTaskSummary";
 import { useFetchUser } from "@/services/user";
@@ -29,7 +30,6 @@ import {
   Text as SvgText,
 } from "react-native-svg";
 
-const HARDCODED_USER_ID = "2a3c19b8-d352-4b30-a2ac-1cdf993d310c";
 const IMG_SIZE = 120;
 
 const fontFamilyMap: { [key in Font]: string } = {
@@ -111,12 +111,13 @@ export default function HomeCard({
   onSettingsPress,
   notificationCount = 8,
 }: HomeCardProps) {
+  const { user: authUser } = useAuth();
+  const userId = authUser?.user_id ?? "";
   const today = getLocalDateString();
 
-  const { data: user, isLoading: userLoading } =
-    useFetchUser(HARDCODED_USER_ID);
+  const { data: user, isLoading: userLoading } = useFetchUser(userId);
   const { data: taskSummary, isLoading: summaryLoading } = useFetchTaskSummary(
-    HARDCODED_USER_ID,
+    userId,
     today
   );
 
