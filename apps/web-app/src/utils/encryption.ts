@@ -10,16 +10,16 @@ import { randomBytes } from "@noble/hashes/utils.js";
  * Output binary layout:
  *   [ephemeral_public_key (65 bytes)] [iv (12 bytes)] [ciphertext + GCM tag]
  *
- * @param doctorPublicKeyBase64 - base64-encoded 65-byte uncompressed P-256 public key
+ * @param appUserPublicKeyBase64 - base64-encoded 65-byte uncompressed P-256 public key
  * @param plaintext - raw file bytes
  * @returns Uint8Array of the full ECIES blob
  */
-export function encryptFileForDoctor(
-  doctorPublicKeyBase64: string,
+export function encryptFileForAppUser(
+  appUserPublicKeyBase64: string,
   plaintext: Uint8Array
 ): Uint8Array {
-  // 1. Decode doctor's public key
-  const doctorPublicKeyBytes = base64ToBytes(doctorPublicKeyBase64);
+  // 1. Decode app user's public key
+  const appUserPublicKeyBytes = base64ToBytes(appUserPublicKeyBase64);
 
   // 2. Generate ephemeral P-256 private key
   const ephemeralPrivateKey = randomBytes(32);
@@ -30,7 +30,7 @@ export function encryptFileForDoctor(
   // 4. ECDH: shared point x-coordinate as shared secret
   const sharedPoint = p256.getSharedSecret(
     ephemeralPrivateKey,
-    doctorPublicKeyBytes
+    appUserPublicKeyBytes
   );
   const sharedSecret = sharedPoint.slice(1, 33); // x-coordinate only
 

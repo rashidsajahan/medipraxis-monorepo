@@ -57,7 +57,7 @@ export function unwrapPrivateKey(
 /**
  * Decrypts an ECIES-encrypted file using a P-256 private key.
  *
- * Reverses the encryption in `encryptFileForDoctor()` from
+ * Reverses the encryption in `encryptFileForAppUser()` from
  * apps/web-app/src/utils/encryption.ts.
  *
  * Expected binary layout:

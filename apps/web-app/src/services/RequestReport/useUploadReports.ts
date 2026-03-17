@@ -1,5 +1,5 @@
 import { API_BASE_URL } from "@/lib";
-import { encryptFileForDoctor } from "@/utils/encryption";
+import { encryptFileForAppUser } from "@/utils/encryption";
 import { useMutation } from "@tanstack/react-query";
 
 export interface UploadReportsInput {
@@ -8,7 +8,7 @@ export interface UploadReportsInput {
   request_report_id: string;
   expiry_date: string;
   files: Array<{ file: File; title: string }>;
-  doctorPublicKey: string;
+  appUserPublicKey: string;
 }
 
 const ENCRYPTED_MIME: Record<string, string> = {
@@ -38,13 +38,13 @@ export const useUploadReports = (options?: UseUploadReportsOptions) => {
       formData.append("request_report_id", input.request_report_id);
       formData.append("expiry_date", input.expiry_date);
 
-      // Encrypt each file with the doctor's public key before upload
+      // Encrypt each file with the app user's public key before upload
       for (let index = 0; index < input.files.length; index++) {
         const item = input.files[index]!;
         const encryptedMime = toEncryptedMime(item.file.type);
         const plaintext = new Uint8Array(await item.file.arrayBuffer());
-        const encrypted = encryptFileForDoctor(
-          input.doctorPublicKey,
+        const encrypted = encryptFileForAppUser(
+          input.appUserPublicKey,
           plaintext
         );
         const encExt = encryptedMime.replace("application/x-", "");

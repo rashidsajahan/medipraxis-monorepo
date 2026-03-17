@@ -1,7 +1,7 @@
 import { DynamicForm } from "@/components/forms";
 import { colors } from "@/constants";
 import {
-  useDoctorPublicKey,
+  useAppUserPublicKey,
   useRequestReport,
   useUploadReports,
 } from "@/services";
@@ -36,12 +36,12 @@ export function UploadReport({ requestReportId }: UploadReportProps) {
     error: fetchError,
   } = useRequestReport(requestReportId);
 
-  // Fetch doctor's public key (needed for encryption)
+  // Fetch user's public key (needed for encryption)
   const {
-    data: doctorPublicKey,
+    data: appUserPublicKey,
     isLoading: keyLoading,
     error: keyError,
-  } = useDoctorPublicKey(requestReport?.user_id ?? undefined);
+  } = useAppUserPublicKey(requestReport?.user_id ?? undefined);
 
   // Upload reports mutation
   const {
@@ -91,7 +91,7 @@ export function UploadReport({ requestReportId }: UploadReportProps) {
   }
 
   const handleSubmit = async (values: FormValues) => {
-    if (!requestReport || uploading || !doctorPublicKey) return;
+    if (!requestReport || uploading || !appUserPublicKey) return;
 
     // Calculate expiry date based on expiration_days from values
     const expirationDays = values.expiration_days || 7;
@@ -116,7 +116,7 @@ export function UploadReport({ requestReportId }: UploadReportProps) {
       request_report_id: requestReportId,
       expiry_date: expiryDate.toISOString(),
       files,
-      doctorPublicKey,
+      appUserPublicKey,
     });
   };
 
