@@ -49,7 +49,7 @@ export const useUploadReports = (options?: UseUploadReportsOptions) => {
         );
         const encExt = encryptedMime.replace("application/x-", "");
         const baseName = item.file.name.replace(/\.[^.]+$/, "");
-        const encFile = new File([encrypted], `${baseName}.${encExt}`, {
+        const encFile = new File([encrypted.slice()], `${baseName}.${encExt}`, {
           type: encryptedMime,
         });
         formData.append(`file${index}`, encFile);

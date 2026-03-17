@@ -109,7 +109,7 @@ export function KeyRevealModal({
           >
             <KeyIcon
               size={30}
-              color={isRevoke ? "#DC2626" : Color.Warning}
+              color={isRevoke ? Color.DangerDark : Color.Warning}
               weight="duotone"
             />
           </View>
@@ -130,14 +130,14 @@ export function KeyRevealModal({
             style={{
               backgroundColor: isRevoke ? "#FEF2F2" : Color.LightCream,
               borderWidth: 1,
-              borderColor: isRevoke ? "#DC2626" : Color.Warning,
+              borderColor: isRevoke ? Color.DangerDark : Color.Warning,
             }}
           >
             {isRevoke && (
               <TextComponent
                 variant={TextVariant.Body}
                 size={TextSize.Medium}
-                color="#DC2626"
+                color={Color.DangerDark}
                 style={{ lineHeight: 22, marginBottom: 8, fontWeight: "700" }}
               >
                 Warning: Revoking your key will make all previously encrypted
@@ -259,7 +259,7 @@ export function KeyRevealModal({
             {step === "info" ? (
               <ButtonComponent
                 onPress={() => setStep("key")}
-                buttonColor={isRevoke ? "#DC2626" : Color.Green}
+                buttonColor={isRevoke ? Color.DangerDark : Color.Green}
                 textColor={Color.White}
                 size={ButtonSize.Large}
               >
@@ -283,7 +283,7 @@ export function KeyRevealModal({
                 buttonColor={
                   acknowledged && !generatingKeys
                     ? isRevoke
-                      ? "#DC2626"
+                      ? Color.DangerDark
                       : Color.Green
                     : Color.Grey
                 }
@@ -307,7 +307,7 @@ export function KeyRevealModal({
             {onClose && (
               <ButtonComponent
                 onPress={onClose}
-                buttonColor="transparent"
+                buttonColor={Color.Transparent}
                 textColor={Color.Grey}
                 size={ButtonSize.Large}
               >
