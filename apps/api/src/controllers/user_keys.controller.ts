@@ -25,8 +25,9 @@ export class UserKeysController {
 
   static async saveUserKeys(c: APIContext<{ json: SaveUserKeysInput }>) {
     try {
-      const { public_key, wrapped_private_key, pbkdf2_salt } =
-        c.req.valid("json") as SaveUserKeysInput;
+      const { public_key, wrapped_private_key, pbkdf2_salt } = c.req.valid(
+        "json"
+      ) as SaveUserKeysInput;
       const userId = (c.get("user" as never) as { sub: string }).sub;
       const userKeysService = getUserKeysService(c);
 
