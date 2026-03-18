@@ -1,6 +1,10 @@
 import { DynamicForm } from "@/components/forms";
 import { colors } from "@/constants";
-import { useRequestReport, useUploadReports } from "@/services";
+import {
+  useAppUserPublicKey,
+  useRequestReport,
+  useUploadReports,
+} from "@/services";
 import type { FormResponse, FormValues } from "@/types";
 import { FormFieldType } from "@/types";
 import { useNavigate } from "@tanstack/react-router";
@@ -32,6 +36,13 @@ export function UploadReport({ requestReportId }: UploadReportProps) {
     error: fetchError,
   } = useRequestReport(requestReportId);
 
+  // Fetch user's public key (needed for encryption)
+  const {
+    data: appUserPublicKey,
+    isLoading: keyLoading,
+    error: keyError,
+  } = useAppUserPublicKey(requestReport?.user_id ?? undefined);
+
   // Upload reports mutation
   const {
     mutate: uploadReports,
@@ -47,7 +58,10 @@ export function UploadReport({ requestReportId }: UploadReportProps) {
   });
 
   const error =
-    (fetchError as Error)?.message || (uploadError as Error)?.message || "";
+    (fetchError as Error)?.message ||
+    (keyError as Error)?.message ||
+    (uploadError as Error)?.message ||
+    "";
 
   // Transform request report data into form data
   if (requestReport && !formData) {
@@ -77,7 +91,7 @@ export function UploadReport({ requestReportId }: UploadReportProps) {
   }
 
   const handleSubmit = async (values: FormValues) => {
-    if (!requestReport || uploading) return;
+    if (!requestReport || uploading || !appUserPublicKey) return;
 
     // Calculate expiry date based on expiration_days from values
     const expirationDays = values.expiration_days || 7;
@@ -102,10 +116,11 @@ export function UploadReport({ requestReportId }: UploadReportProps) {
       request_report_id: requestReportId,
       expiry_date: expiryDate.toISOString(),
       files,
+      appUserPublicKey,
     });
   };
 
-  if (loading) {
+  if (loading || keyLoading) {
     return (
       <div
         style={{
