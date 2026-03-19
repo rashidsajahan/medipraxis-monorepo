@@ -35,7 +35,9 @@ export class ClientReportController {
         user_id: body["user_id"] as string,
         request_report_id: body["request_report_id"] as string,
         expiry_date: body["expiry_date"] as string | undefined,
-        reports: filesWithTitles.map((item) => ({ report_title: item.title })),
+        reports: filesWithTitles.map((item) => ({
+          report_title: item.title,
+        })),
       };
 
       const files = filesWithTitles.map((item) => item.file);
@@ -45,6 +47,7 @@ export class ClientReportController {
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Failed to create report";
+      console.error("Error creating report:", error);
       return c.json({ error: message }, 500);
     }
   }
@@ -85,23 +88,33 @@ export class ClientReportController {
   }
 
   static async getReportFileUrl(
-    c: APIContext<{ param: { id: string } }, "/:id/file">
+    c: APIContext<
+      { param: { user_id: string; id: string } },
+      ":user_id/:id/file"
+    >
   ) {
     try {
       const clientReportService = getClientReportService(c);
       const reportId = c.req.param("id");
+      const userId = c.req.param("user_id");
 
-      const fileUrl = await clientReportService.getReportFileUrl(reportId);
+      const reportFileData = await clientReportService.getReportFileUrl(
+        reportId,
+        userId
+      );
 
-      return c.json({ fileUrl });
+      return c.json(reportFileData);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Failed to get file URL";
-      const status =
-        error instanceof Error && error.message === "Report not found"
-          ? 404
-          : 500;
-      return c.json({ error: message }, status);
+      if (error instanceof Error) {
+        if (error.message === "Report not found") {
+          return c.json({ error: message }, 404);
+        } else if (error.message === "Unauthorized") {
+          return c.json({ error: message }, 403);
+        }
+      }
+      return c.json({ error: message }, 500);
     }
   }
 
@@ -166,6 +179,39 @@ export class ClientReportController {
           ? 404
           : 500;
       return c.json({ error: message }, status);
+    }
+  }
+
+  static async getAllReportsByUserId(
+    c: APIContext<{ query: { user_id: string; completed?: string } }>
+  ) {
+    try {
+      const clientReportService = getClientReportService(c);
+      const userId = c.req.query("user_id");
+      const completedParam = c.req.query("completed");
+
+      if (!userId) {
+        return c.json({ error: "user_id is required" }, 400);
+      }
+
+      let completed: boolean | undefined;
+      if (completedParam !== undefined) {
+        completed = completedParam === "true";
+      }
+
+      const groupedReports =
+        await clientReportService.getGroupedReportsByUserId(userId, completed);
+
+      return c.json({
+        grouped_reports: groupedReports,
+        count: groupedReports.length,
+      });
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to get grouped reports";
+      return c.json({ error: message }, 500);
     }
   }
 }
