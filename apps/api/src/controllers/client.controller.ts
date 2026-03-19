@@ -3,6 +3,7 @@ import type {
   GetAllClientsQuery,
   GetClientByPhoneQuery,
   GetClientParam,
+  GetClientsByNameQuery,
   UpdateClientInput,
   UpdateClientParam,
 } from "@repo/models";
@@ -56,6 +57,29 @@ export class ClientController {
         countryCode!,
         contactNumber!
       );
+
+      if (clients.length === 0) {
+        return c.json({ exists: false, clients: [] });
+      }
+
+      return c.json({ exists: true, clients });
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to check client existence";
+      return c.json({ error: message }, 500);
+    }
+  }
+
+  static async getClientsByName(
+    c: APIContext<{ query: GetClientsByNameQuery }>
+  ) {
+    try {
+      const clientService = getClientService(c);
+      const name = c.req.query("name");
+
+      const clients = await clientService.getClientsByName(name!);
 
       if (clients.length === 0) {
         return c.json({ exists: false, clients: [] });
