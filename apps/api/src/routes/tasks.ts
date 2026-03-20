@@ -29,6 +29,11 @@ const tasks = new Hono()
     TaskController.getTaskSummaryByUserId
   )
   .get(
+    "/upcoming",
+    zValidator("query", getTaskSummaryQuerySchema),
+    TaskController.getUpcomingTasksByUserId
+  )
+  .get(
     "/appointments/client",
     zValidator("query", getAppointmentsByClientQuerySchema),
     TaskController.getAppointmentsByClientId

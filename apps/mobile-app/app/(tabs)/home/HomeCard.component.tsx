@@ -106,7 +106,7 @@ interface HomeCardProps {
 const BellIcon = Icons.Bell;
 const SettingsIcon = Icons.Gear;
 
-export default function HomeCard({
+export function HomeCard({
   onNotificationPress,
   onSettingsPress,
   notificationCount = 8,
@@ -141,7 +141,6 @@ export default function HomeCard({
       imageStyle={{ borderBottomLeftRadius: 24, borderBottomRightRadius: 24 }}
       resizeMode="cover"
     >
-      {/* Date + Icons Row */}
       <View className="flex-row justify-between items-center px-5 pt-5">
         <Text style={{ color: Color.Black, fontSize: 14, fontWeight: "500" }}>
           {getFormattedDate()}
@@ -170,7 +169,6 @@ export default function HomeCard({
         </View>
       </View>
 
-      {/* Greeting + Name */}
       <View className="px-5 pt-3">
         <Text style={{ color: Color.Black, fontSize: 32, fontWeight: "700" }}>
           {getGreeting()}
