@@ -1,6 +1,9 @@
+import { useAuth } from "@/auth/AuthContext";
 import { Icons } from "@/config";
 import { Color, TextSize, TextVariant, textStyles } from "@repo/config";
-import { useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 import TaskForm from "@/components/advanced/taskPanel/TaskForm";
@@ -12,8 +15,20 @@ const FileTextIcon = Icons.FileText;
 import { FormSetupCenter } from "./settings/components/form-setup-center";
 
 export default function TabOneScreen() {
+  const { user } = useAuth();
+  const userId = user?.user_id ?? "";
+  const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [showFormSetup, setShowFormSetup] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      void Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["upcomingTasks", userId] }),
+        queryClient.invalidateQueries({ queryKey: ["taskSummary", userId] }),
+      ]);
+    }, [queryClient, userId])
+  );
 
   return (
     <View style={{ flex: 1, backgroundColor: Color.White }}>

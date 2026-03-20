@@ -1,3 +1,4 @@
+import { useAuth } from "@/auth/AuthContext";
 import { Icons } from "@/config";
 import { useFetchClientById } from "@/services/clients";
 import { useFetchUpcomingTasks } from "@/services/tasks/useUpcomingTasks";
@@ -7,8 +8,6 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 import { ViewClient } from "../clients/viewClient";
-
-const HARDCODED_USER_ID = "2a3c19b8-d352-4b30-a2ac-1cdf993d310c";
 
 const CalendarIcon = Icons.CalendarBlank;
 const CalendarCheckIcon = Icons.CalendarCheckIcon;
@@ -210,9 +209,11 @@ function EventCard({
 }
 
 export function UpcomingEventCard() {
+  const { user } = useAuth();
+  const userId = user?.user_id ?? "";
   const router = useRouter();
   const today = getLocalDateString();
-  const { data, isLoading } = useFetchUpcomingTasks(HARDCODED_USER_ID, today);
+  const { data, isLoading } = useFetchUpcomingTasks(userId, today);
 
   // Track which client's detail modal is open (by client_id)
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
