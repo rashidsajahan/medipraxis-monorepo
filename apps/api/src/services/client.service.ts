@@ -49,6 +49,15 @@ export class ClientService {
     return clients;
   }
 
+  async getClientsByName(name: string): Promise<Client[]> {
+    const clients = await this.clientRepository.findByName(name);
+
+    if (!clients) {
+      throw new Error("Clients not found");
+    }
+    return clients;
+  }
+
   async createClient(input: CreateClientInput): Promise<Client> {
     // Find or create contact_info
     let contactId = input.contact_id;
