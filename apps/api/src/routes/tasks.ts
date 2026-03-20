@@ -5,19 +5,33 @@ import {
   getAllTasksQuerySchema,
   getAppointmentsByClientQuerySchema,
   getTaskParamSchema,
+  getTaskSummaryQuerySchema,
   reserveAppointmentByClientSchema,
   updateTaskParamSchema,
   updateTaskSchema,
 } from "@repo/models";
 import { Hono } from "hono";
 import { TaskController } from "../controllers";
+import { authMiddleware } from "../middleware/auth";
 
 const tasks = new Hono()
+  .use("*", authMiddleware)
   .post("/", zValidator("json", createTaskSchema), TaskController.createTask)
   .get(
     "/",
     zValidator("query", getAllTasksQuerySchema),
     TaskController.getAllTasksByUserId
+  )
+
+  .get(
+    "/summary",
+    zValidator("query", getTaskSummaryQuerySchema),
+    TaskController.getTaskSummaryByUserId
+  )
+  .get(
+    "/upcoming",
+    zValidator("query", getTaskSummaryQuerySchema),
+    TaskController.getUpcomingTasksByUserId
   )
   .get(
     "/appointments/client",
@@ -40,6 +54,11 @@ const tasks = new Hono()
     "/appointments/reserve",
     zValidator("json", reserveAppointmentByClientSchema),
     TaskController.reserveAppointmentByClient
+  )
+  .post(
+    "/appointments/reserve/practitioner",
+    zValidator("json", reserveAppointmentByClientSchema),
+    TaskController.reserveAppointmentByPractitioner
   )
   .post(
     "/appointments/cancel",

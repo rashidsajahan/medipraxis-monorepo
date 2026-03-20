@@ -1,9 +1,16 @@
-import type {
-  ClientReport,
-  CreateClientReportInput,
-  PendingReport,
+import {
+  ReportFileType,
+  type ClientReport,
+  type CreateClientReportInput,
+  type GroupedCompletedReport,
+  type GroupedPendingReport,
+  type PendingReport,
+  type ReportFileUrlResponse,
 } from "@repo/models";
-import { ClientReportRepository, UserRepository } from "../repositories";
+import {
+  type ClientReportRepository,
+  type UserRepository,
+} from "../repositories";
 import type { ClientRepository } from "../repositories/client.repository";
 import type { RequestReportRepository } from "../repositories/request_report.repository";
 
@@ -34,6 +41,10 @@ export class ClientReportService {
       "image/jpeg",
       "image/png",
       "image/jpg",
+      "application/x-epdf",
+      "application/x-ejpeg",
+      "application/x-ejpg",
+      "application/x-epng",
     ];
     const maxSize = 10 * 1024 * 1024; // 10MB
 
@@ -75,6 +86,25 @@ export class ClientReportService {
         input.client_id
       );
 
+      const isPdf = file.type === "application/pdf";
+      const isEncryptedPdf = file.type === "application/x-epdf";
+      const isImage = file.type.startsWith("image/");
+      const isEncryptedImage = [
+        "application/x-ejpeg",
+        "application/x-ejpg",
+        "application/x-epng",
+      ].includes(file.type);
+
+      const file_type = isPdf
+        ? ReportFileType.Pdf
+        : isImage
+          ? ReportFileType.Image
+          : isEncryptedPdf
+            ? ReportFileType.EncryptedPdf
+            : isEncryptedImage
+              ? ReportFileType.EncryptedImage
+              : undefined;
+
       // Create database record with individual report title
       const reportInput = {
         report_title: reportTitle,
@@ -82,6 +112,7 @@ export class ClientReportService {
         user_id: input.user_id,
         request_report_id: input.request_report_id,
         expiry_date: input.expiry_date,
+        file_type,
       };
 
       const createdReport = await this.clientReportRepository.create(
@@ -140,18 +171,45 @@ export class ClientReportService {
     return reportsWithStatus;
   }
 
-  async getReportFileUrl(reportId: string): Promise<string> {
+  async getReportFileUrl(
+    reportId: string,
+    userId: string
+  ): Promise<ReportFileUrlResponse> {
     const report = await this.clientReportRepository.findById(reportId);
 
     if (!report) {
       throw new Error("Report not found");
     }
 
+    if (report.user_id !== userId) {
+      throw new Error("Unauthorized");
+    }
+
     if (!report.file_path) {
       throw new Error("Report has no associated file");
     }
 
-    return await this.clientReportRepository.getFileUrl(report.file_path);
+    const fileUrl = await this.clientReportRepository.getFileUrl(
+      report.file_path,
+      300
+    );
+
+    const client = report.client_id
+      ? await this.clientRepository.findById(report.client_id)
+      : null;
+
+    const clientName = client
+      ? `${client.first_name} ${client.last_name}`.trim()
+      : "Unknown Client";
+
+    return {
+      fileUrl,
+      reportTitle: report.report_title,
+      clientName,
+      uploadedOn: report.created_date,
+      expiresIn: report.expiry_date,
+      fileType: report.file_type,
+    };
   }
 
   async deleteReport(reportId: string): Promise<boolean> {
@@ -244,5 +302,136 @@ export class ClientReportService {
       });
 
     return pendingReports;
+  }
+
+  async getGroupedReportsByUserId(
+    userId: string,
+    completed?: boolean
+  ): Promise<GroupedPendingReport[] | GroupedCompletedReport[]> {
+    // Fetch either completed or pending reports based on the flag
+    if (completed === false) {
+      // Get pending reports (from request_report table)
+      const rawReports =
+        await this.clientReportRepository.findPendingReportsByUserId(userId);
+
+      const groupedMap = new Map<
+        string,
+        {
+          group_id: string;
+          client_id: string;
+          client_first_name: string;
+          client_last_name: string;
+          report_date: string;
+          request_report_id: string;
+          reports: Array<{
+            report_id: string;
+            report_title: string | null;
+            file_path: string | null;
+            file_type: string | null;
+          }>;
+        }
+      >();
+
+      for (const requestReport of rawReports) {
+        const client = Array.isArray(requestReport.client)
+          ? requestReport.client[0]
+          : requestReport.client;
+        if (!client) continue;
+
+        const reportDate = requestReport.created_date.split("T")[0];
+        const groupId = `${requestReport.request_report_id}_${reportDate}`;
+        const key = `${requestReport.client_id}_${reportDate}_${requestReport.request_report_id}`;
+
+        if (!groupedMap.has(key)) {
+          groupedMap.set(key, {
+            group_id: groupId,
+            client_id: requestReport.client_id,
+            client_first_name: client.first_name,
+            client_last_name: client.last_name,
+            report_date: reportDate,
+            request_report_id: requestReport.request_report_id,
+            reports: [],
+          });
+        }
+
+        const group = groupedMap.get(key)!;
+
+        // For pending reports, extract display_label from requested_reports array
+        const requestedReports = requestReport.requested_reports || [];
+
+        // Add each requested report as a separate entry with unique ID
+        if (Array.isArray(requestedReports) && requestedReports.length > 0) {
+          for (let i = 0; i < requestedReports.length; i++) {
+            const report = requestedReports[i];
+            group.reports.push({
+              report_id: `${requestReport.request_report_id}_report_${i}`,
+              report_title: report.display_label || "Report",
+              file_path: null,
+              file_type: null,
+            });
+          }
+        }
+      }
+
+      return Array.from(groupedMap.values());
+    }
+
+    // Get completed reports (from client_report table)
+    const rawReports =
+      await this.clientReportRepository.findCompletedReportsGroupedByUserIdAndDate(
+        userId
+      );
+
+    const groupedMap = new Map<
+      string,
+      {
+        group_id: string;
+        client_id: string;
+        client_first_name: string;
+        client_last_name: string;
+        report_date: string;
+        request_report_id: string | null;
+        reports: Array<{
+          report_id: string;
+          report_title: string | null;
+          file_path: string | null;
+          file_type: string | null;
+        }>;
+      }
+    >();
+
+    for (const report of rawReports) {
+      const client = Array.isArray(report.client)
+        ? report.client[0]
+        : report.client;
+      if (!client) continue;
+
+      const reportDate = report.created_date.split("T")[0];
+      const requestReportId = report.request_report_id || "no_request";
+      const groupId = `${requestReportId}_${reportDate}_${report.client_id}`;
+      const key = `${report.client_id}_${reportDate}_${requestReportId}`;
+
+      if (!groupedMap.has(key)) {
+        groupedMap.set(key, {
+          group_id: groupId,
+          client_id: report.client_id,
+          client_first_name: client.first_name,
+          client_last_name: client.last_name,
+          report_date: reportDate,
+          request_report_id: report.request_report_id,
+          reports: [],
+        });
+      }
+
+      const group = groupedMap.get(key)!;
+      group.reports.push({
+        report_id: report.report_id,
+        report_title: report.report_title,
+        file_path: report.file_path,
+        file_type: report.file_type,
+      });
+    }
+
+    return Array.from(groupedMap.values());
   }
 }
