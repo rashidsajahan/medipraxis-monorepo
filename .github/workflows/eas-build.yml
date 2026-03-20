@@ -36,7 +36,7 @@ jobs:
 
       # Verify Expo login (fail if not logged in)
       - name: Verify Expo login
-        run: npx expo whoami || exit 1
+        run: eas whoami || exit 1
 
       # Run EAS Build and capture output
       - name: Run EAS Build
