@@ -58,8 +58,8 @@ jobs:
           echo "$BUILD_OUTPUT"
 
           # Extract URLs safely (handles both array & object)
-          BUILD_URL=$(echo "$BUILD_OUTPUT" | jq -r '.[0].artifacts.buildUrl // .artifacts.buildUrl')
-          DETAILS_URL=$(echo "$BUILD_OUTPUT" | jq -r '.[0].buildDetailsPageUrl // .buildDetailsPageUrl')
+          BUILD_URL=$(echo "$BUILD_OUTPUT" | jq -r '.[0].artifacts.buildUrl' || echo "")
+          DETAILS_URL=$(echo "$BUILD_OUTPUT" | jq -r '.[0].buildDetailsPageUrl' || echo "")
 
           echo "BUILD_URL=$BUILD_URL" >> $GITHUB_ENV
           echo "DETAILS_URL=$DETAILS_URL" >> $GITHUB_ENV
